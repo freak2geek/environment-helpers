@@ -24,8 +24,10 @@ function isBrewConfigured() {
 
 function installBrew() {
     printf "\n${BLUE}[-] Installing brew...${NC}\n"
-    sudo apt-get install -y --no-install-recommends build-essential curl file git
-    sh -c "$(curl -fsSL https://raw.githubusercontent.com/Linuxbrew/install/master/install.sh)"
+    sudo apt-get update -y
+    sudo apt-get update --fix-missing -y
+    sudo apt-get install --no-install-recommends build-essential curl g++ file git m4 ruby texinfo libbz2-dev libcurl4-openssl-dev libexpat-dev libncurses-dev zlib1g-dev gawk make patch tcl -y
+    yes | sh -c "$(curl -fsSL https://raw.githubusercontent.com/Linuxbrew/install/master/install.sh)"
     brew install gcc
 }
 
@@ -40,8 +42,8 @@ function configureBrew() {
     fi
 
     if ! isBrewUmaskConfigured; then
-        echo ${BREW_UMASK} >>~/.bashrc
-        eval ${BREW_UMASK}
+        echo "${BREW_UMASK}" >>~/.bashrc
+        eval "${BREW_UMASK}"
     fi
 }
 
@@ -65,7 +67,7 @@ function uninstallBrew() {
     fi
     if hasBrew; then
         printf "\n${BLUE}[-] Uninstall brew...${NC}\n"
-        ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Linuxbrew/install/master/uninstall)"
+        yes | ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Linuxbrew/install/master/uninstall)"
     fi
     test -e /home/linuxbrew/.linuxbrew/bin/brew && brew prune
     sed -i '/linuxbrew/d' ~/.bashrc
