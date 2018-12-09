@@ -12,26 +12,9 @@ function installGitFlow() {
     brew install git-flow
 }
 
-function tryInstallGitFlow() {
-    if hasGitFlow; then
-        printf "\n${GREEN}[✔] Already git-flow${NC}\n"
-        return
-    fi
-
-    installGitFlow
-}
-
 function uninstallGitFlow() {
     printf "\n${BLUE}[-] Uninstalling git-flow...${NC}\n"
     brew uninstall git-flow
-}
-
-function tryUninstallGitFlow() {
-    if ! hasGitFlow; then
-        return
-    fi
-
-    uninstallGitFlow
 }
 
 function hasGitConfig() {
@@ -84,4 +67,29 @@ function configureGitFlow() {
     printf "\n[gitflow \"branch\"]" >>./.git/config
     printf "\n\tmaster = ${master}" >>./.git/config
     printf "\n\tdevelop = ${develop}" >>./.git/config
+}
+
+function setupGitFlow() {
+    if hasGitFlow && hasGitFlowConfig; then
+        printf "\n${GREEN}[✔] Already git-flow${NC}\n"
+        return
+    fi
+
+    if ! hasGitFlow; then
+        installGitFlow
+    fi
+
+    if ! hasGitFlowConfig; then
+        configureGitFlow
+    fi
+}
+
+function pruneGitFlow() {
+    if hasGitFlow; then
+        uninstallGitFlow
+    fi
+
+    if hasGitFlowConfig; then
+        pruneGitFlowConfig
+    fi
 }
