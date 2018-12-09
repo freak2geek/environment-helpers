@@ -22,5 +22,8 @@ function tryConfigureBashrc() {
         printf "\n${GREEN}[✔] Already bashrc${NC}\n"
         return
     fi
+}
 
+function endsWithNewLine() {
+    test "$(tail -c 1 "$1" | wc -l)" -ne 0
 }
