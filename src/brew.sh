@@ -23,7 +23,7 @@ function isBrewConfigured() {
 }
 
 function installBrew() {
-    printf "\n${BLUE}[-] Installing brew...${NC}\n"
+    printf "${BLUE}[-] Installing brew...${NC}\n"
     sudo apt-get update -y
     sudo apt-get update --fix-missing -y
     sudo apt-get install --no-install-recommends build-essential curl g++ file git m4 ruby texinfo libbz2-dev libcurl4-openssl-dev libexpat-dev libncurses-dev zlib1g-dev gawk make patch tcl -y
@@ -34,7 +34,7 @@ function installBrew() {
 function configureBrew() {
     tryConfigureBashrc
 
-    printf "\n${BLUE}[-] Configuring brew...${NC}\n"
+    printf "${BLUE}[-] Configuring brew...${NC}\n"
 
     if ! isBrewPathConfigured; then
         echo "export PATH='${BREW_PATH}'":'"$PATH"' >>~/.bashrc
@@ -52,7 +52,7 @@ function uninstallBrew() {
         sudo apt-get install -y --no-install-recommends ruby
     fi
     if hasBrew; then
-        printf "\n${BLUE}[-] Uninstall brew...${NC}\n"
+        printf "${BLUE}[-] Uninstall brew...${NC}\n"
         yes | ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Linuxbrew/install/master/uninstall)"
     fi
     test -e /home/linuxbrew/.linuxbrew/bin/brew && brew prune
@@ -63,9 +63,17 @@ function uninstallBrew() {
     test -d /home/linuxbrew/.linuxbrew/share && rm -R /home/linuxbrew/.linuxbrew/share
 }
 
+function checkBrew() {
+    if hasBrew && isBrewConfigured; then
+        printf "${GREEN}[✔] brew${NC}\n"
+    else
+        printf "${RED}[x] brew${NC}\n"
+    fi
+}
+
 function setupBrew() {
     if hasBrew && isBrewConfigured; then
-        printf "\n${GREEN}[✔] Already brew${NC}\n"
+        printf "${GREEN}[✔] Already brew${NC}\n"
         return
     fi
 

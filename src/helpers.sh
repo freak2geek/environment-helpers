@@ -13,13 +13,13 @@ function hasBashrc() {
 }
 
 function configureBashrc() {
-    printf "\n${BLUE}[-] Configuring bashrc...${NC}\n"
+    printf "${BLUE}[-] Configuring bashrc...${NC}\n"
     echo "[[ -s ~/.bashrc ]] && ${BASHRC_IMPORT}" >> ~/.bash_profile
 }
 
 function tryConfigureBashrc() {
     if hasBashrc; then
-        printf "\n${GREEN}[✔] Already bashrc${NC}\n"
+        printf "${GREEN}[✔] Already bashrc${NC}\n"
         return
     fi
 }

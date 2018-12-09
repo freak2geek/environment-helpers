@@ -7,18 +7,26 @@ function hasGit() {
 }
 
 function installGit() {
-    printf "\n${BLUE}[-] Installing git...${NC}\n"
+    printf "${BLUE}[-] Installing git...${NC}\n"
     brew install git
 }
 
 function uninstallGit() {
-    printf "\n${BLUE}[-] Uninstalling git...${NC}\n"
+    printf "${BLUE}[-] Uninstalling git...${NC}\n"
     brew uninstall git
+}
+
+function checkGit() {
+    if hasGit; then
+        printf "${GREEN}[✔] git${NC}\n"
+    else
+        printf "${RED}[x] git${NC}\n"
+    fi
 }
 
 function setupGit() {
     if hasGit; then
-        printf "\n${GREEN}[✔] Already git${NC}\n"
+        printf "${GREEN}[✔] Already git${NC}\n"
         return
     fi
 

@@ -8,12 +8,12 @@ function hasGitFlow() {
 }
 
 function installGitFlow() {
-    printf "\n${BLUE}[-] Installing git-flow...${NC}\n"
+    printf "${BLUE}[-] Installing git-flow...${NC}\n"
     brew install git-flow
 }
 
 function uninstallGitFlow() {
-    printf "\n${BLUE}[-] Uninstalling git-flow...${NC}\n"
+    printf "${BLUE}[-] Uninstalling git-flow...${NC}\n"
     brew uninstall git-flow
 }
 
@@ -22,7 +22,7 @@ function hasGitConfig() {
 }
 
 function hasGitFlowConfig() {
-    hasGitConfig && cat ./.git/config | grep -icq "[gitflow \"prefix\"]" && cat ./.git/config | grep -icq "[gitflow \"branch\"]"
+    hasGitConfig && cat ./.git/config | grep -icq "\[gitflow \"prefix\"\]" && cat ./.git/config | grep -icq "\[gitflow \"branch\"\]"
 }
 
 function pruneGitFlowConfig() {
@@ -39,7 +39,7 @@ function pruneGitFlowConfig() {
 }
 
 function configureGitFlow() {
-    printf "\n${BLUE}[-] Configuring git-flow...${NC}\n"
+    printf "${BLUE}[-] Configuring git-flow...${NC}\n"
 
     bugfix=${1-'bugfix/'}
     feature=${2-'feature/'}
@@ -69,9 +69,17 @@ function configureGitFlow() {
     printf "\n\tdevelop = ${develop}" >>./.git/config
 }
 
+function checkGitFlow() {
+    if hasGitFlow && hasGitFlowConfig; then
+        printf "${GREEN}[✔] git-flow${NC}\n"
+    else
+        printf "${RED}[x] git-flow${NC}\n"
+    fi
+}
+
 function setupGitFlow() {
     if hasGitFlow && hasGitFlowConfig; then
-        printf "\n${GREEN}[✔] Already git-flow${NC}\n"
+        printf "${GREEN}[✔] Already git-flow${NC}\n"
         return
     fi
 
