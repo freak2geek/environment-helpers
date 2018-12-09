@@ -47,20 +47,6 @@ function configureBrew() {
     fi
 }
 
-function tryInstallBrew() {
-    if hasBrew; then
-        printf "\n${GREEN}[✔] Already brew${NC}\n"
-    fi
-
-    if ! hasBrew && [[ "$OSTYPE" == "linux-gnu" ]]; then
-        installBrew
-    fi
-
-    if ! isBrewConfigured; then
-        configureBrew
-    fi
-}
-
 function uninstallBrew() {
     if ! hasRuby; then
         sudo apt-get install -y --no-install-recommends ruby
@@ -77,6 +63,25 @@ function uninstallBrew() {
     test -d /home/linuxbrew/.linuxbrew/share && rm -R /home/linuxbrew/.linuxbrew/share
 }
 
-function tryUninstallBrew() {
+function setupBrew() {
+    if hasBrew && isBrewConfigured; then
+        printf "\n${GREEN}[✔] Already brew${NC}\n"
+        return
+    fi
+
+    if ! hasBrew && [[ "$OSTYPE" == "linux-gnu" ]]; then
+        installBrew
+    fi
+
+    if ! isBrewConfigured; then
+        configureBrew
+    fi
+}
+
+function pruneBrew() {
+    if ! hasBrew; then
+        return
+    fi
+
     uninstallBrew
 }
