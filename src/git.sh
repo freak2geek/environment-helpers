@@ -11,7 +11,12 @@ function installGit() {
     brew install git
 }
 
-function tryInstallGit() {
+function uninstallGit() {
+    printf "\n${BLUE}[-] Uninstalling git...${NC}\n"
+    brew uninstall git
+}
+
+function setupGit() {
     if hasGit; then
         printf "\n${GREEN}[✔] Already git${NC}\n"
         return
@@ -20,12 +25,7 @@ function tryInstallGit() {
     installGit
 }
 
-function uninstallGit() {
-    printf "\n${BLUE}[-] Uninstalling git...${NC}\n"
-    brew uninstall git
-}
-
-function tryUninstallGit() {
+function pruneGit() {
     if ! hasGit; then
         return
     fi
