@@ -38,11 +38,11 @@ function hasGitConfig() {
     [[ -f ./.git/config ]]
 }
 
-function hasGitFlowPrefix() {
-    hasGitConfig && cat ./.git/config | grep -icq "[gitflow \"prefix\"]"
+function hasGitFlowConfig() {
+    hasGitConfig && cat ./.git/config | grep -icq "[gitflow \"prefix\"]" && cat ./.git/config | grep -icq "[gitflow \"branch\"]"
 }
 
-function removeGitFlowConfig() {
+function pruneGitFlowConfig() {
     sed -i '/\[gitflow \"prefix\"\]/d' ./.git/config
     sed -i '/bugfix =/d' ./.git/config
     sed -i '/feature =/d' ./.git/config
@@ -68,7 +68,7 @@ function configureGitFlow() {
     develop=${8-'development'}
 
     if hasGitFlowPrefix; then
-        removeGitFlowConfig
+        pruneGitFlowConfig
     fi
 
     if ! endsWithNewLine "./.git/config"; then
