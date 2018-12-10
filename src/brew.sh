@@ -55,7 +55,7 @@ function uninstallBrew() {
         printf "${BLUE}[-] Uninstall brew...${NC}\n"
         yes | ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Linuxbrew/install/master/uninstall)"
     fi
-    test -e /home/linuxbrew/.linuxbrew/bin/brew && brew prune
+    test -e /home/linuxbrew/.linuxbrew/bin/brew && brew purge
     sed -i '/linuxbrew/d' ~/.bashrc
     sed -i "/${BREW_UMASK}/d" ~/.bashrc
     test -d /home/linuxbrew/.linuxbrew/bin && rm -R /home/linuxbrew/.linuxbrew/bin
@@ -86,7 +86,7 @@ function setupBrew() {
     fi
 }
 
-function pruneBrew() {
+function purgeBrew() {
     if ! hasBrew; then
         return
     fi

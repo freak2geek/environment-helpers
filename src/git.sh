@@ -33,7 +33,7 @@ function setupGit() {
     installGit
 }
 
-function pruneGit() {
+function purgeGit() {
     if ! hasGit; then
         return
     fi
