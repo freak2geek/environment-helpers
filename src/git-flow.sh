@@ -50,7 +50,7 @@ function configureGitFlow() {
     master=${7-'master'}
     develop=${8-'development'}
 
-    if hasGitFlowPrefix; then
+    if hasGitFlowConfig; then
         purgeGitFlowConfig
     fi
 
