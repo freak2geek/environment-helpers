@@ -17,6 +17,11 @@ function uninstallMeteorM() {
     meteor npm uninstall m -g
 }
 
+function configureMeteorM() {
+    printf "${BLUE}[-] Configuring meteor m...${NC}\n"
+    sudo chmod -R 777 /usr/local
+}
+
 function checkMeteorM() {
     if hasMeteorM; then
         printf "${GREEN}[✔] meteor m${NC}\n"
@@ -36,6 +41,7 @@ function setupMeteorM() {
     fi
 
     installMeteorM
+    configureMeteorM
 }
 
 function purgeMeteorM() {
