@@ -51,3 +51,51 @@ function purgeMeteorM() {
 
     uninstallMeteorM
 }
+
+function hasMongo() {
+    version=${1-'stable'}
+    meteor m | grep -icq "ο.*${version}"
+}
+
+function installMongo() {
+    version=${1-'stable'}
+    if hasMongo $@; then
+        printf "${GREEN}[✔] Already mongo@${version}${NC}\n"
+        return;
+    fi
+    printf "${BLUE}[-] Installing mongo@${version}...${NC}\n"
+    yes | meteor m ${version}
+}
+
+function uninstallMongo() {
+    version=${1-'stable'}
+    printf "${BLUE}[-] Uninstalling mongo@${version}...${NC}\n"
+    yes | meteor m rm ${version}
+}
+
+function hasMongoConfig() {
+    dbpath=${2-'/data/db'}
+    [[ -d  ${dbpath} ]] && ls -la /data/db | grep -icq "drwxrwxrwx .* \."
+}
+
+function configMongo() {
+    dbpath=${2-'/data/db'}
+    if hasMongoConfig $@; then
+        printf "${GREEN}[✔] Already dbpath \"${dbpath}\"${NC}\n"
+        return
+    fi
+
+    printf "${BLUE}[-] Configuring dbpath \"${dbpath}\"...${NC}\n"
+    sudo mkdir -p ${dbpath}
+    sudo chmod -R 777 ${dbpath}
+}
+
+function setupMongo() {
+    setupMeteorM
+    configMongo $@
+    installMongo $@
+}
+
+function purgeMongo() {
+    uninstallMongo $@
+}
