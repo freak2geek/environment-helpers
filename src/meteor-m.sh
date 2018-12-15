@@ -83,37 +83,23 @@ function hasMongoConfig() {
     mongoConf=${2-'/etc/mongodb.conf'}
     dbpath=${3-'/data/db'}
     logpath=${4-'/var/log/mongod.log'}
-    dbReplicaOne=$(getReplicaFile ${dbpath} '1')
-    dbReplicaTwo=$(getReplicaFile ${dbpath} '2')
     logReplicaOne=$(getReplicaFile ${logpath} '1')
     logReplicaTwo=$(getReplicaFile ${logpath} '2')
 
     [[ -f ${mongoConf} ]] && ls -la ${mongoConf} | grep -icq "\-rwxrwxrwx .* ${mongoConf}" &&
     [[ -d  ${dbpath} ]] && ls -la ${dbpath} | grep -icq "drwxrwxrwx .* \." &&
-    [[ -d  ${dbReplicaOne} ]] && ls -la ${dbReplicaOne} | grep -icq "drwxrwxrwx .* \." &&
-    [[ -d  ${dbReplicaTwo} ]] && ls -la ${dbReplicaTwo} | grep -icq "drwxrwxrwx .* \." &&
-    [[ -f ${logpath} ]] && ls -la ${logpath} | grep -icq "\-rw\-r\-\-r\-\- .* ${logpath}" &&
-    [[ -f ${logReplicaOne} ]] && ls -la ${logReplicaOne} | grep -icq "\-rw\-r\-\-r\-\- .* ${logReplicaOne}" &&
-    [[ -f ${logReplicaTwo} ]] && ls -la ${logReplicaTwo} | grep -icq "\-rw\-r\-\-r\-\- .* ${logReplicaTwo}"
+    [[ -f ${logpath} ]] && ls -la ${logpath} | grep -icq "\-rw\-r\-\-r\-\- .* ${logpath}"
 }
 
 function configMongo() {
     mongoConf=${2-'/etc/mongodb.conf'}
     dbpath=${3-'/data/db'}
     logpath=${4-'/var/log/mongod.log'}
-    dbReplicaOne=$(getReplicaFile ${dbpath} '1')
-    dbReplicaTwo=$(getReplicaFile ${dbpath} '2')
-    logReplicaOne=$(getReplicaFile ${logpath} '1')
-    logReplicaTwo=$(getReplicaFile ${logpath} '2')
 
     if hasMongoConfig $@; then
         printf "${GREEN}[✔] Already mongo.conf \"${mongoConf}\"${NC}\n"
         printf "${GREEN}[✔] Already dbpath \"${dbpath}\"${NC}\n"
         printf "${GREEN}[✔] Already logpath \"${logpath}\"${NC}\n"
-        printf "${GREEN}[✔] Already dbReplicaOne \"${dbReplicaOne}\"${NC}\n"
-        printf "${GREEN}[✔] Already dbReplicaTwo \"${dbReplicaTwo}\"${NC}\n"
-        printf "${GREEN}[✔] Already logReplicaOne \"${logReplicaOne}\"${NC}\n"
-        printf "${GREEN}[✔] Already logReplicaTwo \"${logReplicaTwo}\"${NC}\n"
         return
     fi
 
@@ -123,18 +109,9 @@ function configMongo() {
     printf "${BLUE}[-] Configuring dbpath \"${dbpath}\"...${NC}\n"
     sudo mkdir -p ${dbpath}
     sudo chmod -R 777 ${dbpath}
-    printf "${BLUE}[-] Configuring dbReplicaOne \"${dbReplicaOne}\"...${NC}\n"
-    sudo mkdir -p ${dbReplicaOne}
-    sudo chmod -R 777 ${dbReplicaOne}
-    printf "${BLUE}[-] Configuring dbReplicaOne \"${dbReplicaTwo}\"...${NC}\n"
-    sudo mkdir -p ${dbReplicaTwo}
     sudo chmod -R 777 ${dbReplicaTwo}
     printf "${BLUE}[-] Configuring logpath \"${logpath}\"...${NC}\n"
     sudo touch ${logpath}
-    printf "${BLUE}[-] Configuring logReplicaOne \"${logReplicaOne}\"...${NC}\n"
-    sudo touch ${logReplicaOne}
-    printf "${BLUE}[-] Configuring logReplicaTwo \"${logReplicaTwo}\"...${NC}\n"
-    sudo touch ${logReplicaTwo}
 }
 
 function setupMongo() {
@@ -147,12 +124,93 @@ function purgeMongo() {
     uninstallMongo $@
 }
 
-function hasOplog() {
-    # TODO
+REPLICA_SET_CONFIG="replSet = rs0"
+OPLOG_CONFIG="{\"_id\":\"rs0\",\"members\":[{\"_id\":0,\"host\":\"127.0.0.1:27017\"},{\"_id\":1,\"host\":\"127.0.0.1:27018\"},{\"_id\":2,\"host\":\"127.0.0.1:27019\"}]}"
+
+function hasReplicaSetConfig() {
+    mongoConf=${2-'/etc/mongodb.conf'}
+    cat ${mongoConf} | grep -icq "${REPLICA_SET_CONFIG}"
+}
+
+function hasReplicaOneDBConfig() {
+    dbpath=${3-'/data/db'}
+    dbReplicaOne=$(getReplicaFile ${dbpath} '1')
+    [[ -d  ${dbReplicaOne} ]] && ls -la ${dbReplicaOne} | grep -icq "drwxrwxrwx .* \."
+}
+
+function hasReplicaTwoDBConfig() {
+    dbpath=${3-'/data/db'}
+    dbReplicaTwo=$(getReplicaFile ${dbpath} '2')
+    [[ -d  ${dbReplicaTwo} ]] && ls -la ${dbReplicaTwo} | grep -icq "drwxrwxrwx .* \."
+}
+
+function hasReplicaOneLogsConfig() {
+    logpath=${4-'/var/log/mongod.log'}
+    logReplicaOne=$(getReplicaFile ${logpath} '1')
+    [[ -f ${logReplicaOne} ]] && ls -la ${logReplicaOne} | grep -icq "\-rw\-r\-\-r\-\- .* ${logReplicaOne}"
+}
+
+function hasReplicaTwoLogsConfig() {
+    logpath=${4-'/var/log/mongod.log'}
+    logReplicaTwo=$(getReplicaFile ${logpath} '2')
+    [[ -f ${logReplicaTwo} ]] && ls -la ${logReplicaTwo} | grep -icq "\-rw\-r\-\-r\-\- .* ${logReplicaTwo}"
+}
+
+function hasOplogInitialized() {
+    sudo meteor m shell 3.4.18 --eval "rs.config()" | grep -icq "\"_id\" : \"rs0\""
+}
+
+function hasOplogUser() {
+    sudo meteor m shell 3.4.18 --eval "db.getSiblingDB('admin').getCollection('system.users').findOne({\"user\":\"oplogger\"})" | grep -icq "\"user\" : \"oplogger\""
+}
+
+function hasOlogConfig() {
+    hasReplicaSetConfig $@ && hasReplicaOneDBConfig $@ &&  hasReplicaTwoDBConfig $@ && hasReplicaOneLogsConfig $@ &&
+    hasReplicaTwoLogsConfig $@ && hasOplogInitialized $@ && hasOplogUser $@
+}
+
+function isMongoConnected() {
+    version=${1-'stable'}
+    ps -aux | grep -ic "$(meteor m bin ${version})"
+}
+
+function connectMongoAndReplicas() {
+    version=${1-'stable'}
+    mongoConf=${2-'/etc/mongodb.conf'}
+    dbpath=${3-'/data/db'}
+    logpath=${4-'/var/log/mongod.log'}
+    dbReplicaOne=$(getReplicaFile ${dbpath} '1')
+    dbReplicaTwo=$(getReplicaFile ${dbpath} '2')
+    logReplicaOne=$(getReplicaFile ${logpath} '1')
+    logReplicaTwo=$(getReplicaFile ${logpath} '2')
+    printf "${BLUE}[-] Connecting to mongo \"${version}\"...${NC}\n"
+
+    sudo meteor m use ${version} --port 27017 --dbpath ${dbpath} --fork --logpath ${logpath} --replSet rs0 --smallfiles --oplogSize 128 >/dev/null
+    sudo meteor m use ${version} --port 27018 --dbpath ${dbReplicaOne} --fork --logpath ${logReplicaOne} --replSet rs0 --smallfiles --oplogSize 128 >/dev/null
+    sudo meteor m use ${version} --port 27019 --dbpath ${dbReplicaTwo} --fork --logpath ${logReplicaTwo} --replSet rs0 --smallfiles --oplogSize 128 >/dev/null
+
+    # Add a delay to wait the replicas to be loaded
+    # https://stackoverflow.com/a/50397775
+    sudo meteor m shell ${version} --port 27017 --eval "sleep(15000)" >/dev/null
+}
+
+function shutdownMongoAndReplicas() {
+    version=${1-'stable'}
+    printf "${BLUE}[-] Disconnecting to mongo \"${version}\"...${NC}\n"
+
+    sudo meteor m mongo ${version} --port 27017 --eval "db.getSiblingDB('admin').shutdownServer()" >/dev/null
+    sudo meteor m mongo ${version} --port 27018 --eval "db.getSiblingDB('admin').shutdownServer()" >/dev/null
+    sudo meteor m mongo ${version} --port 27019 --eval "db.getSiblingDB('admin').shutdownServer()" >/dev/null
 }
 
 function checkOplog() {
-    # TODO
+    connectMongoAndReplicas $@
+    if hasOlogConfig $@; then
+        printf "${GREEN}[✔] meteor m oplog${NC}\n"
+    else
+        printf "${RED}[x] meteor m oplog${NC}\n"
+    fi
+    shutdownMongoAndReplicas $@
 }
 
 function configOplog() {
@@ -165,13 +223,54 @@ function configOplog() {
     logReplicaOne=$(getReplicaFile ${logpath} '1')
     logReplicaTwo=$(getReplicaFile ${logpath} '2')
 
-    sudo echo "replSet = rs0" >> ${mongoConf}
-    sudo meteor m use ${version} --port 27017 --dbpath ${dbpath} --fork --logpath ${logpath} --replSet rs0 --smallfiles --oplogSize 128
-    sudo meteor m use ${version} --port 27018 --dbpath ${dbReplicaOne} --fork --logpath ${logReplicaOne} --replSet rs0 --smallfiles --oplogSize 128
-    sudo meteor m use ${version} --port 27019 --dbpath ${dbReplicaTwo} --fork --logpath ${logReplicaTwo} --replSet rs0 --smallfiles --oplogSize 128
-    sudo meteor m shell ${version} --port 27017 --eval "rs.initiate({\"_id\":\"rs0\",\"members\":[{\"_id\":0,\"host\":\"127.0.0.1:27017\"},{\"_id\":1,\"host\":\"127.0.0.1:27018\"},{\"_id\":2,\"host\":\"127.0.0.1:27019\"}]})"
-    sudo meteor m shell ${version} --port 27017 --eval "db.getSiblingDB('admin').createUser({\"user\":\"oplogger\",\"pwd\":\"PASSWORD\",\"roles\":[{\"role\":\"read\",\"db\":\"local\"}],\"passwordDigestor\":\"server\"})"
-    sudo meteor m mongo ${version} --port 27017 --eval "db.getSiblingDB('admin').shutdownServer()"
-    sudo meteor m mongo ${version} --port 27018 --eval "db.getSiblingDB('admin').shutdownServer()"
-    sudo meteor m mongo ${version} --port 27019 --eval "db.getSiblingDB('admin').shutdownServer()"
+    if hasReplicaOneDBConfig $@; then
+        printf "${GREEN}[✔] Already dbReplicaOne \"${dbReplicaOne}\"${NC}\n"
+    else
+        printf "${BLUE}[-] Configuring dbReplicaOne \"${dbReplicaOne}\"...${NC}\n"
+        sudo mkdir -p ${dbReplicaOne}
+        sudo chmod -R 777 ${dbReplicaOne}
+    fi
+
+    if hasReplicaTwoDBConfig $@; then
+        printf "${GREEN}[✔] Already dbReplicaOne \"${dbReplicaOne}\"${NC}\n"
+    else
+        printf "${BLUE}[-] Configuring dbReplicaOne \"${dbReplicaTwo}\"...${NC}\n"
+        sudo mkdir -p ${dbReplicaTwo}
+        sudo chmod -R 777 ${dbReplicaTwo}
+    fi
+
+    if hasReplicaOneLogsConfig $@; then
+        printf "${GREEN}[✔] Already logReplicaOne \"${logReplicaOne}\"${NC}\n"
+    else
+        printf "${BLUE}[-] Configuring logReplicaOne \"${logReplicaOne}\"...${NC}\n"
+        sudo touch ${logReplicaOne}
+    fi
+
+    if hasReplicaTwoLogsConfig $@; then
+        printf "${GREEN}[✔] Already logReplicaTwo \"${logReplicaTwo}\"${NC}\n"
+    else
+        printf "${BLUE}[-] Configuring logReplicaTwo \"${logReplicaTwo}\"...${NC}\n"
+        sudo touch ${logReplicaTwo}
+    fi
+
+    if ! hasReplicaSetConfig $@; then
+        sudo echo ${REPLICA_SET_CONFIG} >> ${mongoConf}
+    fi
+    wasConnected=$(isMongoConnected $@)
+    if [[ ${wasConnected} -eq 0 ]]; then
+        connectMongoAndReplicas $@
+    fi
+    if hasOplogInitialized; then
+        printf "${GREEN}[✔] Already oplog initialized${NC}\n"
+    else
+        sudo meteor m shell ${version} --port 27017 --eval "rs.initiate(${OPLOG_CONFIG})"
+    fi
+    if hasOplogUser $@; then
+        printf "${GREEN}[✔] Already oplog user${NC}\n"
+    else
+        sudo meteor m shell ${version} --port 27017 --eval "db.getSiblingDB('admin').createUser({\"user\":\"oplogger\",\"pwd\":\"PASSWORD\",\"roles\":[{\"role\":\"read\",\"db\":\"local\"}],\"passwordDigestor\":\"server\"})"
+    fi
+    if [[ ${wasConnected} -eq 0 ]]; then
+        shutdownMongoAndReplicas $@
+    fi
 }
