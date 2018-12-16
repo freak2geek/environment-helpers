@@ -156,12 +156,19 @@ function hasReplicaTwoLogsConfig() {
     [[ -f ${logReplicaTwo} ]] && ls -la ${logReplicaTwo} | grep -icq "\-rw\-r\-\-r\-\- .* ${logReplicaTwo}"
 }
 
+function hasOplogConf() {
+    version=${1-'stable'}
+    sudo meteor m shell ${version} --eval "rs.conf()" | grep -icq "\"_id\" : \"rs0\""
+}
+
 function hasOplogInitialized() {
-    sudo meteor m shell 3.4.18 --eval "rs.config()" | grep -icq "\"_id\" : \"rs0\""
+    version=${1-'stable'}
+    sudo meteor m shell ${version} --eval "db.getSiblingDB('local').getCollection('system.replset').findOne({\"_id\":\"rs0\"})" | grep -icq "\"_id\" : \"rs0\""
 }
 
 function hasOplogUser() {
-    sudo meteor m shell 3.4.18 --eval "db.getSiblingDB('admin').getCollection('system.users').findOne({\"user\":\"oplogger\"})" | grep -icq "\"user\" : \"oplogger\""
+    version=${1-'stable'}
+    sudo meteor m shell ${version} --eval "db.getSiblingDB('admin').getCollection('system.users').findOne({\"user\":\"oplogger\"})" | grep -icq "\"user\" : \"oplogger\""
 }
 
 function hasOlogConfig() {
@@ -172,6 +179,27 @@ function hasOlogConfig() {
 function isMongoConnected() {
     version=${1-'stable'}
     ps -aux | grep -ic "$(meteor m bin ${version})"
+}
+
+function connectMongo() {
+    version=${1-'stable'}
+    mongoConf=${2-'/etc/mongodb.conf'}
+    dbpath=${3-'/data/db'}
+    logpath=${4-'/var/log/mongod.log'}
+    printf "${BLUE}[-] Connecting to mongo \"${version}\"...${NC}\n"
+
+    sudo meteor m use ${version} --port 27017 --dbpath ${dbpath} --fork --logpath ${logpath} >/dev/null
+
+    # Add a delay to wait the replicas to be loaded
+    # https://stackoverflow.com/a/50397775
+    sudo meteor m shell ${version} --port 27017 --eval "sleep(5000)" >/dev/null
+}
+
+function shutdownMongo() {
+    version=${1-'stable'}
+    printf "${BLUE}[-] Disconnecting to mongo \"${version}\"...${NC}\n"
+
+    sudo meteor m mongo ${version} --port 27017 --eval "db.getSiblingDB('admin').shutdownServer()" >/dev/null
 }
 
 function connectMongoAndReplicas() {
@@ -204,13 +232,13 @@ function shutdownMongoAndReplicas() {
 }
 
 function checkOplog() {
-    connectMongoAndReplicas $@
+    connectMongo $@
     if hasOlogConfig $@; then
         printf "${GREEN}[✔] meteor m oplog${NC}\n"
     else
         printf "${RED}[x] meteor m oplog${NC}\n"
     fi
-    shutdownMongoAndReplicas $@
+    shutdownMongo $@
 }
 
 function configOplog() {
@@ -260,10 +288,14 @@ function configOplog() {
     if [[ ${wasConnected} -eq 0 ]]; then
         connectMongoAndReplicas $@
     fi
-    if hasOplogInitialized; then
+    if hasOplogInitialized $@; then
         printf "${GREEN}[✔] Already oplog initialized${NC}\n"
     else
-        sudo meteor m shell ${version} --port 27017 --eval "rs.initiate(${OPLOG_CONFIG})"
+        if hasOplogConf $@; then
+            sudo meteor m shell ${version} --port 27017 --eval "rs.reconfig(${OPLOG_CONFIG})"
+        else
+            sudo meteor m shell ${version} --port 27017 --eval "rs.initiate(${OPLOG_CONFIG})"
+        fi
     fi
     if hasOplogUser $@; then
         printf "${GREEN}[✔] Already oplog user${NC}\n"
@@ -272,5 +304,55 @@ function configOplog() {
     fi
     if [[ ${wasConnected} -eq 0 ]]; then
         shutdownMongoAndReplicas $@
+    fi
+}
+
+function purgeOplog() {
+    version=${1-'stable'}
+    mongoConf=${2-'/etc/mongodb.conf'}
+    dbpath=${3-'/data/db'}
+    logpath=${4-'/var/log/mongod.log'}
+    dbReplicaOne=$(getReplicaFile ${dbpath} '1')
+    dbReplicaTwo=$(getReplicaFile ${dbpath} '2')
+    logReplicaOne=$(getReplicaFile ${logpath} '1')
+    logReplicaTwo=$(getReplicaFile ${logpath} '2')
+
+    printf "${BLUE}[-] Purging oplog...${NC}\n"
+
+    wasConnected=$(isMongoConnected $@)
+    if [[ ${wasConnected} -eq 0 ]]; then
+        connectMongo $@
+    fi
+
+    if hasOplogUser $@; then
+        sudo meteor m shell ${version} --port 27017 --eval "db.getSiblingDB('admin').getCollection('system.users').deleteOne({\"user\":\"oplogger\"})"
+    fi
+
+    if hasOplogInitialized; then
+        sudo meteor m shell ${version} --port 27017 --eval "db.getSiblingDB('local').getCollection('system.replset').deleteOne({\"_id\":\"rs0\"})"
+    fi
+
+    if [[ ${wasConnected} -eq 0 ]]; then
+        shutdownMongo $@
+    fi
+
+    if hasReplicaOneDBConfig $@; then
+        sudo rm -rf ${dbReplicaOne}
+    fi
+
+    if hasReplicaTwoDBConfig $@; then
+        sudo rm -rf ${dbReplicaTwo}
+    fi
+
+    if hasReplicaOneLogsConfig $@; then
+        sudo rm ${logReplicaOne}
+    fi
+
+    if hasReplicaTwoLogsConfig $@; then
+        sudo rm ${logReplicaTwo}
+    fi
+
+    if hasReplicaSetConfig $@; then
+        sudo sed -i "/${REPLICA_SET_CONFIG}/d" ${mongoConf}
     fi
 }
