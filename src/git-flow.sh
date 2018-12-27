@@ -38,7 +38,7 @@ function purgeGitFlowConfig() {
     sed -i '/develop =/d' ./.git/config
 }
 
-function configureGitFlow() {
+function configGitFlow() {
     printf "${BLUE}[-] Configuring git-flow...${NC}\n"
 
     bugfix=${1-'bugfix/'}
@@ -88,7 +88,7 @@ function setupGitFlow() {
     fi
 
     if ! hasGitFlowConfig; then
-        configureGitFlow
+        configGitFlow
     fi
 }
 

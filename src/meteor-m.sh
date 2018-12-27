@@ -17,7 +17,7 @@ function uninstallMeteorM() {
     meteor npm uninstall m -g
 }
 
-function configureMeteorM() {
+function configMeteorM() {
     printf "${BLUE}[-] Configuring meteor m...${NC}\n"
     sudo chmod -R 777 /usr/local
 }
@@ -207,7 +207,7 @@ function hasOlogConfig() {
     hasReplicaTwoLogsConfig $@ && hasOplogInitialized $@ && hasOplogUser $@
 }
 
-function isMongoConnected() {
+function hasMongoConnected() {
     version=${1-'stable'}
     ps -aux | grep -ic "$(meteor m bin ${version})"
 }
@@ -251,7 +251,7 @@ function checkOplog() {
     shutdownMongo $@
 }
 
-function configOplog() {
+function setupOplog() {
     version=${1-'stable'}
     mongoConf=${2-'/etc/mongodb.conf'}
     dbpath=${3-'/data/db'}
@@ -294,7 +294,7 @@ function configOplog() {
     if ! hasReplicaSetConfig $@; then
         sudo echo ${REPLICA_SET_CONFIG} >> ${mongoConf}
     fi
-    wasConnected=$(isMongoConnected $@)
+    wasConnected=$(hasMongoConnected $@)
     if [[ ${wasConnected} -eq 0 ]]; then
         connectMongoAndReplicas $@
     fi
@@ -329,7 +329,7 @@ function purgeOplog() {
 
     printf "${BLUE}[-] Purging oplog...${NC}\n"
 
-    wasConnected=$(isMongoConnected $@)
+    wasConnected=$(hasMongoConnected $@)
     if [[ ${wasConnected} -eq 0 ]]; then
         connectMongo $@
     fi

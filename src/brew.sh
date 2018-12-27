@@ -10,38 +10,38 @@ function hasBrew() {
     which brew | grep -icq "[^not found]"
 }
 
-function isBrewPathConfigured() {
+function hasBrewPathConfig() {
     cat ~/.bashrc | grep -icq "${BREW_PATH}"
 }
 
-function isBrewUmaskConfigured() {
+function hasBrewUmaskConfig() {
     cat ~/.bashrc | grep -icq "${BREW_UMASK}"
 }
 
-function isBrewConfigured() {
-   isBrewPathConfigured && isBrewUmaskConfigured
+function hasBrewConfig() {
+   hasBrewPathConfig && hasBrewUmaskConfig
 }
 
 function installBrew() {
     printf "${BLUE}[-] Installing brew...${NC}\n"
     sudo apt-get update -y
-    sudo apt-get update --fix-missing -y
+    sudo apt-get update --fix-missing -y-
     sudo apt-get install --no-install-recommends build-essential curl g++ file git m4 ruby texinfo libbz2-dev libcurl4-openssl-dev libexpat-dev libncurses-dev zlib1g-dev gawk make patch tcl -y
     yes | sh -c "$(curl -fsSL https://raw.githubusercontent.com/Linuxbrew/install/master/install.sh)"
     brew install gcc
 }
 
-function configureBrew() {
+function configBrew() {
     tryConfigureBashrc
 
     printf "${BLUE}[-] Configuring brew...${NC}\n"
 
-    if ! isBrewPathConfigured; then
+    if ! hasBrewPathConfig; then
         echo "export PATH='${BREW_PATH}'":'"$PATH"' >>~/.bashrc
         export PATH="${BREW_PATH}:$PATH"
     fi
 
-    if ! isBrewUmaskConfigured; then
+    if ! hasBrewUmaskConfig; then
         echo "${BREW_UMASK}" >>~/.bashrc
         eval "${BREW_UMASK}"
     fi
@@ -64,7 +64,7 @@ function uninstallBrew() {
 }
 
 function checkBrew() {
-    if hasBrew && isBrewConfigured; then
+    if hasBrew && hasBrewConfig; then
         printf "${GREEN}[✔] brew${NC}\n"
     else
         printf "${RED}[x] brew${NC}\n"
@@ -72,7 +72,7 @@ function checkBrew() {
 }
 
 function setupBrew() {
-    if hasBrew && isBrewConfigured; then
+    if hasBrew && hasBrewConfig; then
         printf "${GREEN}[✔] Already brew${NC}\n"
         return
     fi
@@ -81,8 +81,8 @@ function setupBrew() {
         installBrew
     fi
 
-    if ! isBrewConfigured; then
-        configureBrew
+    if ! hasBrewConfig; then
+        configBrew
     fi
 }
 
