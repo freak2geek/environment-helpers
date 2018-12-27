@@ -17,8 +17,18 @@ function uninstallMeteorYarn() {
     meteor npm uninstall yarn -g
 }
 
+function hasMeteorYarnConfig() {
+    [[ -d ~/.cache ]] && ls -la ~ | grep -icq "drwxrwxrwx .* \.cache"
+}
+
+function configMeteorYarn() {
+    printf "${BLUE}[-] Configuring meteor yarn...${NC}\n"
+    [[ ! -d ~/.cache ]] && mkdir ~/.cache
+    sudo chmod 777 ~/.cache
+}
+
 function checkMeteorYarn() {
-    if hasMeteorYarn; then
+    if hasMeteorYarn && hasMeteorYarnConfig; then
         printf "${GREEN}[✔] meteor yarn${NC}\n"
     else
         printf "${RED}[x] meteor yarn${NC}\n"
@@ -30,12 +40,18 @@ function setupMeteorYarn() {
         setupMeteor
     fi
 
-    if hasMeteorYarn; then
+    if hasMeteorYarn && hasMeteorYarnConfig; then
         printf "${GREEN}[✔] Already meteor yarn${NC}\n"
         return
     fi
 
-    installMeteorYarn
+    if ! hasMeteorYarn; then
+        installMeteorYarn
+    fi
+
+    if ! hasMeteorYarnConfig; then
+        configMeteorYarn
+    fi
 }
 
 function purgeMeteorYarn() {
@@ -44,4 +60,5 @@ function purgeMeteorYarn() {
     fi
 
     uninstallMeteorYarn
+    rm -rf ~/.cache
 }
