@@ -118,8 +118,8 @@ function configMongo() {
 
 function setupMongo() {
     setupMeteorM $@
-    configMongo $@
     installMongo $@
+    configMongo $@
 }
 
 function purgeMongo() {
