@@ -88,7 +88,7 @@ function setupGitFlow() {
     fi
 
     if ! hasGitFlowConfig; then
-        configGitFlow
+        configGitFlow $@
     fi
 }
 
