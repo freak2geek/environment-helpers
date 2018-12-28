@@ -4,24 +4,22 @@ source "./src/constants.sh"
 
 BASHRC_IMPORT="source ~/.bashrc"
 
-function hasRuby() {
-    which ruby | grep -icq "[^not found]"
-}
-
 function hasBashrc() {
     [[ -s ~/.bash_profile ]] && cat ~/.bash_profile | grep -icq BASHRC_IMPORT
 }
 
-function configureBashrc() {
+function configBashrc() {
     printf "${BLUE}[-] Configuring bashrc...${NC}\n"
     echo "[[ -s ~/.bashrc ]] && ${BASHRC_IMPORT}" >> ~/.bash_profile
 }
 
-function tryConfigureBashrc() {
+function setupBashrc() {
     if hasBashrc; then
         printf "${GREEN}[✔] Already bashrc${NC}\n"
         return
     fi
+
+    configBashrc
 }
 
 function endsWithNewLine() {

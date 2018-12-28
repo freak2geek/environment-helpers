@@ -44,7 +44,7 @@ function installBrew() {
 }
 
 function configBrew() {
-    tryConfigureBashrc
+    setupBashrc
 
     printf "${BLUE}[-] Configuring brew...${NC}\n"
 
@@ -60,9 +60,6 @@ function configBrew() {
 }
 
 function uninstallBrew() {
-    if ! hasRuby; then
-        sudo apt-get install -y --no-install-recommends ruby
-    fi
     if hasBrew; then
         printf "${BLUE}[-] Uninstall brew...${NC}\n"
         yes | ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Linuxbrew/install/master/uninstall)"
