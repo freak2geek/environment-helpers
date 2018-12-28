@@ -26,3 +26,19 @@ All these groups contain the next kind of helpers:
 - `uninstall[PROGRAM]` to just uninstall program
 
 - `config[PROGRAM]` to just configure program
+
+### Git Flow
+
+Parameters: 
+
+bugfix, feature, release, hotfix, support, versiontag, master, develop - Git Flow names configuration
+
+### Meteor m
+
+version - Mongo version to install/config/use/remove
+
+mongoConf - Path to the mongo configuration file
+
+dbpath - Path to the folder where the data is stored
+
+logpath - Path to the file where the logs are stored
