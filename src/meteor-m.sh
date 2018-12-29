@@ -82,12 +82,9 @@ function hasMongoConfig() {
     mongoConf=${2-'/etc/mongodb.conf'}
     dbpath=${3-'/data/db'}
     logpath=${4-'/var/log/mongod.log'}
-    logReplicaOne=$(getReplicaFile ${logpath} '1')
-    logReplicaTwo=$(getReplicaFile ${logpath} '2')
 
-    [[ -f ${mongoConf} ]] && ls -la ${mongoConf} | grep -icq "\-rwxrwxrwx .* ${mongoConf}" &&
-    [[ -d  ${dbpath} ]] && ls -la ${dbpath} | grep -icq "drwxrwxrwx .* \." &&
-    [[ -f ${logpath} ]] && ls -la ${logpath} | grep -icq "\-rw\-r\-\-r\-\- .* ${logpath}"
+    [[ -f ${mongoConf} ]] && ls -la ${mongoConf} | grep -icq "\-rw\-r\-\-r\-\- .* ${mongoConf}" &&
+    [[ -d  ${dbpath} ]] && [[ -f ${logpath} ]]
 }
 
 function configMongo() {
@@ -114,6 +111,15 @@ function configMongo() {
     sudo chown -R ${USER}:${USER} ${logpath}
 
     sudo chown -R ${USER}:${USER} $(meteor m bin ${version})
+}
+
+function checkMongo() {
+    version=${1-'stable'}
+    if hasMongo $@ && hasMongoConfig $@; then
+        printf "${GREEN}[✔] meteor mongo ${version}${NC}\n"
+    else
+        printf "${RED}[x] meteor mongo ${version}${NC}\n"
+    fi
 }
 
 function setupMongo() {
@@ -143,9 +149,7 @@ function connectMongo() {
     printf "${BLUE}[-] Connecting to mongo \"${version}\"...${NC}\n"
     sudo meteor m use ${version} --port 27017 --dbpath ${dbpath} --fork --logpath ${logpath} >/dev/null
 
-    # Add a delay to wait the replicas to be loaded
-    # https://stackoverflow.com/a/50397775
-    meteor m shell ${version} --port 27017 --eval "sleep(5000)" >/dev/null
+    while ! nc -z localhost 27017 </dev/null; do sleep 1; done
 }
 
 function shutdownMongo() {
@@ -166,25 +170,25 @@ function hasReplicaSetConfig() {
 function hasReplicaOneDBConfig() {
     dbpath=${3-'/data/db'}
     dbReplicaOne=$(getReplicaFile ${dbpath} '1')
-    [[ -d  ${dbReplicaOne} ]] && ls -la ${dbReplicaOne} | grep -icq "drwxrwxrwx .* \."
+    [[ -d  ${dbReplicaOne} ]]
 }
 
 function hasReplicaTwoDBConfig() {
     dbpath=${3-'/data/db'}
     dbReplicaTwo=$(getReplicaFile ${dbpath} '2')
-    [[ -d  ${dbReplicaTwo} ]] && ls -la ${dbReplicaTwo} | grep -icq "drwxrwxrwx .* \."
+    [[ -d  ${dbReplicaTwo} ]]
 }
 
 function hasReplicaOneLogsConfig() {
     logpath=${4-'/var/log/mongod.log'}
     logReplicaOne=$(getReplicaFile ${logpath} '1')
-    [[ -f ${logReplicaOne} ]] && ls -la ${logReplicaOne} | grep -icq "\-rw\-r\-\-r\-\- .* ${logReplicaOne}"
+    [[ -f ${logReplicaOne} ]]
 }
 
 function hasReplicaTwoLogsConfig() {
     logpath=${4-'/var/log/mongod.log'}
     logReplicaTwo=$(getReplicaFile ${logpath} '2')
-    [[ -f ${logReplicaTwo} ]] && ls -la ${logReplicaTwo} | grep -icq "\-rw\-r\-\-r\-\- .* ${logReplicaTwo}"
+    [[ -f ${logReplicaTwo} ]]
 }
 
 function hasOplogConf() {
@@ -203,8 +207,8 @@ function hasOplogUser() {
 }
 
 function hasOlogConfig() {
-    hasReplicaSetConfig $@ && hasReplicaOneDBConfig $@ &&  hasReplicaTwoDBConfig $@ && hasReplicaOneLogsConfig $@ &&
-    hasReplicaTwoLogsConfig $@ && hasOplogInitialized $@ && hasOplogUser $@
+    hasMongoConfig $@ && hasReplicaSetConfig $@ && hasReplicaOneDBConfig $@ &&  hasReplicaTwoDBConfig $@ &&
+    hasReplicaOneLogsConfig $@ && hasReplicaTwoLogsConfig $@ && hasOplogInitialized $@ && hasOplogUser $@
 }
 
 function hasMongoConnected() {
@@ -221,7 +225,7 @@ function connectMongoAndReplicas() {
     dbReplicaTwo=$(getReplicaFile ${dbpath} '2')
     logReplicaOne=$(getReplicaFile ${logpath} '1')
     logReplicaTwo=$(getReplicaFile ${logpath} '2')
-    printf "${BLUE}[-] Connecting to mongo \"${version}\"...${NC}\n"
+    printf "${BLUE}[-] Connecting to mongo \"${version}\" and replicas...${NC}\n"
 
     sudo meteor m use ${version} --port 27017 --dbpath ${dbpath} --fork --logpath ${logpath} --replSet rs0 --smallfiles --oplogSize 128 >/dev/null
     sudo meteor m use ${version} --port 27018 --dbpath ${dbReplicaOne} --fork --logpath ${logReplicaOne} --replSet rs0 --smallfiles --oplogSize 128 >/dev/null
@@ -229,12 +233,14 @@ function connectMongoAndReplicas() {
 
     # Add a delay to wait the replicas to be loaded
     # https://stackoverflow.com/a/50397775
-    meteor m shell ${version} --port 27017 --eval "sleep(15000)" >/dev/null
+    while ! nc -z localhost 27017 </dev/null; do sleep 1; done
+    while ! nc -z localhost 27018 </dev/null; do sleep 1; done
+    while ! nc -z localhost 27019 </dev/null; do sleep 1; done
 }
 
 function shutdownMongoAndReplicas() {
     version=${1-'stable'}
-    printf "${BLUE}[-] Disconnecting to mongo \"${version}\"...${NC}\n"
+    printf "${BLUE}[-] Disconnecting to mongo \"${version}\" and replicas \"${version}\"...${NC}\n"
 
     meteor m mongo ${version} --port 27017 --eval "db.getSiblingDB('admin').shutdownServer()" >/dev/null
     meteor m mongo ${version} --port 27018 --eval "db.getSiblingDB('admin').shutdownServer()" >/dev/null
@@ -261,6 +267,8 @@ function setupOplog() {
     logReplicaOne=$(getReplicaFile ${logpath} '1')
     logReplicaTwo=$(getReplicaFile ${logpath} '2')
 
+    configMongo
+
     if hasReplicaOneDBConfig $@; then
         printf "${GREEN}[✔] Already dbReplicaOne \"${dbReplicaOne}\"${NC}\n"
     else
@@ -281,6 +289,7 @@ function setupOplog() {
         printf "${GREEN}[✔] Already logReplicaOne \"${logReplicaOne}\"${NC}\n"
     else
         printf "${BLUE}[-] Configuring logReplicaOne \"${logReplicaOne}\"...${NC}\n"
+        # [[ ! -d  "$(dirname -- ${logReplicaOne})" ]] && sudo mkdir -p -- "$(dirname -- ${logReplicaOne})"
         sudo touch ${logReplicaOne}
     fi
 
@@ -294,10 +303,8 @@ function setupOplog() {
     if ! hasReplicaSetConfig $@; then
         sudo echo ${REPLICA_SET_CONFIG} >> ${mongoConf}
     fi
-    wasConnected=$(hasMongoConnected $@)
-    if [[ ${wasConnected} -eq 0 ]]; then
-        connectMongoAndReplicas $@
-    fi
+
+    connectMongoAndReplicas $@
     if hasOplogInitialized $@; then
         printf "${GREEN}[✔] Already oplog initialized${NC}\n"
     else
@@ -307,14 +314,16 @@ function setupOplog() {
             meteor m shell ${version} --port 27017 --eval "rs.initiate(${OPLOG_CONFIG})"
         fi
     fi
+    shutdownMongoAndReplicas $@
+
+    connectMongo $@
     if hasOplogUser $@; then
         printf "${GREEN}[✔] Already oplog user${NC}\n"
     else
+
         meteor m shell ${version} --port 27017 --eval "db.getSiblingDB('admin').createUser({\"user\":\"oplogger\",\"pwd\":\"PASSWORD\",\"roles\":[{\"role\":\"read\",\"db\":\"local\"}],\"passwordDigestor\":\"server\"})"
     fi
-    if [[ ${wasConnected} -eq 0 ]]; then
-        shutdownMongoAndReplicas $@
-    fi
+    shutdownMongo $@
 }
 
 function purgeOplog() {
