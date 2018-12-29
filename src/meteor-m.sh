@@ -147,7 +147,7 @@ function connectMongo() {
     logpath=${4-'/var/log/mongod.log'}
 
     printf "${BLUE}[-] Connecting to mongo \"${version}\"...${NC}\n"
-    sudo meteor m use ${version} --port 27017 --dbpath ${dbpath} --fork --logpath ${logpath} >/dev/null
+    sudo meteor m use ${version} --port 27017 --dbpath ${dbpath} --fork --logpath ${logpath} 1>/dev/null
 
     while ! nc -z localhost 27017 </dev/null; do sleep 1; done
 }
@@ -156,7 +156,7 @@ function shutdownMongo() {
     version=${1-'stable'}
     printf "${BLUE}[-] Disconnecting to mongo \"${version}\"...${NC}\n"
 
-    meteor m mongo ${version} --port 27017 --eval "db.getSiblingDB('admin').shutdownServer()" >/dev/null
+    meteor m mongo ${version} --port 27017 --eval "db.getSiblingDB('admin').shutdownServer()" 1>/dev/null
 }
 
 REPLICA_SET_CONFIG="replSet = rs0"
@@ -227,12 +227,10 @@ function connectMongoAndReplicas() {
     logReplicaTwo=$(getReplicaFile ${logpath} '2')
     printf "${BLUE}[-] Connecting to mongo \"${version}\" and replicas...${NC}\n"
 
-    sudo meteor m use ${version} --port 27017 --dbpath ${dbpath} --fork --logpath ${logpath} --replSet rs0 --smallfiles --oplogSize 128 >/dev/null
-    sudo meteor m use ${version} --port 27018 --dbpath ${dbReplicaOne} --fork --logpath ${logReplicaOne} --replSet rs0 --smallfiles --oplogSize 128 >/dev/null
-    sudo meteor m use ${version} --port 27019 --dbpath ${dbReplicaTwo} --fork --logpath ${logReplicaTwo} --replSet rs0 --smallfiles --oplogSize 128 >/dev/null
+    sudo meteor m use ${version} --port 27017 --dbpath ${dbpath} --fork --logpath ${logpath} --replSet rs0 --smallfiles --oplogSize 128 1>/dev/null
+    sudo meteor m use ${version} --port 27018 --dbpath ${dbReplicaOne} --fork --logpath ${logReplicaOne} --replSet rs0 --smallfiles --oplogSize 128 1>/dev/null
+    sudo meteor m use ${version} --port 27019 --dbpath ${dbReplicaTwo} --fork --logpath ${logReplicaTwo} --replSet rs0 --smallfiles --oplogSize 128 1>/dev/null
 
-    # Add a delay to wait the replicas to be loaded
-    # https://stackoverflow.com/a/50397775
     while ! nc -z localhost 27017 </dev/null; do sleep 1; done
     while ! nc -z localhost 27018 </dev/null; do sleep 1; done
     while ! nc -z localhost 27019 </dev/null; do sleep 1; done
@@ -240,21 +238,21 @@ function connectMongoAndReplicas() {
 
 function shutdownMongoAndReplicas() {
     version=${1-'stable'}
-    printf "${BLUE}[-] Disconnecting to mongo \"${version}\" and replicas \"${version}\"...${NC}\n"
+    printf "${BLUE}[-] Disconnecting to mongo \"${version}\" and replicas...${NC}\n"
 
-    meteor m mongo ${version} --port 27017 --eval "db.getSiblingDB('admin').shutdownServer()" >/dev/null
-    meteor m mongo ${version} --port 27018 --eval "db.getSiblingDB('admin').shutdownServer()" >/dev/null
-    meteor m mongo ${version} --port 27019 --eval "db.getSiblingDB('admin').shutdownServer()" >/dev/null
+    meteor m mongo ${version} --port 27017 --eval "db.getSiblingDB('admin').shutdownServer()" 1>/dev/null
+    meteor m mongo ${version} --port 27018 --eval "db.getSiblingDB('admin').shutdownServer()" 1>/dev/null
+    meteor m mongo ${version} --port 27019 --eval "db.getSiblingDB('admin').shutdownServer()" 1>/dev/null
 }
 
 function checkOplog() {
-    connectMongo $@
+    connectMongo $@ 1>/dev/null
     if hasOlogConfig $@; then
         printf "${GREEN}[✔] meteor m oplog${NC}\n"
     else
         printf "${RED}[x] meteor m oplog${NC}\n"
     fi
-    shutdownMongo $@
+    shutdownMongo $@ 1>/dev/null
 }
 
 function setupOplog() {
@@ -267,7 +265,7 @@ function setupOplog() {
     logReplicaOne=$(getReplicaFile ${logpath} '1')
     logReplicaTwo=$(getReplicaFile ${logpath} '2')
 
-    configMongo
+    configMongo $@
 
     if hasReplicaOneDBConfig $@; then
         printf "${GREEN}[✔] Already dbReplicaOne \"${dbReplicaOne}\"${NC}\n"
