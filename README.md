@@ -7,11 +7,13 @@ This repository implements utilities to support the implementation or adoption o
 The helpers available are for:
 
 - Brew
+- Docker
 - Git
 - Git Flow
 - Meteor
 - Meteor m (mongo manager)
 - Meteor yarn
+- Zsh
 
 All these groups contain the next kind of helpers:
 

@@ -16,9 +16,7 @@ function hasZshrc() {
 }
 
 function hasZshAsDefault() {
-  # Alternative method
-  # [[ $(cat "${HOME}/.bashrc" | grep -ic 'export SHELL=$(which zsh)') -ne "0" ]]
-  false
+  [[ $(cat "${HOME}/.bashrc" | grep -ic 'export SHELL=$(which zsh)') -ne "0" ]]
 }
 
 function installZsh() {
@@ -92,11 +90,11 @@ function configZshAsDefault() {
     setupBashrc
 
     printf "${BLUE}[-] Setting zsh as default shell...${NC}\n"
-    if [[ $(cat /etc/shells | grep -ic "$(which zsh)") -eq "0" ]]; then
-        which zsh | sudo tee -a /etc/shells
-    fi
-    chsh -s $(which zsh)
+    printf '\n export SHELL=$(which zsh)' >>~/.bashrc
+    printf '\n [[ -z "$ZSH_VERSION" ]] && exec "$SHELL" -l' >>~/.bashrc
     # Alternative method
-    # printf '\n export SHELL=$(which zsh)' >>~/.bashrc
-    # printf '\n [[ -z "$ZSH_VERSION" ]] && exec "$SHELL" -l' >>~/.bashrc
+    # if [[ $(cat /etc/shells | grep -ic "$(which zsh)") -eq "0" ]]; then
+    #    which zsh | sudo tee -a /etc/shells
+    # fi
+    # chsh -s $(which zsh)
 }
