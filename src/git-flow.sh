@@ -4,7 +4,7 @@ source "./src/constants.sh"
 source "./src/helpers.sh"
 
 function hasGitFlow() {
-    which git-flow | grep -icq "[^not found]"
+    [[ $(which git-flow | grep -ic "not found") -eq "0" ]]
 }
 
 function installGitFlow() {

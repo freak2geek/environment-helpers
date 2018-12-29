@@ -21,7 +21,7 @@ function purgeBrewOS() {
 }
 
 function hasBrew() {
-    which brew | grep -icq "[^not found]"
+    [[ $(which brew | grep -ic "not found") -eq "0" ]]
 }
 
 function hasBrewPathConfig() {

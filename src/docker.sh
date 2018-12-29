@@ -3,7 +3,7 @@
 source "./src/constants.sh"
 
 function hasDocker() {
-    which docker | grep -icq "[^not found]"
+    [[ $(which docker | grep -ic "not found") -eq "0" ]]
 }
 
 function installDocker() {
