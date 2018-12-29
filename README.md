@@ -35,6 +35,8 @@ bugfix, feature, release, hotfix, support, versiontag, master, develop - Git Flo
 
 ### Meteor m
 
+Parameters: 
+
 version - Mongo version to install/config/use/remove
 
 mongoConf - Path to the mongo configuration file
