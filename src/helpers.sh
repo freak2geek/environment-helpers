@@ -5,7 +5,7 @@ source "./src/constants.sh"
 BASHRC_IMPORT="source ~/.bashrc"
 
 function hasBashrc() {
-    [[ -s ~/.bash_profile ]] && cat ~/.bash_profile | grep -icq BASHRC_IMPORT
+    [[ -f ~/.bash_profile ]] && [[ $(cat ~/.bash_profile | grep -ic "${BASHRC_IMPORT}") -ne "0" ]]
 }
 
 function configBashrc() {
