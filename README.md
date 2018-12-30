@@ -2,6 +2,21 @@
 
 This repository implements utilities to support the implementation or adoption of scripts for your projects, such us environment initialization, checkers and more.
 
+
+## Usage
+
+Import and use the helpers by running the next command in your shell scripts.
+
+``` bash
+source <(curl -sSL https://raw.githubusercontent.com/freak2geek/environment-helpers/master/src/index.sh)
+```
+
+You can also import the helpers by demand just by running:
+
+``` bash
+source <(curl -sSL https://raw.githubusercontent.com/freak2geek/environment-helpers/master/src/<group-of-helpers>.sh)
+```
+
 ## API
 
 The helpers available are for:
