@@ -40,6 +40,8 @@ function hasBrewConfig() {
 function installBrew() {
     printf "${BLUE}[-] Installing brew...${NC}\n"
     setupBrewOS
+    export PATH="${BREW_PATH}:$PATH"
+    eval "${BREW_UMASK}"
     yes | sh -c "$(curl -fsSL https://raw.githubusercontent.com/Linuxbrew/install/master/install.sh)"
     brew install gcc
 }
@@ -51,12 +53,10 @@ function configBrew() {
 
     if ! hasBrewPathConfig; then
         echo "export PATH='${BREW_PATH}'":'"$PATH"' >>~/.bashrc
-        export PATH="${BREW_PATH}:$PATH"
     fi
 
     if ! hasBrewUmaskConfig; then
         echo "${BREW_UMASK}" >>~/.bashrc
-        eval "${BREW_UMASK}"
     fi
 }
 
