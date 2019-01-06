@@ -19,7 +19,7 @@ function purgeBrewOS() {
 }
 
 function hasBrew() {
-    [[ $(which brew | grep -ic "not found") -eq "0" ]]
+    which brew >/dev/null && [[ $(which brew | grep -ic "not found") -eq "0" ]]
 }
 
 function hasBrewPathConfig() {
@@ -116,7 +116,7 @@ BBLUE='\033[1;34m'
 
 
 function hasDocker() {
-    [[ $(which docker | grep -ic "not found") -eq "0" ]]
+    which docker >/dev/null && [[ $(which docker | grep -ic "not found") -eq "0" ]]
 }
 
 function installDocker() {
@@ -156,7 +156,7 @@ function purgeDocker() {
 
 
 function hasGitFlow() {
-    [[ $(which git-flow | grep -ic "not found") -eq "0" ]]
+    which git-flow >/dev/null && [[ $(which git-flow | grep -ic "not found") -eq "0" ]]
 }
 
 function installGitFlow() {
@@ -256,7 +256,7 @@ function purgeGitFlow() {
 
 
 function hasGit() {
-    [[ $(which git | grep -ic "not found") -eq "0" ]]
+    which git >/dev/null && [[ $(which git | grep -ic "not found") -eq "0" ]]
 }
 
 function installGit() {
@@ -755,7 +755,7 @@ function purgeMeteorYarn() {
 
 
 function hasMeteor() {
-    [[ $(which meteor | grep -ic "not found") -eq "0" ]]
+    which meteor >/dev/null && [[ $(which meteor | grep -ic "not found") -eq "0" ]]
 }
 
 function installMeteor() {
@@ -796,7 +796,7 @@ function purgeMeteor() {
 
 
 function hasZsh() {
-    [[ $(which zsh | grep -ic "not found") -eq "0" ]]
+    which zsh >/dev/null && [[ $(which zsh | grep -ic "not found") -eq "0" ]]
 }
 
 function hasOhMyZsh() {

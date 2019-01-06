@@ -3,7 +3,7 @@
 source "./src/constants.sh"
 
 function hasMeteor() {
-    [[ $(which meteor | grep -ic "not found") -eq "0" ]]
+    which meteor >/dev/null && [[ $(which meteor | grep -ic "not found") -eq "0" ]]
 }
 
 function installMeteor() {

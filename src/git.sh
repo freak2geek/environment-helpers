@@ -3,7 +3,7 @@
 source "./src/constants.sh"
 
 function hasGit() {
-    [[ $(which git | grep -ic "not found") -eq "0" ]]
+    which git >/dev/null && [[ $(which git | grep -ic "not found") -eq "0" ]]
 }
 
 function installGit() {
