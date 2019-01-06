@@ -4,19 +4,20 @@
 BREW_PATH="/home/linuxbrew/.linuxbrew/bin:/home/linuxbrew/.linuxbrew/sbin"
 BREW_UMASK="umask 002"
 
-BREW_OS_DEPENDENCIES="build-essential curl g++ file git m4 ruby texinfo libbz2-dev libcurl4-openssl-dev libexpat-dev libncurses-dev zlib1g-dev gawk make patch tcl"
+BREW_OS_DEPENDENCIES="build-essential curl g++ file git m4 texinfo libbz2-dev libcurl4-openssl-dev libexpat-dev libncurses-dev zlib1g-dev gawk make patch tcl"
 
 function setupBrewOS() {
-    sudo apt-add-repository ppa:brightbox/ruby-ng -y &&
-        sudo apt-get update -y &&
+    sudo apt-get update -y &&
         sudo apt-get update --fix-missing -y &&
         sudo apt-get install --no-install-recommends ${BREW_OS_DEPENDENCIES} -y &&
         sudo apt autoremove -y
+    installRuby
 }
 
 function purgeBrewOS() {
     sudo apt-get remove --purge ${BREW_OS_DEPENDENCIES} -y &&
         sudo apt autoremove -y
+    uninstallRuby
 }
 
 function hasBrew() {
@@ -38,9 +39,9 @@ function hasBrewConfig() {
 function installBrew() {
     printf "${BLUE}[-] Installing brew...${NC}\n"
     setupBrewOS
+    yes | sh -c "$(curl -fsSL https://raw.githubusercontent.com/Linuxbrew/install/master/install.sh)"
     export PATH="${BREW_PATH}:$PATH"
     eval "${BREW_UMASK}"
-    yes | sh -c "$(curl -fsSL https://raw.githubusercontent.com/Linuxbrew/install/master/install.sh)"
     brew install gcc
 }
 
@@ -793,6 +794,45 @@ function purgeMeteor() {
     fi
 
     uninstallMeteor
+}
+
+
+function hasRvm() {
+    which rvm >/dev/null && [[ $(which rvm | grep -ic "not found") -eq "0" ]]
+}
+
+function hasRuby() {
+    which ruby >/dev/null && [[ $(which ruby | grep -ic "not found") -eq "0" ]]
+}
+
+function installRvm() {
+    printf "${BLUE}[-] Installing rvm...${NC}\n"
+    command curl -sSL https://rvm.io/pkuczynski.asc | gpg --import -
+    curl -sSL https://get.rvm.io | bash -s stable
+    source ~/.rvm/scripts/rvm
+}
+
+function uninstallRvm() {
+    printf "${BLUE}[-] Uninstalling rvm...${NC}\n"
+    rm -rf ~/.rvm
+    sed -i '/\.rvm\/bin/d' ~/.bashrc
+    sed -i '/\.rvm\//d' ~/.bash_profile
+}
+
+function installRuby() {
+    version=${1-'2.5.0'}
+
+    if ! hasRvm; then
+        installRvm
+    fi
+
+    printf "${BLUE}[-] Installing ruby ${version}...${NC}\n"
+    rvm install ${version}
+    rvm --default use ${version}
+}
+
+function uninstallRuby() {
+    uninstallRvm
 }
 
 

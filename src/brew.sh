@@ -2,23 +2,25 @@
 
 source "./src/constants.sh"
 source "./src/helpers.sh"
+source "./src/ruby.sh"
 
 BREW_PATH="/home/linuxbrew/.linuxbrew/bin:/home/linuxbrew/.linuxbrew/sbin"
 BREW_UMASK="umask 002"
 
-BREW_OS_DEPENDENCIES="build-essential curl g++ file git m4 ruby texinfo libbz2-dev libcurl4-openssl-dev libexpat-dev libncurses-dev zlib1g-dev gawk make patch tcl"
+BREW_OS_DEPENDENCIES="build-essential curl g++ file git m4 texinfo libbz2-dev libcurl4-openssl-dev libexpat-dev libncurses-dev zlib1g-dev gawk make patch tcl"
 
 function setupBrewOS() {
-    sudo apt-add-repository ppa:brightbox/ruby-ng -y &&
-        sudo apt-get update -y &&
+    sudo apt-get update -y &&
         sudo apt-get update --fix-missing -y &&
         sudo apt-get install --no-install-recommends ${BREW_OS_DEPENDENCIES} -y &&
         sudo apt autoremove -y
+    installRuby
 }
 
 function purgeBrewOS() {
     sudo apt-get remove --purge ${BREW_OS_DEPENDENCIES} -y &&
         sudo apt autoremove -y
+    uninstallRuby
 }
 
 function hasBrew() {
@@ -40,9 +42,9 @@ function hasBrewConfig() {
 function installBrew() {
     printf "${BLUE}[-] Installing brew...${NC}\n"
     setupBrewOS
+    yes | sh -c "$(curl -fsSL https://raw.githubusercontent.com/Linuxbrew/install/master/install.sh)"
     export PATH="${BREW_PATH}:$PATH"
     eval "${BREW_UMASK}"
-    yes | sh -c "$(curl -fsSL https://raw.githubusercontent.com/Linuxbrew/install/master/install.sh)"
     brew install gcc
 }
 
