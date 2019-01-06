@@ -9,7 +9,7 @@ BREW_UMASK="umask 002"
 BREW_OS_DEPENDENCIES="build-essential curl g++ file git m4 ruby texinfo libbz2-dev libcurl4-openssl-dev libexpat-dev libncurses-dev zlib1g-dev gawk make patch tcl"
 
 function setupBrewOS() {
-    sudo apt-add-repository ppa:brightbox/ruby-ng &&
+    sudo apt-add-repository ppa:brightbox/ruby-ng -y &&
         sudo apt-get update -y &&
         sudo apt-get update --fix-missing -y &&
         sudo apt-get install --no-install-recommends ${BREW_OS_DEPENDENCIES} -y &&
