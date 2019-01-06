@@ -14,13 +14,11 @@ function setupBrewOS() {
         sudo apt-get update --fix-missing -y &&
         sudo apt-get install --no-install-recommends ${BREW_OS_DEPENDENCIES} -y &&
         sudo apt autoremove -y
-    installRuby
 }
 
 function purgeBrewOS() {
     sudo apt-get remove --purge ${BREW_OS_DEPENDENCIES} -y &&
         sudo apt autoremove -y
-    uninstallRuby
 }
 
 function hasBrew() {
