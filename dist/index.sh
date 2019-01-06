@@ -7,7 +7,8 @@ BREW_UMASK="umask 002"
 BREW_OS_DEPENDENCIES="build-essential curl g++ file git m4 ruby texinfo libbz2-dev libcurl4-openssl-dev libexpat-dev libncurses-dev zlib1g-dev gawk make patch tcl"
 
 function setupBrewOS() {
-    sudo apt-get update -y &&
+    sudo apt-add-repository ppa:brightbox/ruby-ng &&
+        sudo apt-get update -y &&
         sudo apt-get update --fix-missing -y &&
         sudo apt-get install --no-install-recommends ${BREW_OS_DEPENDENCIES} -y &&
         sudo apt autoremove -y
@@ -37,6 +38,8 @@ function hasBrewConfig() {
 function installBrew() {
     printf "${BLUE}[-] Installing brew...${NC}\n"
     setupBrewOS
+    export PATH="${BREW_PATH}:$PATH"
+    eval "${BREW_UMASK}"
     yes | sh -c "$(curl -fsSL https://raw.githubusercontent.com/Linuxbrew/install/master/install.sh)"
     brew install gcc
 }
@@ -48,12 +51,10 @@ function configBrew() {
 
     if ! hasBrewPathConfig; then
         echo "export PATH='${BREW_PATH}'":'"$PATH"' >>~/.bashrc
-        export PATH="${BREW_PATH}:$PATH"
     fi
 
     if ! hasBrewUmaskConfig; then
         echo "${BREW_UMASK}" >>~/.bashrc
-        eval "${BREW_UMASK}"
     fi
 }
 
