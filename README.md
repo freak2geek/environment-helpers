@@ -8,13 +8,7 @@ This repository implements utilities to support the implementation or adoption o
 Import and use the helpers by running the next command in your shell scripts.
 
 ``` bash
-source <(curl -sSL https://raw.githubusercontent.com/freak2geek/environment-helpers/master/src/index.sh)
-```
-
-You can also import the helpers by demand just by running:
-
-``` bash
-source <(curl -sSL https://raw.githubusercontent.com/freak2geek/environment-helpers/master/src/<group-of-helpers>.sh)
+source <(curl -sSL https://raw.githubusercontent.com/freak2geek/environment-helpers/master/dist/index.sh)
 ```
 
 ## API
@@ -61,3 +55,9 @@ mongoConf - Path to the mongo configuration file
 dbpath - Path to the folder where the data is stored
 
 logpath - Path to the file where the logs are stored
+
+## Contribute
+
+- Implement helpers as modules within the `src` folder
+
+- Build the distribution script by running `./build.sh`
