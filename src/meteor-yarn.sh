@@ -9,6 +9,7 @@ function hasMeteorYarn() {
 
 function installMeteorYarn() {
     printf "${BLUE}[-] Installing meteor yarn...${NC}\n"
+    sudo chmod -R 777 ~/.npm
     meteor npm install yarn -g
 }
 
