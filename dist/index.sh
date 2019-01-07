@@ -381,13 +381,13 @@ function installMongo() {
         return;
     fi
     printf "${BLUE}[-] Installing mongo@${version}...${NC}\n"
-    yes | meteor m ${version}
+    yes | sudo meteor m ${version}
 }
 
 function uninstallMongo() {
     version=${1-'stable'}
     printf "${BLUE}[-] Uninstalling mongo@${version}...${NC}\n"
-    yes | meteor m rm ${version}
+    yes | sudo meteor m rm ${version}
 }
 
 function getReplicaFile() {
