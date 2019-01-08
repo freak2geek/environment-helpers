@@ -477,35 +477,35 @@ function shutdownMongo() {
     meteor m mongo ${version} --port 27017 --eval "db.getSiblingDB('admin').shutdownServer()" 1>/dev/null
 }
 
-REPLICA_SET_CONFIG="replSet = rs0"
-OPLOG_CONFIG="{\"_id\":\"rs0\",\"members\":[{\"_id\":0,\"host\":\"127.0.0.1:27017\"},{\"_id\":1,\"host\":\"127.0.0.1:27018\"},{\"_id\":2,\"host\":\"127.0.0.1:27019\"}]}"
+REPLICA_SET_CONFIG="replSet = "
 
 function hasReplicaSetConfig() {
     mongoConf=${2-'/etc/mongodb.conf'}
-    cat ${mongoConf} | grep -icq "${REPLICA_SET_CONFIG}"
+    replica=${5-'rs0'}
+    cat ${mongoConf} | grep -icq "${REPLICA_SET_CONFIG}${replica}"
 }
 
 function hasReplicaOneDBConfig() {
     dbpath=${3-'/data/db'}
-    dbReplicaOne=${5-"/data/db-rs0-0"}
+    dbReplicaOne=${6-"/data/db-rs0-0"}
     [[ -d  ${dbReplicaOne} ]]
 }
 
 function hasReplicaTwoDBConfig() {
     dbpath=${3-'/data/db'}
-    dbReplicaTwo=${6-"/data/db-rs0-1"}
+    dbReplicaTwo=${7-"/data/db-rs0-1"}
     [[ -d  ${dbReplicaTwo} ]]
 }
 
 function hasReplicaOneLogsConfig() {
     logpath=${4-'/var/log/mongod.log'}
-    logReplicaOne=${7-"/var/log/mongod-rs0-0.log"}
+    logReplicaOne=${8-"/var/log/mongod-rs0-0.log"}
     [[ -f ${logReplicaOne} ]]
 }
 
 function hasReplicaTwoLogsConfig() {
     logpath=${4-'/var/log/mongod.log'}
-    logReplicaTwo=${8-"/var/log/mongod-rs0-1.log"}
+    logReplicaTwo=${9-"/var/log/mongod-rs0-1.log"}
     [[ -f ${logReplicaTwo} ]]
 }
 
@@ -516,7 +516,8 @@ function hasOplogConf() {
 
 function hasOplogInitialized() {
     version=${1-'stable'}
-    meteor m shell ${version} --eval "db.getSiblingDB('local').getCollection('system.replset').findOne({\"_id\":\"rs0\"})" | grep -icq "\"_id\" : \"rs0\""
+    replica=${5-'rs0'}
+    meteor m shell ${version} --eval "db.getSiblingDB('local').getCollection('system.replset').findOne({\"_id\":\"${replica}\"})" | grep -icq "\"_id\" : \"rs0\""
 }
 
 function hasOplogUser() {
@@ -539,15 +540,16 @@ function connectMongoAndReplicas() {
     mongoConf=${2-'/etc/mongodb.conf'}
     dbpath=${3-'/data/db'}
     logpath=${4-'/var/log/mongod.log'}
-    dbReplicaOne=${5-"/data/db-rs0-0"}
-    dbReplicaTwo=${6-"/data/db-rs0-1"}
-    logReplicaOne=${7-"/var/log/mongod-rs0-0.log"}
-    logReplicaTwo=${8-"/var/log/mongod-rs0-1.log"}
+    replica=${5-'rs0'}
+    dbReplicaOne=${6-"/data/db-rs0-0"}
+    dbReplicaTwo=${7-"/data/db-rs0-1"}
+    logReplicaOne=${8-"/var/log/mongod-rs0-0.log"}
+    logReplicaTwo=${9-"/var/log/mongod-rs0-1.log"}
     printf "${BLUE}[-] Connecting to mongo \"${version}\" and replicas...${NC}\n"
 
-    sudo meteor m use ${version} --port 27017 --dbpath ${dbpath} --fork --logpath ${logpath} --replSet rs0 --smallfiles --oplogSize 128 1>/dev/null
-    sudo meteor m use ${version} --port 27018 --dbpath ${dbReplicaOne} --fork --logpath ${logReplicaOne} --replSet rs0 --smallfiles --oplogSize 128 1>/dev/null
-    sudo meteor m use ${version} --port 27019 --dbpath ${dbReplicaTwo} --fork --logpath ${logReplicaTwo} --replSet rs0 --smallfiles --oplogSize 128 1>/dev/null
+    sudo meteor m use ${version} --port 27017 --dbpath ${dbpath} --fork --logpath ${logpath} --replSet ${replica} --smallfiles --oplogSize 128 1>/dev/null
+    sudo meteor m use ${version} --port 27018 --dbpath ${dbReplicaOne} --fork --logpath ${logReplicaOne} --replSet ${replica} --smallfiles --oplogSize 128 1>/dev/null
+    sudo meteor m use ${version} --port 27019 --dbpath ${dbReplicaTwo} --fork --logpath ${logReplicaTwo} --replSet ${replica} --smallfiles --oplogSize 128 1>/dev/null
 
     while ! nc -z localhost 27017 </dev/null; do sleep 1; done
     while ! nc -z localhost 27018 </dev/null; do sleep 1; done
@@ -578,10 +580,11 @@ function setupOplog() {
     mongoConf=${2-'/etc/mongodb.conf'}
     dbpath=${3-'/data/db'}
     logpath=${4-'/var/log/mongod.log'}
-    dbReplicaOne=${5-"/data/db-rs0-0"}
-    dbReplicaTwo=${6-"/data/db-rs0-1"}
-    logReplicaOne=${7-"/var/log/mongod-rs0-0.log"}
-    logReplicaTwo=${8-"/var/log/mongod-rs0-1.log"}
+    replica=${5-'rs0'}
+    dbReplicaOne=${6-"/data/db-rs0-0"}
+    dbReplicaTwo=${7-"/data/db-rs0-1"}
+    logReplicaOne=${8-"/var/log/mongod-rs0-0.log"}
+    logReplicaTwo=${9-"/var/log/mongod-rs0-1.log"}
 
     configMongo $@
 
@@ -617,13 +620,14 @@ function setupOplog() {
     fi
 
     if ! hasReplicaSetConfig $@; then
-        sudo echo ${REPLICA_SET_CONFIG} >> ${mongoConf}
+        sudo echo "${REPLICA_SET_CONFIG}${replica}" >> ${mongoConf}
     fi
 
     connectMongoAndReplicas $@
     if hasOplogInitialized $@; then
         printf "${GREEN}[✔] Already oplog initialized${NC}\n"
     else
+        OPLOG_CONFIG="{\"_id\":\"${replica}\",\"members\":[{\"_id\":0,\"host\":\"127.0.0.1:27017\"},{\"_id\":1,\"host\":\"127.0.0.1:27018\"},{\"_id\":2,\"host\":\"127.0.0.1:27019\"}]}"
         if hasOplogConf $@; then
             meteor m shell ${version} --port 27017 --eval "rs.reconfig(${OPLOG_CONFIG})"
         else
@@ -647,10 +651,11 @@ function purgeOplog() {
     mongoConf=${2-'/etc/mongodb.conf'}
     dbpath=${3-'/data/db'}
     logpath=${4-'/var/log/mongod.log'}
-    dbReplicaOne=${5-"/data/db-rs0-0"}
-    dbReplicaTwo=${6-"/data/db-rs0-1"}
-    logReplicaOne=${7-"/var/log/mongod-rs0-0.log"}
-    logReplicaTwo=${8-"/var/log/mongod-rs0-1.log"}
+    replica=${5-'rs0'}
+    dbReplicaOne=${6-"/data/db-rs0-0"}
+    dbReplicaTwo=${7-"/data/db-rs0-1"}
+    logReplicaOne=${8-"/var/log/mongod-rs0-0.log"}
+    logReplicaTwo=${9-"/var/log/mongod-rs0-1.log"}
 
     printf "${BLUE}[-] Purging oplog...${NC}\n"
 
