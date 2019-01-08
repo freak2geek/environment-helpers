@@ -487,25 +487,25 @@ function hasReplicaSetConfig() {
 
 function hasReplicaOneDBConfig() {
     dbpath=${3-'/data/db'}
-    dbReplicaOne=$(getReplicaFile ${dbpath} '1')
+    dbReplicaOne=${5-"/data/db-rs0-0"}
     [[ -d  ${dbReplicaOne} ]]
 }
 
 function hasReplicaTwoDBConfig() {
     dbpath=${3-'/data/db'}
-    dbReplicaTwo=$(getReplicaFile ${dbpath} '2')
+    dbReplicaTwo=${6-"/data/db-rs0-1"}
     [[ -d  ${dbReplicaTwo} ]]
 }
 
 function hasReplicaOneLogsConfig() {
     logpath=${4-'/var/log/mongod.log'}
-    logReplicaOne=$(getReplicaFile ${logpath} '1')
+    logReplicaOne=${7-"/var/log/mongod-rs0-0.log"}
     [[ -f ${logReplicaOne} ]]
 }
 
 function hasReplicaTwoLogsConfig() {
     logpath=${4-'/var/log/mongod.log'}
-    logReplicaTwo=$(getReplicaFile ${logpath} '2')
+    logReplicaTwo=${8-"/var/log/mongod-rs0-1.log"}
     [[ -f ${logReplicaTwo} ]]
 }
 
@@ -539,10 +539,10 @@ function connectMongoAndReplicas() {
     mongoConf=${2-'/etc/mongodb.conf'}
     dbpath=${3-'/data/db'}
     logpath=${4-'/var/log/mongod.log'}
-    dbReplicaOne=$(getReplicaFile ${dbpath} '1')
-    dbReplicaTwo=$(getReplicaFile ${dbpath} '2')
-    logReplicaOne=$(getReplicaFile ${logpath} '1')
-    logReplicaTwo=$(getReplicaFile ${logpath} '2')
+    dbReplicaOne=${5-"/data/db-rs0-0"}
+    dbReplicaTwo=${6-"/data/db-rs0-1"}
+    logReplicaOne=${7-"/var/log/mongod-rs0-0.log"}
+    logReplicaTwo=${8-"/var/log/mongod-rs0-1.log"}
     printf "${BLUE}[-] Connecting to mongo \"${version}\" and replicas...${NC}\n"
 
     sudo meteor m use ${version} --port 27017 --dbpath ${dbpath} --fork --logpath ${logpath} --replSet rs0 --smallfiles --oplogSize 128 1>/dev/null
@@ -578,10 +578,10 @@ function setupOplog() {
     mongoConf=${2-'/etc/mongodb.conf'}
     dbpath=${3-'/data/db'}
     logpath=${4-'/var/log/mongod.log'}
-    dbReplicaOne=$(getReplicaFile ${dbpath} '1')
-    dbReplicaTwo=$(getReplicaFile ${dbpath} '2')
-    logReplicaOne=$(getReplicaFile ${logpath} '1')
-    logReplicaTwo=$(getReplicaFile ${logpath} '2')
+    dbReplicaOne=${5-"/data/db-rs0-0"}
+    dbReplicaTwo=${6-"/data/db-rs0-1"}
+    logReplicaOne=${7-"/var/log/mongod-rs0-0.log"}
+    logReplicaTwo=${8-"/var/log/mongod-rs0-1.log"}
 
     configMongo $@
 
@@ -594,9 +594,9 @@ function setupOplog() {
     fi
 
     if hasReplicaTwoDBConfig $@; then
-        printf "${GREEN}[✔] Already dbReplicaOne \"${dbReplicaOne}\"${NC}\n"
+        printf "${GREEN}[✔] Already dbReplicaTwo \"${dbReplicaTwo}\"${NC}\n"
     else
-        printf "${BLUE}[-] Configuring dbReplicaOne \"${dbReplicaTwo}\"...${NC}\n"
+        printf "${BLUE}[-] Configuring dbReplicaTwo \"${dbReplicaTwo}\"...${NC}\n"
         sudo mkdir -p ${dbReplicaTwo}
         sudo chmod -R 777 ${dbReplicaTwo}
     fi
@@ -647,10 +647,10 @@ function purgeOplog() {
     mongoConf=${2-'/etc/mongodb.conf'}
     dbpath=${3-'/data/db'}
     logpath=${4-'/var/log/mongod.log'}
-    dbReplicaOne=$(getReplicaFile ${dbpath} '1')
-    dbReplicaTwo=$(getReplicaFile ${dbpath} '2')
-    logReplicaOne=$(getReplicaFile ${logpath} '1')
-    logReplicaTwo=$(getReplicaFile ${logpath} '2')
+    dbReplicaOne=${5-"/data/db-rs0-0"}
+    dbReplicaTwo=${6-"/data/db-rs0-1"}
+    logReplicaOne=${7-"/var/log/mongod-rs0-0.log"}
+    logReplicaTwo=${8-"/var/log/mongod-rs0-1.log"}
 
     printf "${BLUE}[-] Purging oplog...${NC}\n"
 
