@@ -322,7 +322,7 @@ function endsWithNewLine() {
 
 
 function hasMeteorM() {
-    meteor npm ls --depth 0 -g 2>/dev/null | grep -icq " m@"
+   hasMeteor && meteor npm ls --depth 0 -g 2>/dev/null | grep -icq " m@"
 }
 
 function installMeteorM() {
@@ -371,7 +371,7 @@ function purgeMeteorM() {
 
 function hasMongo() {
     version=${1-'stable'}
-    meteor m | grep -icq "ο.*${version}"
+    hasMeteorM && meteor m | grep -icq "ο.*${version}"
 }
 
 function installMongo() {
@@ -464,6 +464,10 @@ function connectMongo() {
     dbpath=${3-'/data/db'}
     logpath=${4-'/var/log/mongod.log'}
 
+    if ! hasMongo $@; then
+        return
+    fi
+
     printf "${BLUE}[-] Connecting to mongo \"${version}\"...${NC}\n"
     sudo meteor m use ${version} --port 27017 --dbpath ${dbpath} --fork --logpath ${logpath} 1>/dev/null
 
@@ -473,6 +477,10 @@ function connectMongo() {
 function shutdownMongo() {
     version=${1-'stable'}
     printf "${BLUE}[-] Disconnecting to mongo \"${version}\"...${NC}\n"
+
+    if ! hasMongo $@; then
+        return
+    fi
 
     meteor m mongo ${version} --port 27017 --eval "db.getSiblingDB('admin').shutdownServer()" 1>/dev/null
 }
@@ -526,7 +534,7 @@ function hasOplogUser() {
 }
 
 function hasOlogConfig() {
-    hasMongoConfig $@ && hasReplicaSetConfig $@ && hasReplicaOneDBConfig $@ &&  hasReplicaTwoDBConfig $@ &&
+    hasMongo $@ && hasMongoConfig $@ && hasReplicaSetConfig $@ && hasReplicaOneDBConfig $@ &&  hasReplicaTwoDBConfig $@ &&
     hasReplicaOneLogsConfig $@ && hasReplicaTwoLogsConfig $@ && hasOplogInitialized $@ && hasOplogUser $@
 }
 
@@ -565,7 +573,7 @@ function shutdownMongoAndReplicas() {
     meteor m mongo ${version} --port 27019 --eval "db.getSiblingDB('admin').shutdownServer()" 1>/dev/null
 }
 
-function checkOplog() {
+function checkMongoOplog() {
     connectMongo $@ 1>/dev/null
     if hasOlogConfig $@; then
         printf "${GREEN}[✔] meteor mongo oplog${NC}\n"
@@ -575,7 +583,7 @@ function checkOplog() {
     shutdownMongo $@ 1>/dev/null
 }
 
-function setupOplog() {
+function setupMongoOplog() {
     version=${1-'stable'}
     mongoConf=${2-'/etc/mongodb.conf'}
     dbpath=${3-'/data/db'}
@@ -646,7 +654,7 @@ function setupOplog() {
     shutdownMongo $@
 }
 
-function purgeOplog() {
+function purgeMongoOplog() {
     version=${1-'stable'}
     mongoConf=${2-'/etc/mongodb.conf'}
     dbpath=${3-'/data/db'}
@@ -699,7 +707,7 @@ function purgeOplog() {
 
 
 function hasMeteorYarn() {
-    meteor npm ls --depth 0 -g 2>/dev/null | grep -icq "yarn@"
+    hasMeteor && meteor npm ls --depth 0 -g 2>/dev/null | grep -icq "yarn@"
 }
 
 function installMeteorYarn() {
