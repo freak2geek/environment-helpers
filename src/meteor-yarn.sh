@@ -73,7 +73,7 @@ function getPackageName() {
 function hasYarnDeps() {
     path=${1-"."}
     cd ${path}
-    hasMeteorYarn && [[ $(meteor yarn check --verify-tree | grep -ic "error") -eq "0" ]]
+    hasMeteorYarn && [[ $(meteor yarn check --verify-tree 2>&1 >/dev/null | grep -ic "error") -eq "0" ]]
 }
 
 function checkYarnDeps() {
