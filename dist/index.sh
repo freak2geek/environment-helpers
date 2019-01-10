@@ -767,6 +767,56 @@ function purgeMeteorYarn() {
     rm -rf ~/.cache
 }
 
+function getPackageName() {
+    path=${1-"."}
+    cd ${path}
+    cat package.json | sed 's/.*"name": "\(.*\)".*/\1/;t;d'
+}
+
+function hasYarnDeps() {
+    path=${1-"."}
+    cd ${path}
+    hasMeteorYarn && [[ $(meteor yarn check --verify-tree | grep -ic "error") -eq "0" ]]
+}
+
+function checkYarnDeps() {
+    oldPath=${PWD}
+    path=${1-"."}
+    package=${2-$(getPackageName $@)}
+
+    if hasYarnDeps $@; then
+        printf "${GREEN}[✔] \"${package}\" dependencies${NC}\n"
+    else
+        printf "${RED}[x] \"${package}\" dependencies${NC}\n"
+    fi
+
+    cd ${oldPath}
+}
+
+function installYarnDeps() {
+    oldPath=${PWD}
+    path=${1-"."}
+    package=${2-$(getPackageName $@)}
+
+    printf "${BLUE}[-] Installing \"${package}\" dependencies...${NC}\n"
+    cd ${path}
+    meteor yarn install
+    cd ${oldPath}
+}
+
+function setupYarnDeps() {
+    oldPath=${PWD}
+    path=${1-"."}
+    package=${2-$(getPackageName $@)}
+
+    if hasYarnDeps $@; then
+        printf "${GREEN}[✔] Already \"${package}\" dependencies${NC}\n"
+        return
+    fi
+
+    installYarnDeps $@
+}
+
 
 function hasMeteor() {
     which meteor >/dev/null && [[ $(which meteor | grep -ic "not found") -eq "0" ]]
