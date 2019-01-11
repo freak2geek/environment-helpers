@@ -20,6 +20,7 @@ The helpers available are for:
 - Git
 - Git Flow
 - Meteor
+- Meteor lerna
 - Meteor m (mongo manager)
 - Meteor yarn
 - Zsh
