@@ -4,7 +4,7 @@ source "./src/constants.sh"
 source "./src/meteor.sh"
 
 function hasMeteorYarn() {
-    hasMeteor && meteor npm ls --depth 0 -g 2>/dev/null | grep -icq "yarn@"
+    hasMeteor && find ${METEOR_TOOL_DIR} -type d -name "yarn" | grep -icq "yarn"
 }
 
 function installMeteorYarn() {

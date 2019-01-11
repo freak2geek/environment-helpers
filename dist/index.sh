@@ -114,6 +114,9 @@ BRED='\033[1;31m'
 BGREEN='\033[1;32m'
 BBLUE='\033[1;34m'
 
+# Dirs
+METEOR_TOOL_DIR=~/.meteor/packages/meteor-tool
+
 
 function hasDocker() {
     which docker >/dev/null && [[ $(which docker | grep -ic "not found") -eq "0" ]]
@@ -322,7 +325,7 @@ function endsWithNewLine() {
 
 
 function hasMeteorM() {
-   hasMeteor && meteor npm ls --depth 0 -g 2>/dev/null | grep -icq " m@"
+   hasMeteor && find ${METEOR_TOOL_DIR} -type d -name "m" | grep -icq "m"
 }
 
 function installMeteorM() {
@@ -707,7 +710,7 @@ function purgeMongoOplog() {
 
 
 function hasMeteorYarn() {
-    hasMeteor && meteor npm ls --depth 0 -g 2>/dev/null | grep -icq "yarn@"
+    hasMeteor && find ${METEOR_TOOL_DIR} -type d -name "yarn" | grep -icq "yarn"
 }
 
 function installMeteorYarn() {
