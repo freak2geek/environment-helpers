@@ -237,9 +237,9 @@ function connectMongoAndReplicas() {
     logReplicaTwo=${9-"/var/log/mongod-rs0-1.log"}
     printf "${BLUE}[-] Connecting to mongo \"${version}\" and replicas...${NC}\n"
 
-    sudo meteor m use ${version} --port 27017 --dbpath ${dbpath} --fork --logpath ${logpath} --replSet ${replica} --smallfiles --oplogSize 128 1>/dev/null
-    sudo meteor m use ${version} --port 27018 --dbpath ${dbReplicaOne} --fork --logpath ${logReplicaOne} --replSet ${replica} --smallfiles --oplogSize 128 1>/dev/null
-    sudo meteor m use ${version} --port 27019 --dbpath ${dbReplicaTwo} --fork --logpath ${logReplicaTwo} --replSet ${replica} --smallfiles --oplogSize 128 1>/dev/null
+    sudo meteor m use ${version} --config ${mongoConf} --port 27017 --dbpath ${dbpath} --fork --logpath ${logpath} --replSet ${replica} 1>/dev/null
+    sudo meteor m use ${version} --config ${mongoConf} --port 27018 --dbpath ${dbReplicaOne} --fork --logpath ${logReplicaOne} --replSet ${replica} 1>/dev/null
+    sudo meteor m use ${version} --config ${mongoConf} --port 27019 --dbpath ${dbReplicaTwo} --fork --logpath ${logReplicaTwo} --replSet ${replica} 1>/dev/null
 
     while ! nc -z localhost 27017 </dev/null; do sleep 1; done
     while ! nc -z localhost 27018 </dev/null; do sleep 1; done
