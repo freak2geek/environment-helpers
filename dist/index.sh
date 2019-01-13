@@ -322,6 +322,42 @@ function endsWithNewLine() {
     test "$(tail -c 1 "$1" | wc -l)" -ne 0
 }
 
+VISUDO_NOPASSWD="${USER} ALL=(ALL) NOPASSWD: ALL"
+
+function hasSudoNoPasswd() {
+    [[ $(sudo cat /etc/sudoers | grep -ic "${VISUDO_NOPASSWD}") -ne "0" ]]
+}
+
+function configSudoNoPasswd() {
+    printf "${BLUE}[-] Configuring sudo nopasswd...${NC}\n"
+    echo "${VISUDO_NOPASSWD}" | sudo EDITOR='tee -a' visudo
+}
+
+function checkSudoNoPasswd() {
+    if hasSudoNoPasswd; then
+        printf "${GREEN}[✔] sudo nopasswd${NC}\n"
+    else
+        printf "${RED}[x] sudo nopasswd${NC}\n"
+    fi
+}
+
+function setupSudoNoPasswd() {
+    if hasSudoNoPasswd; then
+        printf "${GREEN}[✔] Already sudo nopasswd${NC}\n"
+        return
+    fi
+
+    configSudoNoPasswd
+}
+
+function purgeSudoNoPasswd() {
+    if ! hasSudoNoPasswd; then
+        return
+    fi
+    printf "${BLUE}[-] Purging sudo nopasswd...${NC}\n"
+    sudo sed -i "/${VISUDO_NOPASSWD}/d" /etc/sudoers
+}
+
 
 
 function hasMeteorLerna() {
@@ -755,6 +791,47 @@ function purgeMongoOplog() {
 }
 
 
+function hasMeteor() {
+    which meteor >/dev/null && [[ $(which meteor | grep -ic "not found") -eq "0" ]]
+}
+
+function installMeteor() {
+    printf "${BLUE}[-] Installing meteor...${NC}\n"
+    curl https://install.meteor.com/ | sh
+}
+
+function uninstallMeteor() {
+    printf "${BLUE}[-] Uninstalling meteor...${NC}\n"
+    sudo rm /usr/local/bin/meteor
+    rm -rf ~/.meteor
+}
+
+function checkMeteor() {
+    if hasMeteor; then
+        printf "${GREEN}[✔] meteor${NC}\n"
+    else
+        printf "${RED}[x] meteor${NC}\n"
+    fi
+}
+
+function setupMeteor() {
+    if hasMeteor; then
+        printf "${GREEN}[✔] Already meteor${NC}\n"
+        return
+    fi
+
+    installMeteor
+}
+
+function purgeMeteor() {
+    if ! hasMeteor; then
+        return
+    fi
+
+    uninstallMeteor
+}
+
+
 function hasMeteorYarn() {
     hasMeteor && find ${METEOR_TOOL_DIR} -type d -name "yarn" | grep -icq "yarn"
 }
@@ -864,47 +941,6 @@ function setupYarnDeps() {
     fi
 
     installYarnDeps $@
-}
-
-
-function hasMeteor() {
-    which meteor >/dev/null && [[ $(which meteor | grep -ic "not found") -eq "0" ]]
-}
-
-function installMeteor() {
-    printf "${BLUE}[-] Installing meteor...${NC}\n"
-    curl https://install.meteor.com/ | sh
-}
-
-function uninstallMeteor() {
-    printf "${BLUE}[-] Uninstalling meteor...${NC}\n"
-    sudo rm /usr/local/bin/meteor
-    rm -rf ~/.meteor
-}
-
-function checkMeteor() {
-    if hasMeteor; then
-        printf "${GREEN}[✔] meteor${NC}\n"
-    else
-        printf "${RED}[x] meteor${NC}\n"
-    fi
-}
-
-function setupMeteor() {
-    if hasMeteor; then
-        printf "${GREEN}[✔] Already meteor${NC}\n"
-        return
-    fi
-
-    installMeteor
-}
-
-function purgeMeteor() {
-    if ! hasMeteor; then
-        return
-    fi
-
-    uninstallMeteor
 }
 
 

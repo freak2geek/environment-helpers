@@ -25,3 +25,39 @@ function setupBashrc() {
 function endsWithNewLine() {
     test "$(tail -c 1 "$1" | wc -l)" -ne 0
 }
+
+VISUDO_NOPASSWD="${USER} ALL=(ALL) NOPASSWD: ALL"
+
+function hasSudoNoPasswd() {
+    [[ $(sudo cat /etc/sudoers | grep -ic "${VISUDO_NOPASSWD}") -ne "0" ]]
+}
+
+function configSudoNoPasswd() {
+    printf "${BLUE}[-] Configuring sudo nopasswd...${NC}\n"
+    echo "${VISUDO_NOPASSWD}" | sudo EDITOR='tee -a' visudo
+}
+
+function checkSudoNoPasswd() {
+    if hasSudoNoPasswd; then
+        printf "${GREEN}[✔] sudo nopasswd${NC}\n"
+    else
+        printf "${RED}[x] sudo nopasswd${NC}\n"
+    fi
+}
+
+function setupSudoNoPasswd() {
+    if hasSudoNoPasswd; then
+        printf "${GREEN}[✔] Already sudo nopasswd${NC}\n"
+        return
+    fi
+
+    configSudoNoPasswd
+}
+
+function purgeSudoNoPasswd() {
+    if ! hasSudoNoPasswd; then
+        return
+    fi
+    printf "${BLUE}[-] Purging sudo nopasswd...${NC}\n"
+    sudo sed -i "/${VISUDO_NOPASSWD}/d" /etc/sudoers
+}

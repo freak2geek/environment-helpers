@@ -2,7 +2,6 @@
 
 This repository implements utilities to support the implementation or adoption of scripts for your projects, such us environment initialization, checkers and more.
 
-
 ## Usage
 
 Import and use the helpers by running the next command in your shell scripts.
@@ -23,6 +22,7 @@ The helpers available are for:
 - Meteor lerna
 - Meteor m (mongo manager)
 - Meteor yarn
+- sudo nopasswd
 - Zsh
 
 All these groups contain the next kind of helpers:
