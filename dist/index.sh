@@ -34,6 +34,10 @@ function hasBrewConfig() {
    hasBrewPathConfig && hasBrewUmaskConfig
 }
 
+function hasBrewByOS() {
+    (isLinux && hasBrew && hasBrewConfig) || (isOSX && hasBrew)
+}
+
 function installBrew() {
     printf "${BLUE}[-] Installing brew...${NC}\n"
     setupBrewOS
@@ -71,7 +75,7 @@ function uninstallBrew() {
 }
 
 function checkBrew() {
-    if hasBrew && hasBrewConfig; then
+    if hasBrewByOS; then
         printf "${GREEN}[✔] brew${NC}\n"
     else
         printf "${RED}[x] brew${NC}\n"
@@ -79,12 +83,12 @@ function checkBrew() {
 }
 
 function setupBrew() {
-    if hasBrew && hasBrewConfig; then
+    if hasBrewByOS; then
         printf "${GREEN}[✔] Already brew${NC}\n"
         return
     fi
 
-    if ! hasBrew && [[ "$OSTYPE" == "linux-gnu" ]]; then
+    if ! hasBrew; then
         installBrew
     fi
 
@@ -356,6 +360,23 @@ function purgeSudoNoPasswd() {
     fi
     printf "${BLUE}[-] Purging sudo nopasswd...${NC}\n"
     sudo sed -i "/${VISUDO_NOPASSWD}/d" /etc/sudoers
+}
+
+function isOSX() {
+    [[ "$OSTYPE" == "darwin"* ]]
+}
+
+function isLinux() {
+    [[ "$OSTYPE" == "linux-gnu" ]]
+}
+
+function sedi() {
+  case $(uname) in
+    Darwin*) sedi=('-i' '') ;;
+    *) sedi='-i' ;;
+  esac
+
+  LC_ALL=C sed "${sedi[@]}" "$@"
 }
 
 
@@ -791,47 +812,6 @@ function purgeMongoOplog() {
 }
 
 
-function hasMeteor() {
-    which meteor >/dev/null && [[ $(which meteor | grep -ic "not found") -eq "0" ]]
-}
-
-function installMeteor() {
-    printf "${BLUE}[-] Installing meteor...${NC}\n"
-    curl https://install.meteor.com/ | sh
-}
-
-function uninstallMeteor() {
-    printf "${BLUE}[-] Uninstalling meteor...${NC}\n"
-    sudo rm /usr/local/bin/meteor
-    rm -rf ~/.meteor
-}
-
-function checkMeteor() {
-    if hasMeteor; then
-        printf "${GREEN}[✔] meteor${NC}\n"
-    else
-        printf "${RED}[x] meteor${NC}\n"
-    fi
-}
-
-function setupMeteor() {
-    if hasMeteor; then
-        printf "${GREEN}[✔] Already meteor${NC}\n"
-        return
-    fi
-
-    installMeteor
-}
-
-function purgeMeteor() {
-    if ! hasMeteor; then
-        return
-    fi
-
-    uninstallMeteor
-}
-
-
 function hasMeteorYarn() {
     hasMeteor && find ${METEOR_TOOL_DIR} -type d -name "yarn" | grep -icq "yarn"
 }
@@ -941,6 +921,47 @@ function setupYarnDeps() {
     fi
 
     installYarnDeps $@
+}
+
+
+function hasMeteor() {
+    which meteor >/dev/null && [[ $(which meteor | grep -ic "not found") -eq "0" ]]
+}
+
+function installMeteor() {
+    printf "${BLUE}[-] Installing meteor...${NC}\n"
+    curl https://install.meteor.com/ | sh
+}
+
+function uninstallMeteor() {
+    printf "${BLUE}[-] Uninstalling meteor...${NC}\n"
+    sudo rm /usr/local/bin/meteor
+    rm -rf ~/.meteor
+}
+
+function checkMeteor() {
+    if hasMeteor; then
+        printf "${GREEN}[✔] meteor${NC}\n"
+    else
+        printf "${RED}[x] meteor${NC}\n"
+    fi
+}
+
+function setupMeteor() {
+    if hasMeteor; then
+        printf "${GREEN}[✔] Already meteor${NC}\n"
+        return
+    fi
+
+    installMeteor
+}
+
+function purgeMeteor() {
+    if ! hasMeteor; then
+        return
+    fi
+
+    uninstallMeteor
 }
 
 

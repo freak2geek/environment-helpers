@@ -26,15 +26,19 @@ function hasBrew() {
 }
 
 function hasBrewPathConfig() {
-    cat ~/.bashrc | grep -icq "${BREW_PATH}"
+    hasBashrc && cat ~/.bashrc | grep -icq "${BREW_PATH}"
 }
 
 function hasBrewUmaskConfig() {
-    cat ~/.bashrc | grep -icq "${BREW_UMASK}"
+    hasBashrc && cat ~/.bashrc | grep -icq "${BREW_UMASK}"
 }
 
 function hasBrewConfig() {
    hasBrewPathConfig && hasBrewUmaskConfig
+}
+
+function hasBrewByOS() {
+    (isLinux && hasBrew && hasBrewConfig) || (isOSX && hasBrew)
 }
 
 function installBrew() {
@@ -74,7 +78,7 @@ function uninstallBrew() {
 }
 
 function checkBrew() {
-    if hasBrew && hasBrewConfig; then
+    if hasBrewByOS; then
         printf "${GREEN}[✔] brew${NC}\n"
     else
         printf "${RED}[x] brew${NC}\n"
@@ -82,12 +86,12 @@ function checkBrew() {
 }
 
 function setupBrew() {
-    if hasBrew && hasBrewConfig; then
+    if hasBrewByOS; then
         printf "${GREEN}[✔] Already brew${NC}\n"
         return
     fi
 
-    if ! hasBrew && [[ "$OSTYPE" == "linux-gnu" ]]; then
+    if ! hasBrew; then
         installBrew
     fi
 
