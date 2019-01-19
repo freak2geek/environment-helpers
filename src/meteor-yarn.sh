@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 source "./src/constants.sh"
+source "./src/helpers.sh"
 source "./src/meteor.sh"
 
 function hasMeteorYarn() {
@@ -67,7 +68,7 @@ function purgeMeteorYarn() {
 function getPackageName() {
     path=${1-"."}
     cd ${path}
-    cat package.json | sed 's/.*"name": "\(.*\)".*/\1/;t;d'
+    cat package.json | sed -n 's@.*"name": "\(.*\)".*@\1@p'
 }
 
 function hasYarnDeps() {
