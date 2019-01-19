@@ -61,3 +61,20 @@ function purgeSudoNoPasswd() {
     printf "${BLUE}[-] Purging sudo nopasswd...${NC}\n"
     sudo sed -i "/${VISUDO_NOPASSWD}/d" /etc/sudoers
 }
+
+function isOSX() {
+    [[ "$OSTYPE" == "darwin"* ]]
+}
+
+function isLinux() {
+    [[ "$OSTYPE" == "linux-gnu" ]]
+}
+
+function sedi() {
+  case $(uname) in
+    Darwin*) sedi=('-i' '') ;;
+    *) sedi='-i' ;;
+  esac
+
+  LC_ALL=C sed "${sedi[@]}" "$@"
+}
