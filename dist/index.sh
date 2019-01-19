@@ -371,12 +371,7 @@ function isLinux() {
 }
 
 function sedi() {
-  case $(uname) in
-    Darwin*) sedi=('-i' '') ;;
-    *) sedi='-i' ;;
-  esac
-
-  LC_ALL=C sed "${sedi[@]}" "$@"
+  sed --version >/dev/null 2>&1 && sed -i -- "$@" || sed -i "" "$@"
 }
 
 
@@ -876,7 +871,7 @@ function purgeMeteorYarn() {
 function getPackageName() {
     path=${1-"."}
     cd ${path}
-    cat package.json | sed 's/.*"name": "\(.*\)".*/\1/;t;d'
+    cat package.json | sed -n 's@.*"name": "\(.*\)".*@\1@p'
 }
 
 function hasYarnDeps() {

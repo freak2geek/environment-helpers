@@ -71,10 +71,5 @@ function isLinux() {
 }
 
 function sedi() {
-  case $(uname) in
-    Darwin*) sedi=('-i' '') ;;
-    *) sedi='-i' ;;
-  esac
-
-  LC_ALL=C sed "${sedi[@]}" "$@"
+  sed --version >/dev/null 2>&1 && sed -i -- "$@" || sed -i "" "$@"
 }
