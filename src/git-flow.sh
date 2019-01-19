@@ -26,16 +26,16 @@ function hasGitFlowConfig() {
 }
 
 function purgeGitFlowConfig() {
-    sed -i '/\[gitflow \"prefix\"\]/d' ./.git/config
-    sed -i '/bugfix =/d' ./.git/config
-    sed -i '/feature =/d' ./.git/config
-    sed -i '/release =/d' ./.git/config
-    sed -i '/hotfix =/d' ./.git/config
-    sed -i '/support =/d' ./.git/config
-    sed -i '/versiontag =/d' ./.git/config
-    sed -i '/\[gitflow \"branch\"\]/d' ./.git/config
-    sed -i '/master =/d' ./.git/config
-    sed -i '/develop =/d' ./.git/config
+    sedi '/\[gitflow \"prefix\"\]/d' ./.git/config
+    sedi '/bugfix =/d' ./.git/config
+    sedi '/feature =/d' ./.git/config
+    sedi '/release =/d' ./.git/config
+    sedi '/hotfix =/d' ./.git/config
+    sedi '/support =/d' ./.git/config
+    sedi '/versiontag =/d' ./.git/config
+    sedi '/\[gitflow \"branch\"\]/d' ./.git/config
+    sedi '/master =/d' ./.git/config
+    sedi '/develop =/d' ./.git/config
 }
 
 function configGitFlow() {

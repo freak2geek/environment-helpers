@@ -23,11 +23,11 @@ function hasBrew() {
 }
 
 function hasBrewPathConfig() {
-    cat ~/.bashrc | grep -icq "${BREW_PATH}"
+    hasBashrc && cat ~/.bashrc | grep -icq "${BREW_PATH}"
 }
 
 function hasBrewUmaskConfig() {
-    cat ~/.bashrc | grep -icq "${BREW_UMASK}"
+    hasBashrc && cat ~/.bashrc | grep -icq "${BREW_UMASK}"
 }
 
 function hasBrewConfig() {
@@ -67,8 +67,8 @@ function uninstallBrew() {
         yes | ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Linuxbrew/install/master/uninstall)"
     fi
     test -e /home/linuxbrew/.linuxbrew/bin/brew && brew purge
-    sed -i '/linuxbrew/d' ~/.bashrc
-    sed -i "/${BREW_UMASK}/d" ~/.bashrc
+    sedi '/linuxbrew/d' ~/.bashrc
+    sedi "/${BREW_UMASK}/d" ~/.bashrc
     test -d /home/linuxbrew/.linuxbrew/bin && rm -R /home/linuxbrew/.linuxbrew/bin
     test -d /home/linuxbrew/.linuxbrew/lib && rm -R /home/linuxbrew/.linuxbrew/lib
     test -d /home/linuxbrew/.linuxbrew/share && rm -R /home/linuxbrew/.linuxbrew/share
@@ -185,16 +185,16 @@ function hasGitFlowConfig() {
 }
 
 function purgeGitFlowConfig() {
-    sed -i '/\[gitflow \"prefix\"\]/d' ./.git/config
-    sed -i '/bugfix =/d' ./.git/config
-    sed -i '/feature =/d' ./.git/config
-    sed -i '/release =/d' ./.git/config
-    sed -i '/hotfix =/d' ./.git/config
-    sed -i '/support =/d' ./.git/config
-    sed -i '/versiontag =/d' ./.git/config
-    sed -i '/\[gitflow \"branch\"\]/d' ./.git/config
-    sed -i '/master =/d' ./.git/config
-    sed -i '/develop =/d' ./.git/config
+    sedi '/\[gitflow \"prefix\"\]/d' ./.git/config
+    sedi '/bugfix =/d' ./.git/config
+    sedi '/feature =/d' ./.git/config
+    sedi '/release =/d' ./.git/config
+    sedi '/hotfix =/d' ./.git/config
+    sedi '/support =/d' ./.git/config
+    sedi '/versiontag =/d' ./.git/config
+    sedi '/\[gitflow \"branch\"\]/d' ./.git/config
+    sedi '/master =/d' ./.git/config
+    sedi '/develop =/d' ./.git/config
 }
 
 function configGitFlow() {
@@ -807,7 +807,7 @@ function purgeMongoOplog() {
     fi
 
     if hasReplicaSetConfig $@; then
-        sudo sed -i "/${REPLICA_SET_CONFIG}/d" ${mongoConf}
+        sudo sedi "/${REPLICA_SET_CONFIG}/d" ${mongoConf}
     fi
 }
 
@@ -983,8 +983,8 @@ function installRvm() {
 function uninstallRvm() {
     printf "${BLUE}[-] Uninstalling rvm...${NC}\n"
     rm -rf ~/.rvm
-    sed -i '/\.rvm\/bin/d' ~/.bashrc
-    sed -i '/\.rvm\//d' ~/.bash_profile
+    sedi '/\.rvm\/bin/d' ~/.bashrc
+    sedi '/\.rvm\//d' ~/.bash_profile
 }
 
 function installRuby() {

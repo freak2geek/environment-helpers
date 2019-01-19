@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 source "./src/constants.sh"
+source "./src/helpers.sh"
 source "./src/meteor.sh"
 
 function hasMeteorM() {
@@ -383,6 +384,6 @@ function purgeMongoOplog() {
     fi
 
     if hasReplicaSetConfig $@; then
-        sudo sed -i "/${REPLICA_SET_CONFIG}/d" ${mongoConf}
+        sudo sedi "/${REPLICA_SET_CONFIG}/d" ${mongoConf}
     fi
 }

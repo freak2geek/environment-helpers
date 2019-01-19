@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 source "./src/constants.sh"
+source "./src/helpers.sh"
 
 function hasRvm() {
     which rvm >/dev/null && [[ $(which rvm | grep -ic "not found") -eq "0" ]]
@@ -20,8 +21,8 @@ function installRvm() {
 function uninstallRvm() {
     printf "${BLUE}[-] Uninstalling rvm...${NC}\n"
     rm -rf ~/.rvm
-    sed -i '/\.rvm\/bin/d' ~/.bashrc
-    sed -i '/\.rvm\//d' ~/.bash_profile
+    sedi '/\.rvm\/bin/d' ~/.bashrc
+    sedi '/\.rvm\//d' ~/.bash_profile
 }
 
 function installRuby() {
