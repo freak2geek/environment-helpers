@@ -59,7 +59,7 @@ function purgeSudoNoPasswd() {
         return
     fi
     printf "${BLUE}[-] Purging sudo nopasswd...${NC}\n"
-    sudo sed -i "/${VISUDO_NOPASSWD}/d" /etc/sudoers
+    sudoSedi "/${VISUDO_NOPASSWD}/d" /etc/sudoers
 }
 
 function isOSX() {
@@ -72,4 +72,8 @@ function isLinux() {
 
 function sedi() {
   sed --version >/dev/null 2>&1 && sed -i -- "$@" || sed -i "" "$@"
+}
+
+function sudoSedi() {
+  sed --version >/dev/null 2>&1 && sudo sed -i -- "$@" || sudo sed -i "" "$@"
 }
