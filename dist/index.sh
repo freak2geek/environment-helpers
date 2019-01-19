@@ -869,20 +869,20 @@ function purgeMeteorYarn() {
 }
 
 function getPackageName() {
-    path=${1-"."}
-    cd ${path}
+    packagePath=${1-"."}
+    cd ${packagePath}
     cat package.json | sed -n 's@.*"name": "\(.*\)".*@\1@p'
 }
 
 function hasYarnDeps() {
-    path=${1-"."}
-    cd ${path}
+    packagePath=${1-"."}
+    cd ${packagePath}
     hasMeteorYarn && [[ $(meteor yarn check --verify-tree 2>&1 >/dev/null | grep -ic "error") -eq "0" ]]
 }
 
 function checkYarnDeps() {
     oldPath=${PWD}
-    path=${1-"."}
+    packagePath=${1-"."}
     package=${2-$(getPackageName $@)}
 
     if hasYarnDeps $@; then
@@ -896,18 +896,18 @@ function checkYarnDeps() {
 
 function installYarnDeps() {
     oldPath=${PWD}
-    path=${1-"."}
+    packagePath=${1-"."}
     package=${2-$(getPackageName $@)}
 
     printf "${BLUE}[-] Installing \"${package}\" dependencies...${NC}\n"
-    cd ${path}
+    cd ${packagePath}
     meteor yarn install
     cd ${oldPath}
 }
 
 function setupYarnDeps() {
     oldPath=${PWD}
-    path=${1-"."}
+    packagePath=${1-"."}
     package=${2-$(getPackageName $@)}
 
     if hasYarnDeps $@; then
