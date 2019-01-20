@@ -19,7 +19,7 @@ function purgeBrewOS() {
 }
 
 function hasBrew() {
-    which brew >/dev/null && [[ $(which brew | grep -ic "not found") -eq "0" ]]
+    which brew >/dev/null && [[ "$(which brew | grep -ic "not found")" -eq "0" ]]
 }
 
 function hasBrewPathConfig() {
@@ -123,7 +123,7 @@ METEOR_TOOL_DIR=~/.meteor/packages/meteor-tool
 
 
 function hasDocker() {
-    which docker >/dev/null && [[ $(which docker | grep -ic "not found") -eq "0" ]]
+    which docker >/dev/null && [[ "$(which docker | grep -ic "not found")" -eq "0" ]]
 }
 
 function installDocker() {
@@ -173,7 +173,7 @@ GITFLOW_MASTER="master"
 GITFLOW_DEVELOP="develop"
 
 function hasGitFlow() {
-    which git-flow >/dev/null && [[ $(which git-flow | grep -ic "not found") -eq "0" ]]
+    which git-flow >/dev/null && [[ "$(which git-flow | grep -ic "not found")" -eq "0" ]]
 }
 
 function installGitFlow() {
@@ -265,7 +265,7 @@ function purgeGitFlow() {
 
 
 function hasGit() {
-    which git >/dev/null && [[ $(which git | grep -ic "not found") -eq "0" ]]
+    which git >/dev/null && [[ "$(which git | grep -ic "not found")" -eq "0" ]]
 }
 
 function installGit() {
@@ -923,7 +923,7 @@ function setupYarnDeps() {
 
 
 function hasMeteor() {
-    which meteor >/dev/null && [[ $(which meteor | grep -ic "not found") -eq "0" ]]
+    which meteor >/dev/null && [[ "$(which meteor | grep -ic "not found")" -eq "0" ]]
 }
 
 function installMeteor() {
@@ -964,11 +964,11 @@ function purgeMeteor() {
 
 
 function hasRvm() {
-    which rvm >/dev/null && [[ $(which rvm | grep -ic "not found") -eq "0" ]]
+    which rvm >/dev/null && [[ "$(which rvm | grep -ic "not found")" -eq "0" ]]
 }
 
 function hasRuby() {
-    which ruby >/dev/null && [[ $(which ruby | grep -ic "not found") -eq "0" ]]
+    which ruby >/dev/null && [[ "$(which ruby | grep -ic "not found")" -eq "0" ]]
 }
 
 function installRvm() {
@@ -1005,7 +1005,7 @@ function uninstallRuby() {
 
 
 function hasZsh() {
-    which zsh >/dev/null && [[ $(which zsh | grep -ic "not found") -eq "0" ]]
+    which zsh >/dev/null && [[ "$(which zsh | grep -ic "not found")" -eq "0" ]]
 }
 
 function hasOhMyZsh() {

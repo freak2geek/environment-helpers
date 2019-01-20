@@ -4,11 +4,11 @@ source "./src/constants.sh"
 source "./src/helpers.sh"
 
 function hasRvm() {
-    which rvm >/dev/null && [[ $(which rvm | grep -ic "not found") -eq "0" ]]
+    which rvm >/dev/null && [[ "$(which rvm | grep -ic "not found")" -eq "0" ]]
 }
 
 function hasRuby() {
-    which ruby >/dev/null && [[ $(which ruby | grep -ic "not found") -eq "0" ]]
+    which ruby >/dev/null && [[ "$(which ruby | grep -ic "not found")" -eq "0" ]]
 }
 
 function installRvm() {
