@@ -102,15 +102,10 @@ function configMongo() {
 
     printf "${BLUE}[-] Configuring mongoConf \"${MONGO_CONF}\"...${NC}\n"
     sudo touch ${MONGO_CONF}
-    sudo chown -R ${USER}:${USER} ${MONGO_CONF}
     printf "${BLUE}[-] Configuring dbpath \"${MONGO_DBPATH}\"...${NC}\n"
     sudo mkdir -p ${MONGO_DBPATH}
-    sudo chown -R ${USER}:${USER} ${MONGO_DBPATH}
     printf "${BLUE}[-] Configuring logpath \"${MONGO_LOGPATH}\"...${NC}\n"
     sudo touch ${MONGO_LOGPATH}
-    sudo chown -R ${USER}:${USER} ${MONGO_LOGPATH}
-
-    sudo chown -R ${USER}:${USER} $(meteor m bin ${MONGO_VERSION})
 }
 
 function checkMongo() {
@@ -159,7 +154,7 @@ function shutdownMongo() {
 REPLICA_SET_CONFIG="replSet = "
 
 function hasReplicaSetConfig() {
-    sudo cat ${MONGO_CONF} | grep -icq "${REPLICA_SET_CONFIG}${MONGO_REPLICA}"
+    cat ${MONGO_CONF} | grep -icq "${REPLICA_SET_CONFIG}${MONGO_REPLICA}"
 }
 
 function hasReplicaOneDBConfig() {
@@ -191,7 +186,7 @@ function hasOplogUser() {
 }
 
 function hasOlogConfig() {
-    hasMongo && hasMongoConfig && hasReplicaSetConfig && hasReplicaOneDBConfig &&  hasReplicaTwoDBConfig &&
+    hasMongo && hasMongoConfig && hasReplicaSetConfig && hasReplicaOneDBConfig && hasReplicaTwoDBConfig &&
     hasReplicaOneLogsConfig && hasReplicaTwoLogsConfig && hasOplogInitialized && hasOplogUser
 }
 
@@ -264,7 +259,7 @@ function setupMongoOplog() {
     fi
 
     if ! hasReplicaSetConfig; then
-        sudo echo "${REPLICA_SET_CONFIG}${MONGO_REPLICA}" >> ${MONGO_CONF}
+        echo "${REPLICA_SET_CONFIG}${MONGO_REPLICA}" | sudo tee -a ${MONGO_CONF}
     fi
 
     connectMongoAndReplicas
