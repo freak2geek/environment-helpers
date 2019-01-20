@@ -25,12 +25,12 @@ function setupBashrc() {
 }
 
 function hasEnvrcInBash() {
-    [[ "$(cat ~/.bashrc | grep -ic "source ~/.envrc")" -ne "0" ]] &&
+    hasBashrc && [[ "$(cat ~/.bashrc | grep -ic "source ~/.envrc")" -ne "0" ]] &&
         [[ "$(cat ~/.bashrc | grep -ic "source ${PWD}/.envrc")" -ne "0" ]]
 }
 
 function hasEnvrcInZsh() {
-    [[ "$(cat ~/.zshrc | grep -ic "source ~/.envrc")" -ne "0" ]] &&
+    hasZshrc && [[ "$(cat ~/.zshrc | grep -ic "source ~/.envrc")" -ne "0" ]] &&
         [[ "$(cat ~/.zshrc | grep -ic "source ${PWD}/.envrc")" -ne "0" ]]
 }
 
