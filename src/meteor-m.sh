@@ -159,7 +159,7 @@ function shutdownMongo() {
 REPLICA_SET_CONFIG="replSet = "
 
 function hasReplicaSetConfig() {
-    cat ${MONGO_CONF} | grep -icq "${REPLICA_SET_CONFIG}${MONGO_REPLICA}"
+    sudo cat ${MONGO_CONF} | grep -icq "${REPLICA_SET_CONFIG}${MONGO_REPLICA}"
 }
 
 function hasReplicaOneDBConfig() {

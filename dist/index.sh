@@ -642,7 +642,7 @@ function shutdownMongo() {
 REPLICA_SET_CONFIG="replSet = "
 
 function hasReplicaSetConfig() {
-    cat ${MONGO_CONF} | grep -icq "${REPLICA_SET_CONFIG}${MONGO_REPLICA}"
+    sudo cat ${MONGO_CONF} | grep -icq "${REPLICA_SET_CONFIG}${MONGO_REPLICA}"
 }
 
 function hasReplicaOneDBConfig() {
@@ -815,47 +815,6 @@ function purgeMongoOplog() {
 }
 
 
-function hasMeteor() {
-    which meteor >/dev/null && [[ $(which meteor | grep -ic "not found") -eq "0" ]]
-}
-
-function installMeteor() {
-    printf "${BLUE}[-] Installing meteor...${NC}\n"
-    curl https://install.meteor.com/ | sh
-}
-
-function uninstallMeteor() {
-    printf "${BLUE}[-] Uninstalling meteor...${NC}\n"
-    sudo rm /usr/local/bin/meteor
-    rm -rf ~/.meteor
-}
-
-function checkMeteor() {
-    if hasMeteor; then
-        printf "${GREEN}[✔] meteor${NC}\n"
-    else
-        printf "${RED}[x] meteor${NC}\n"
-    fi
-}
-
-function setupMeteor() {
-    if hasMeteor; then
-        printf "${GREEN}[✔] Already meteor${NC}\n"
-        return
-    fi
-
-    installMeteor
-}
-
-function purgeMeteor() {
-    if ! hasMeteor; then
-        return
-    fi
-
-    uninstallMeteor
-}
-
-
 function hasMeteorYarn() {
     hasMeteor && find ${METEOR_TOOL_DIR} -type d -name "yarn" | grep -icq "yarn"
 }
@@ -968,6 +927,47 @@ function setupYarnDeps() {
 }
 
 
+function hasMeteor() {
+    which meteor >/dev/null && [[ $(which meteor | grep -ic "not found") -eq "0" ]]
+}
+
+function installMeteor() {
+    printf "${BLUE}[-] Installing meteor...${NC}\n"
+    curl https://install.meteor.com/ | sh
+}
+
+function uninstallMeteor() {
+    printf "${BLUE}[-] Uninstalling meteor...${NC}\n"
+    sudo rm /usr/local/bin/meteor
+    rm -rf ~/.meteor
+}
+
+function checkMeteor() {
+    if hasMeteor; then
+        printf "${GREEN}[✔] meteor${NC}\n"
+    else
+        printf "${RED}[x] meteor${NC}\n"
+    fi
+}
+
+function setupMeteor() {
+    if hasMeteor; then
+        printf "${GREEN}[✔] Already meteor${NC}\n"
+        return
+    fi
+
+    installMeteor
+}
+
+function purgeMeteor() {
+    if ! hasMeteor; then
+        return
+    fi
+
+    uninstallMeteor
+}
+
+
 function hasRvm() {
     which rvm >/dev/null && [[ $(which rvm | grep -ic "not found") -eq "0" ]]
 }
@@ -999,9 +999,9 @@ function installRuby() {
         installRvm
     fi
 
-    printf "${BLUE}[-] Installing ruby ${MONGO_VERSION}...${NC}\n"
-    rvm install ${MONGO_VERSION}
-    rvm --default use ${MONGO_VERSION}
+    printf "${BLUE}[-] Installing ruby ${version}...${NC}\n"
+    rvm install ${version}
+    rvm --default use ${version}
 }
 
 function uninstallRuby() {
