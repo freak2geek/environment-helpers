@@ -335,7 +335,7 @@ function hasEnvrcInZsh() {
 }
 
 function hasEnvrc() {
-    ! hasZshrc && hasEnvrcInBash || hasZshrc && hasEnvrcInBash && hasEnvrcInZsh
+    [[ ! hasZshrc && hasEnvrcInBash ]] || [[ hasZshrc && hasEnvrcInBash && hasEnvrcInZsh ]]
 }
 
 function configEnvrc() {
@@ -870,6 +870,47 @@ function purgeMongoOplog() {
 }
 
 
+function hasMeteor() {
+    which meteor >/dev/null && [[ $(which meteor | grep -ic "not found") -eq "0" ]]
+}
+
+function installMeteor() {
+    printf "${BLUE}[-] Installing meteor...${NC}\n"
+    curl https://install.meteor.com/ | sh
+}
+
+function uninstallMeteor() {
+    printf "${BLUE}[-] Uninstalling meteor...${NC}\n"
+    sudo rm /usr/local/bin/meteor
+    rm -rf ~/.meteor
+}
+
+function checkMeteor() {
+    if hasMeteor; then
+        printf "${GREEN}[✔] meteor${NC}\n"
+    else
+        printf "${RED}[x] meteor${NC}\n"
+    fi
+}
+
+function setupMeteor() {
+    if hasMeteor; then
+        printf "${GREEN}[✔] Already meteor${NC}\n"
+        return
+    fi
+
+    installMeteor
+}
+
+function purgeMeteor() {
+    if ! hasMeteor; then
+        return
+    fi
+
+    uninstallMeteor
+}
+
+
 function hasMeteorYarn() {
     hasMeteor && find ${METEOR_TOOL_DIR} -type d -name "yarn" | grep -icq "yarn"
 }
@@ -979,47 +1020,6 @@ function setupYarnDeps() {
     fi
 
     installYarnDeps $@
-}
-
-
-function hasMeteor() {
-    which meteor >/dev/null && [[ $(which meteor | grep -ic "not found") -eq "0" ]]
-}
-
-function installMeteor() {
-    printf "${BLUE}[-] Installing meteor...${NC}\n"
-    curl https://install.meteor.com/ | sh
-}
-
-function uninstallMeteor() {
-    printf "${BLUE}[-] Uninstalling meteor...${NC}\n"
-    sudo rm /usr/local/bin/meteor
-    rm -rf ~/.meteor
-}
-
-function checkMeteor() {
-    if hasMeteor; then
-        printf "${GREEN}[✔] meteor${NC}\n"
-    else
-        printf "${RED}[x] meteor${NC}\n"
-    fi
-}
-
-function setupMeteor() {
-    if hasMeteor; then
-        printf "${GREEN}[✔] Already meteor${NC}\n"
-        return
-    fi
-
-    installMeteor
-}
-
-function purgeMeteor() {
-    if ! hasMeteor; then
-        return
-    fi
-
-    uninstallMeteor
 }
 
 
