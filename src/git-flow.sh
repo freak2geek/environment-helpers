@@ -3,6 +3,16 @@
 source "./src/constants.sh"
 source "./src/helpers.sh"
 
+# GIT FLOW default config
+GITFLOW_BUGFIX="fix/"
+GITFLOW_FEATURE="feature/"
+GITFLOW_RELEASE="release/"
+GITFLOW_HOTFIX="hotfix/"
+GITFLOW_SUPPORT="support/"
+GITFLOW_VERSIONTAG=""
+GITFLOW_MASTER="master"
+GITFLOW_DEVELOP="develop"
+
 function hasGitFlow() {
     which git-flow >/dev/null && [[ $(which git-flow | grep -ic "not found") -eq "0" ]]
 }
@@ -41,15 +51,6 @@ function purgeGitFlowConfig() {
 function configGitFlow() {
     printf "${BLUE}[-] Configuring git-flow...${NC}\n"
 
-    bugfix=${1-'bugfix/'}
-    feature=${2-'feature/'}
-    release=${3-'release/'}
-    hotfix=${4-'hotfix/'}
-    support=${5-'support/'}
-    versiontag=${6-''}
-    master=${7-'master'}
-    develop=${8-'development'}
-
     if hasGitFlowConfig; then
         purgeGitFlowConfig
     fi
@@ -59,14 +60,15 @@ function configGitFlow() {
     fi
 
     printf "[gitflow \"prefix\"]" >>./.git/config
-    printf "\n\tbugfix = ${bugfix}" >>./.git/config
-    printf "\n\tfeature = ${feature}" >>./.git/config
-    printf "\n\trelease = ${release}" >>./.git/config
-    printf "\n\tsupport = ${support}" >>./.git/config
-    printf "\n\tversiontag = ${versiontag}" >>./.git/config
+    printf "\n\tbugfix = ${GITFLOW_BUGFIX}" >>./.git/config
+    printf "\n\tfeature = ${GITFLOW_FEATURE}" >>./.git/config
+    printf "\n\trelease = ${GITFLOW_RELEASE}" >>./.git/config
+    printf "\n\thotfix = ${GITFLOW_HOTFIX}" >>./.git/config
+    printf "\n\tsupport = ${GITFLOW_SUPPORT}" >>./.git/config
+    printf "\n\tversiontag = ${GITFLOW_VERSIONTAG}" >>./.git/config
     printf "\n[gitflow \"branch\"]" >>./.git/config
-    printf "\n\tmaster = ${master}" >>./.git/config
-    printf "\n\tdevelop = ${develop}" >>./.git/config
+    printf "\n\tmaster = ${GITFLOW_MASTER}" >>./.git/config
+    printf "\n\tdevelop = ${GITFLOW_DEVELOP}" >>./.git/config
 }
 
 function checkGitFlow() {
@@ -88,7 +90,7 @@ function setupGitFlow() {
     fi
 
     if ! hasGitFlowConfig; then
-        configGitFlow $@
+        configGitFlow
     fi
 }
 
