@@ -12,6 +12,8 @@ function hasRuby() {
 }
 
 function installRvm() {
+    configEnvrc
+
     printf "${BLUE}[-] Installing rvm...${NC}\n"
     command curl -sSL https://rvm.io/pkuczynski.asc | gpg --import -
     curl -sSL https://get.rvm.io | bash -s stable
@@ -21,7 +23,7 @@ function installRvm() {
 function uninstallRvm() {
     printf "${BLUE}[-] Uninstalling rvm...${NC}\n"
     rm -rf ~/.rvm
-    sedi '/\.rvm\/bin/d' ~/.bashrc
+    sedi '/\.rvm\/bin/d' ~/.envrc
     sedi '/\.rvm\//d' ~/.bash_profile
 }
 

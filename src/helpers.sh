@@ -5,21 +5,80 @@ source "./src/constants.sh"
 BASHRC_IMPORT="source ~/.bashrc"
 
 function hasBashrc() {
-    [[ -f ~/.bash_profile ]] && [[ $(cat ~/.bash_profile | grep -ic "${BASHRC_IMPORT}") -ne "0" ]]
+    [[ -f ~/.bash_profile ]] && [[ "$(cat ~/.bash_profile | grep -ic "${BASHRC_IMPORT}")" -ne "0" ]]
+}
+
+function hasZshrc() {
+    [[ -f ~/.zshrc ]]
 }
 
 function configBashrc() {
-    printf "${BLUE}[-] Configuring bashrc...${NC}\n"
-    echo "[[ -s ~/.bashrc ]] && ${BASHRC_IMPORT}" >> ~/.bash_profile
+    echo "[[ -s ~/.bashrc ]] && ${BASHRC_IMPORT}" >>~/.bash_profile
 }
 
 function setupBashrc() {
     if hasBashrc; then
-        printf "${GREEN}[✔] Already bashrc${NC}\n"
         return
     fi
 
     configBashrc
+}
+
+function hasEnvrcInBash() {
+    [[ "$(cat ~/.bashrc | grep -ic "source ~/.envrc")" -ne "0" ]] &&
+        [[ "$(cat ~/.bashrc | grep -ic "source ${PWD}/.envrc")" -ne "0" ]]
+}
+
+function hasEnvrcInZsh() {
+    [[ "$(cat ~/.zshrc | grep -ic "source ~/.envrc")" -ne "0" ]] &&
+        [[ "$(cat ~/.zshrc | grep -ic "source ${PWD}/.envrc")" -ne "0" ]]
+}
+
+function hasEnvrc() {
+    ! hasZshrc && hasEnvrcInBash || hasZshrc && hasEnvrcInBash && hasEnvrcInZsh
+}
+
+function configEnvrc() {
+    printf "${BLUE}[-] Configuring .envrc...${NC}\n"
+
+    if hasBashrc && ! hasEnvrcInBash; then
+        setupBashrc
+
+        echo "[[ -s ~/.envrc ]] && source ~/.envrc" >>~/.bashrc
+        echo "[[ -s ${PWD}/.envrc ]] && source ${PWD}/.envrc" >>~/.bashrc
+    fi
+
+    if hasZshrc && ! hasEnvrcInZsh; then
+        echo "[[ -s ~/.envrc ]] && source ~/.envrc" >>~/.zshrc
+        echo "[[ -s ${PWD}/.envrc ]] && source ${PWD}/.envrc" >>~/.zshrc
+    fi
+}
+
+function setupEnvrc() {
+    if hasEnvrc; then
+        printf "${GREEN}[✔] Already .envrc${NC}\n"
+        return
+    fi
+
+    configEnvrc
+}
+
+function checkEnvrc() {
+    if hasEnvrc; then
+        printf "${GREEN}[✔] .envrc${NC}\n"
+    else
+        printf "${RED}[x] .envrc${NC}\n"
+    fi
+}
+
+function purgeEnvrc() {
+    if ! hasEnvrc; then
+        return
+    fi
+
+    printf "${BLUE}[-] Purging .envrc...${NC}\n"
+    sedi "/envrc/d" ~/.bashrc
+    sedi "/envrc/d" ~/.zshrc
 }
 
 function endsWithNewLine() {

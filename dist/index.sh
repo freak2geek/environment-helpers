@@ -23,11 +23,11 @@ function hasBrew() {
 }
 
 function hasBrewPathConfig() {
-    hasBashrc && cat ~/.bashrc | grep -icq "${BREW_PATH}"
+    hasEnvrc && cat ~/.envrc | grep -icq "${BREW_PATH}"
 }
 
 function hasBrewUmaskConfig() {
-    hasBashrc && cat ~/.bashrc | grep -icq "${BREW_UMASK}"
+    hasEnvrc && cat ~/.envrc | grep -icq "${BREW_UMASK}"
 }
 
 function hasBrewConfig() {
@@ -48,16 +48,16 @@ function installBrew() {
 }
 
 function configBrew() {
-    setupBashrc
+    configEnvrc
 
     printf "${BLUE}[-] Configuring brew...${NC}\n"
 
     if ! hasBrewPathConfig; then
-        echo "export PATH='${BREW_PATH}'":'"$PATH"' >>~/.bashrc
+        echo "export PATH='${BREW_PATH}'":'"$PATH"' >>~/.envrc
     fi
 
     if ! hasBrewUmaskConfig; then
-        echo "${BREW_UMASK}" >>~/.bashrc
+        echo "${BREW_UMASK}" >>~/.envrc
     fi
 }
 
@@ -67,8 +67,8 @@ function uninstallBrew() {
         yes | ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Linuxbrew/install/master/uninstall)"
     fi
     test -e /home/linuxbrew/.linuxbrew/bin/brew && brew purge
-    sedi '/linuxbrew/d' ~/.bashrc
-    sedi "/${BREW_UMASK}/d" ~/.bashrc
+    sedi '/linuxbrew/d' ~/.envrc
+    sedi "/${BREW_UMASK}/d" ~/.envrc
     test -d /home/linuxbrew/.linuxbrew/bin && rm -R /home/linuxbrew/.linuxbrew/bin
     test -d /home/linuxbrew/.linuxbrew/lib && rm -R /home/linuxbrew/.linuxbrew/lib
     test -d /home/linuxbrew/.linuxbrew/share && rm -R /home/linuxbrew/.linuxbrew/share
@@ -305,21 +305,80 @@ function purgeGit() {
 BASHRC_IMPORT="source ~/.bashrc"
 
 function hasBashrc() {
-    [[ -f ~/.bash_profile ]] && [[ $(cat ~/.bash_profile | grep -ic "${BASHRC_IMPORT}") -ne "0" ]]
+    [[ -f ~/.bash_profile ]] && [[ "$(cat ~/.bash_profile | grep -ic "${BASHRC_IMPORT}")" -ne "0" ]]
+}
+
+function hasZshrc() {
+    [[ -f ~/.zshrc ]]
 }
 
 function configBashrc() {
-    printf "${BLUE}[-] Configuring bashrc...${NC}\n"
-    echo "[[ -s ~/.bashrc ]] && ${BASHRC_IMPORT}" >> ~/.bash_profile
+    echo "[[ -s ~/.bashrc ]] && ${BASHRC_IMPORT}" >>~/.bash_profile
 }
 
 function setupBashrc() {
     if hasBashrc; then
-        printf "${GREEN}[✔] Already bashrc${NC}\n"
         return
     fi
 
     configBashrc
+}
+
+function hasEnvrcInBash() {
+    [[ "$(cat ~/.bashrc | grep -ic "source ~/.envrc")" -ne "0" ]] &&
+        [[ "$(cat ~/.bashrc | grep -ic "source ${PWD}/.envrc")" -ne "0" ]]
+}
+
+function hasEnvrcInZsh() {
+    [[ "$(cat ~/.zshrc | grep -ic "source ~/.envrc")" -ne "0" ]] &&
+        [[ "$(cat ~/.zshrc | grep -ic "source ${PWD}/.envrc")" -ne "0" ]]
+}
+
+function hasEnvrc() {
+    ! hasZshrc && hasEnvrcInBash || hasZshrc && hasEnvrcInBash && hasEnvrcInZsh
+}
+
+function configEnvrc() {
+    printf "${BLUE}[-] Configuring .envrc...${NC}\n"
+
+    if hasBashrc && ! hasEnvrcInBash; then
+        setupBashrc
+
+        echo "[[ -s ~/.envrc ]] && source ~/.envrc" >>~/.bashrc
+        echo "[[ -s ${PWD}/.envrc ]] && source ${PWD}/.envrc" >>~/.bashrc
+    fi
+
+    if hasZshrc && ! hasEnvrcInZsh; then
+        echo "[[ -s ~/.envrc ]] && source ~/.envrc" >>~/.zshrc
+        echo "[[ -s ${PWD}/.envrc ]] && source ${PWD}/.envrc" >>~/.zshrc
+    fi
+}
+
+function setupEnvrc() {
+    if hasEnvrc; then
+        printf "${GREEN}[✔] Already .envrc${NC}\n"
+        return
+    fi
+
+    configEnvrc
+}
+
+function checkEnvrc() {
+    if hasEnvrc; then
+        printf "${GREEN}[✔] .envrc${NC}\n"
+    else
+        printf "${RED}[x] .envrc${NC}\n"
+    fi
+}
+
+function purgeEnvrc() {
+    if ! hasEnvrc; then
+        return
+    fi
+
+    printf "${BLUE}[-] Purging .envrc...${NC}\n"
+    sedi "/envrc/d" ~/.bashrc
+    sedi "/envrc/d" ~/.zshrc
 }
 
 function endsWithNewLine() {
@@ -973,6 +1032,8 @@ function hasRuby() {
 }
 
 function installRvm() {
+    configEnvrc
+
     printf "${BLUE}[-] Installing rvm...${NC}\n"
     command curl -sSL https://rvm.io/pkuczynski.asc | gpg --import -
     curl -sSL https://get.rvm.io | bash -s stable
@@ -982,7 +1043,7 @@ function installRvm() {
 function uninstallRvm() {
     printf "${BLUE}[-] Uninstalling rvm...${NC}\n"
     rm -rf ~/.rvm
-    sedi '/\.rvm\/bin/d' ~/.bashrc
+    sedi '/\.rvm\/bin/d' ~/.envrc
     sedi '/\.rvm\//d' ~/.bash_profile
 }
 
@@ -1015,8 +1076,12 @@ function hasZshrc() {
     [[ -f "${HOME}/.oh-my-zsh/custom/plugins/zshrc/zshrc.plugin.zsh" ]]
 }
 
+function hasZshAndOhMyZsh() {
+    hasZsh && hasOhMyZsh
+}
+
 function hasZshAsDefault() {
-  [[ $(cat "${HOME}/.bashrc" | grep -ic 'export SHELL=$(which zsh)') -ne "0" ]]
+  [[ $(cat ~/.envrc | grep -ic 'export SHELL=$(which zsh)') -ne "0" ]]
 }
 
 function installZsh() {
@@ -1045,7 +1110,7 @@ function installZshrc() {
 }
 
 function checkZsh() {
-    if hasZsh && hasOhMyZsh && hasZshrc; then
+    if hasZshAndOhMyZsh && hasZshrc; then
         printf "${GREEN}[✔] zsh${NC}\n"
     else
         printf "${RED}[x] zsh${NC}\n"
@@ -1053,7 +1118,7 @@ function checkZsh() {
 }
 
 function setupZsh() {
-    if hasZsh && hasOhMyZsh && hasZshrc; then
+    if hasZshAndOhMyZsh && hasZshrc; then
         printf "${GREEN}[✔] Already zsh${NC}\n"
         return
     fi
@@ -1069,6 +1134,8 @@ function setupZsh() {
     if ! hasZshrc; then
         installZshrc
     fi
+
+    configEnvrc
 }
 
 function purgeZsh() {
@@ -1087,11 +1154,11 @@ function configZshAsDefault() {
         return
     fi
 
-    setupBashrc
+    configEnvrc
 
     printf "${BLUE}[-] Setting zsh as default shell...${NC}\n"
-    printf '\n export SHELL=$(which zsh)' >>~/.bashrc
-    printf '\n [[ -z "$ZSH_VERSION" ]] && exec "$SHELL" -l' >>~/.bashrc
+    printf '\n export SHELL=$(which zsh)' >>~/.envrc
+    printf '\n [[ -z "$ZSH_VERSION" ]] && exec "$SHELL" -l' >>~/.envrc
     # Alternative method
     # if [[ $(cat /etc/shells | grep -ic "$(which zsh)") -eq "0" ]]; then
     #    which zsh | sudo tee -a /etc/shells

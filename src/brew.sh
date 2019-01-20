@@ -26,11 +26,11 @@ function hasBrew() {
 }
 
 function hasBrewPathConfig() {
-    hasBashrc && cat ~/.bashrc | grep -icq "${BREW_PATH}"
+    hasEnvrc && cat ~/.envrc | grep -icq "${BREW_PATH}"
 }
 
 function hasBrewUmaskConfig() {
-    hasBashrc && cat ~/.bashrc | grep -icq "${BREW_UMASK}"
+    hasEnvrc && cat ~/.envrc | grep -icq "${BREW_UMASK}"
 }
 
 function hasBrewConfig() {
@@ -51,16 +51,16 @@ function installBrew() {
 }
 
 function configBrew() {
-    setupBashrc
+    configEnvrc
 
     printf "${BLUE}[-] Configuring brew...${NC}\n"
 
     if ! hasBrewPathConfig; then
-        echo "export PATH='${BREW_PATH}'":'"$PATH"' >>~/.bashrc
+        echo "export PATH='${BREW_PATH}'":'"$PATH"' >>~/.envrc
     fi
 
     if ! hasBrewUmaskConfig; then
-        echo "${BREW_UMASK}" >>~/.bashrc
+        echo "${BREW_UMASK}" >>~/.envrc
     fi
 }
 
@@ -70,8 +70,8 @@ function uninstallBrew() {
         yes | ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Linuxbrew/install/master/uninstall)"
     fi
     test -e /home/linuxbrew/.linuxbrew/bin/brew && brew purge
-    sedi '/linuxbrew/d' ~/.bashrc
-    sedi "/${BREW_UMASK}/d" ~/.bashrc
+    sedi '/linuxbrew/d' ~/.envrc
+    sedi "/${BREW_UMASK}/d" ~/.envrc
     test -d /home/linuxbrew/.linuxbrew/bin && rm -R /home/linuxbrew/.linuxbrew/bin
     test -d /home/linuxbrew/.linuxbrew/lib && rm -R /home/linuxbrew/.linuxbrew/lib
     test -d /home/linuxbrew/.linuxbrew/share && rm -R /home/linuxbrew/.linuxbrew/share

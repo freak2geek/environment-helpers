@@ -15,8 +15,12 @@ function hasZshrc() {
     [[ -f "${HOME}/.oh-my-zsh/custom/plugins/zshrc/zshrc.plugin.zsh" ]]
 }
 
+function hasZshAndOhMyZsh() {
+    hasZsh && hasOhMyZsh
+}
+
 function hasZshAsDefault() {
-  [[ $(cat "${HOME}/.bashrc" | grep -ic 'export SHELL=$(which zsh)') -ne "0" ]]
+  [[ $(cat ~/.envrc | grep -ic 'export SHELL=$(which zsh)') -ne "0" ]]
 }
 
 function installZsh() {
@@ -45,7 +49,7 @@ function installZshrc() {
 }
 
 function checkZsh() {
-    if hasZsh && hasOhMyZsh && hasZshrc; then
+    if hasZshAndOhMyZsh && hasZshrc; then
         printf "${GREEN}[✔] zsh${NC}\n"
     else
         printf "${RED}[x] zsh${NC}\n"
@@ -53,7 +57,7 @@ function checkZsh() {
 }
 
 function setupZsh() {
-    if hasZsh && hasOhMyZsh && hasZshrc; then
+    if hasZshAndOhMyZsh && hasZshrc; then
         printf "${GREEN}[✔] Already zsh${NC}\n"
         return
     fi
@@ -69,6 +73,8 @@ function setupZsh() {
     if ! hasZshrc; then
         installZshrc
     fi
+
+    configEnvrc
 }
 
 function purgeZsh() {
@@ -87,11 +93,11 @@ function configZshAsDefault() {
         return
     fi
 
-    setupBashrc
+    configEnvrc
 
     printf "${BLUE}[-] Setting zsh as default shell...${NC}\n"
-    printf '\n export SHELL=$(which zsh)' >>~/.bashrc
-    printf '\n [[ -z "$ZSH_VERSION" ]] && exec "$SHELL" -l' >>~/.bashrc
+    printf '\n export SHELL=$(which zsh)' >>~/.envrc
+    printf '\n [[ -z "$ZSH_VERSION" ]] && exec "$SHELL" -l' >>~/.envrc
     # Alternative method
     # if [[ $(cat /etc/shells | grep -ic "$(which zsh)") -eq "0" ]]; then
     #    which zsh | sudo tee -a /etc/shells
