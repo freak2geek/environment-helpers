@@ -692,6 +692,10 @@ function shutdownMongoAndReplicas() {
 }
 
 function checkMongoOplog() {
+    if ! hasMongo || ! hasMongoConfig; then
+        printf "${RED}[x] meteor mongo oplog${NC}\n"
+    fi
+
     connectMongo 1>/dev/null
     if hasOlogConfig; then
         printf "${GREEN}[✔] meteor mongo oplog${NC}\n"
