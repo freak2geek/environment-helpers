@@ -267,7 +267,7 @@ function setupMongoOplog() {
             meteor m shell ${MONGO_VERSION} --port 27017 --eval "rs.initiate(${OPLOG_CONFIG})"
         fi
     fi
-    shutdownMongoAndReplicas
+    shutdownMongoAndReplicas 1>/dev/null
 
     connectMongo
     if hasOplogUser; then
@@ -276,7 +276,7 @@ function setupMongoOplog() {
 
         meteor m shell ${MONGO_VERSION} --port 27017 --eval "db.getSiblingDB('admin').createUser({\"user\":\"oplogger\",\"pwd\":\"PASSWORD\",\"roles\":[{\"role\":\"read\",\"db\":\"local\"}],\"passwordDigestor\":\"server\"})"
     fi
-    shutdownMongo
+    shutdownMongo 1>/dev/null
 }
 
 function purgeMongoOplog() {
