@@ -619,7 +619,7 @@ function connectMongo() {
     fi
 
     printf "${BLUE}[-] Connecting to mongo \"${MONGO_VERSION}\"...${NC}\n"
-    sudo meteor m use ${MONGO_VERSION} --port 27017 --dbpath ${MONGO_DBPATH} --fork --logpath ${MONGO_LOGPATH} 1>/dev/null
+    sudo meteor m use ${MONGO_VERSION} --port 27017 --dbpath ${MONGO_DBPATH} --fork --logpath ${MONGO_LOGPATH} --journal
 
     while ! nc -z localhost 27017 </dev/null; do sleep 1; done
 }
@@ -631,13 +631,7 @@ function shutdownMongo() {
         return
     fi
 
-    meteor m mongo ${MONGO_VERSION} --port 27017 --eval "db.getSiblingDB('admin').shutdownServer()" 1>/dev/null
-}
-
-REPLICA_SET_CONFIG="replSet = "
-
-function hasReplicaSetConfig() {
-    cat ${MONGO_CONF} | grep -icq "${REPLICA_SET_CONFIG}${MONGO_REPLICA}"
+    meteor m mongo ${MONGO_VERSION} --port 27017 --eval "db.getSiblingDB('admin').shutdownServer()"
 }
 
 function hasReplicaOneDBConfig() {
@@ -669,7 +663,7 @@ function hasOplogUser() {
 }
 
 function hasOlogConfig() {
-    hasMongo && hasMongoConfig && hasReplicaSetConfig && hasReplicaOneDBConfig && hasReplicaTwoDBConfig &&
+    hasMongo && hasMongoConfig && hasReplicaOneDBConfig && hasReplicaTwoDBConfig &&
     hasReplicaOneLogsConfig && hasReplicaTwoLogsConfig && hasOplogInitialized && hasOplogUser
 }
 
@@ -680,9 +674,9 @@ function hasMongoConnected() {
 function connectMongoAndReplicas() {
     printf "${BLUE}[-] Connecting to mongo \"${MONGO_VERSION}\" and replicas...${NC}\n"
 
-    sudo meteor m use ${MONGO_VERSION} --config ${MONGO_CONF} --port 27017 --dbpath ${MONGO_DBPATH} --fork --logpath ${MONGO_LOGPATH} --replSet ${MONGO_REPLICA} 1>/dev/null
-    sudo meteor m use ${MONGO_VERSION} --config ${MONGO_CONF} --port 27018 --dbpath ${MONGO_R1_DBPATH} --fork --logpath ${MONGO_R1_LOGPATH} --replSet ${MONGO_REPLICA} 1>/dev/null
-    sudo meteor m use ${MONGO_VERSION} --config ${MONGO_CONF} --port 27019 --dbpath ${MONGO_R2_DBPATH} --fork --logpath ${MONGO_R2_LOGPATH} --replSet ${MONGO_REPLICA} 1>/dev/null
+    sudo meteor m use ${MONGO_VERSION} --config ${MONGO_CONF} --port 27017 --dbpath ${MONGO_DBPATH} --fork --logpath ${MONGO_LOGPATH} --replSet ${MONGO_REPLICA} --journal
+    sudo meteor m use ${MONGO_VERSION} --config ${MONGO_CONF} --port 27018 --dbpath ${MONGO_R1_DBPATH} --fork --logpath ${MONGO_R1_LOGPATH} --replSet ${MONGO_REPLICA} --journal
+    sudo meteor m use ${MONGO_VERSION} --config ${MONGO_CONF} --port 27019 --dbpath ${MONGO_R2_DBPATH} --fork --logpath ${MONGO_R2_LOGPATH} --replSet ${MONGO_REPLICA} --journal
 
     while ! nc -z localhost 27017 </dev/null; do sleep 1; done
     while ! nc -z localhost 27018 </dev/null; do sleep 1; done
@@ -692,9 +686,9 @@ function connectMongoAndReplicas() {
 function shutdownMongoAndReplicas() {
     printf "${BLUE}[-] Disconnecting to mongo \"${MONGO_VERSION}\" and replicas...${NC}\n"
 
-    meteor m mongo ${MONGO_VERSION} --port 27017 --eval "db.getSiblingDB('admin').shutdownServer()" 1>/dev/null
-    meteor m mongo ${MONGO_VERSION} --port 27018 --eval "db.getSiblingDB('admin').shutdownServer()" 1>/dev/null
-    meteor m mongo ${MONGO_VERSION} --port 27019 --eval "db.getSiblingDB('admin').shutdownServer()" 1>/dev/null
+    meteor m mongo ${MONGO_VERSION} --port 27017 --eval "db.getSiblingDB('admin').shutdownServer()"
+    meteor m mongo ${MONGO_VERSION} --port 27018 --eval "db.getSiblingDB('admin').shutdownServer()"
+    meteor m mongo ${MONGO_VERSION} --port 27019 --eval "db.getSiblingDB('admin').shutdownServer()"
 }
 
 function checkMongoOplog() {
@@ -739,10 +733,6 @@ function setupMongoOplog() {
     else
         printf "${BLUE}[-] Configuring logReplicaTwo \"${MONGO_R2_LOGPATH}\"...${NC}\n"
         sudo touch ${MONGO_R2_LOGPATH}
-    fi
-
-    if ! hasReplicaSetConfig; then
-        echo "${REPLICA_SET_CONFIG}${MONGO_REPLICA}" | sudo tee -a ${MONGO_CONF}
     fi
 
     connectMongoAndReplicas
@@ -802,10 +792,6 @@ function purgeMongoOplog() {
 
     if hasReplicaTwoLogsConfig; then
         sudo rm ${MONGO_R2_LOGPATH}
-    fi
-
-    if hasReplicaSetConfig; then
-        sudo sedi "/${REPLICA_SET_CONFIG}/d" ${MONGO_CONF}
     fi
 }
 
@@ -880,7 +866,7 @@ function getPackageName() {
 function hasYarnDeps() {
     packagePath=${1-"."}
     cd ${packagePath}
-    hasMeteorYarn && [[ $(meteor yarn check --verify-tree 2>&1 >/dev/null | grep -ic "error") -eq "0" ]]
+    hasMeteorYarn && [[ "$(meteor yarn check --verify-tree 2>&1 >/dev/null | grep -ic "error")" -eq "0" ]]
 }
 
 function checkYarnDeps() {
