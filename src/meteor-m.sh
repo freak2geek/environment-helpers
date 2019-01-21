@@ -88,8 +88,7 @@ function getReplicaFile() {
 }
 
 function hasMongoConfig() {
-    [[ -f ${MONGO_CONF} ]] && ls -la ${MONGO_CONF} | grep -icq "\-rw\-r\-\-r\-\- .* ${MONGO_CONF}" &&
-    [[ -d  ${MONGO_DBPATH} ]] && [[ -f ${MONGO_LOGPATH} ]]
+    [[ -f ${MONGO_CONF} ]] && [[ -d  ${MONGO_DBPATH} ]] && [[ -f ${MONGO_LOGPATH} ]]
 }
 
 function configMongo() {
