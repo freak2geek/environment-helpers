@@ -207,6 +207,14 @@ function shutdownMongoAndReplicas() {
     meteor m mongo ${MONGO_VERSION} --port 27019 --eval "db.getSiblingDB('admin').shutdownServer()"
 }
 
+function repairMongoAndReplicas() {
+    printf "${BLUE}[-] Repairing mongo \"${MONGO_VERSION}\" and replicas...${NC}\n"
+
+    sudo meteor m use ${MONGO_VERSION} --config ${MONGO_CONF} --port 27017 --dbpath ${MONGO_DBPATH} --repair
+    sudo meteor m use ${MONGO_VERSION} --config ${MONGO_CONF} --port 27018 --dbpath ${MONGO_R1_DBPATH} --repair
+    sudo meteor m use ${MONGO_VERSION} --config ${MONGO_CONF} --port 27019 --dbpath ${MONGO_R2_DBPATH} --repair
+}
+
 function checkMongoOplog() {
     if ! hasMongo || ! hasMongoConfig; then
         printf "${RED}[x] meteor mongo oplog${NC}\n"

@@ -690,6 +690,14 @@ function shutdownMongoAndReplicas() {
     meteor m mongo ${MONGO_VERSION} --port 27019 --eval "db.getSiblingDB('admin').shutdownServer()"
 }
 
+function repairMongoAndReplicas() {
+    printf "${BLUE}[-] Repairing mongo \"${MONGO_VERSION}\" and replicas...${NC}\n"
+
+    sudo meteor m use ${MONGO_VERSION} --config ${MONGO_CONF} --port 27017 --dbpath ${MONGO_DBPATH} --repair
+    sudo meteor m use ${MONGO_VERSION} --config ${MONGO_CONF} --port 27018 --dbpath ${MONGO_R1_DBPATH} --repair
+    sudo meteor m use ${MONGO_VERSION} --config ${MONGO_CONF} --port 27019 --dbpath ${MONGO_R2_DBPATH} --repair
+}
+
 function checkMongoOplog() {
     if ! hasMongo || ! hasMongoConfig; then
         printf "${RED}[x] meteor mongo oplog${NC}\n"
@@ -797,6 +805,47 @@ function purgeMongoOplog() {
     if hasReplicaTwoLogsConfig; then
         sudo rm ${MONGO_R2_LOGPATH}
     fi
+}
+
+
+function hasMeteor() {
+    which meteor >/dev/null && [[ "$(which meteor | grep -ic "not found")" -eq "0" ]]
+}
+
+function installMeteor() {
+    printf "${BLUE}[-] Installing meteor...${NC}\n"
+    curl https://install.meteor.com/ | sh
+}
+
+function uninstallMeteor() {
+    printf "${BLUE}[-] Uninstalling meteor...${NC}\n"
+    sudo rm /usr/local/bin/meteor
+    rm -rf ~/.meteor
+}
+
+function checkMeteor() {
+    if hasMeteor; then
+        printf "${GREEN}[✔] meteor${NC}\n"
+    else
+        printf "${RED}[x] meteor${NC}\n"
+    fi
+}
+
+function setupMeteor() {
+    if hasMeteor; then
+        printf "${GREEN}[✔] Already meteor${NC}\n"
+        return
+    fi
+
+    installMeteor
+}
+
+function purgeMeteor() {
+    if ! hasMeteor; then
+        return
+    fi
+
+    uninstallMeteor
 }
 
 
@@ -909,47 +958,6 @@ function setupYarnDeps() {
     fi
 
     installYarnDeps $@
-}
-
-
-function hasMeteor() {
-    which meteor >/dev/null && [[ "$(which meteor | grep -ic "not found")" -eq "0" ]]
-}
-
-function installMeteor() {
-    printf "${BLUE}[-] Installing meteor...${NC}\n"
-    curl https://install.meteor.com/ | sh
-}
-
-function uninstallMeteor() {
-    printf "${BLUE}[-] Uninstalling meteor...${NC}\n"
-    sudo rm /usr/local/bin/meteor
-    rm -rf ~/.meteor
-}
-
-function checkMeteor() {
-    if hasMeteor; then
-        printf "${GREEN}[✔] meteor${NC}\n"
-    else
-        printf "${RED}[x] meteor${NC}\n"
-    fi
-}
-
-function setupMeteor() {
-    if hasMeteor; then
-        printf "${GREEN}[✔] Already meteor${NC}\n"
-        return
-    fi
-
-    installMeteor
-}
-
-function purgeMeteor() {
-    if ! hasMeteor; then
-        return
-    fi
-
-    uninstallMeteor
 }
 
 
