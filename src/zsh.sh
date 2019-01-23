@@ -49,7 +49,7 @@ function installZshrc() {
 }
 
 function checkZsh() {
-    if hasZshAndOhMyZsh && hasZshrc; then
+    if hasZshAndOhMyZsh; then
         printf "${GREEN}[✔] zsh${NC}\n"
     else
         printf "${RED}[x] zsh${NC}\n"
@@ -57,7 +57,7 @@ function checkZsh() {
 }
 
 function setupZsh() {
-    if hasZshAndOhMyZsh && hasZshrc; then
+    if hasZshAndOhMyZsh; then
         printf "${GREEN}[✔] Already zsh${NC}\n"
         return
     fi
@@ -68,10 +68,6 @@ function setupZsh() {
 
     if ! hasOhMyZsh; then
         installOhMyZsh
-    fi
-
-    if ! hasZshrc; then
-        installZshrc
     fi
 
     configEnvrc
