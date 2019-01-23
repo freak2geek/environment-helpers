@@ -1121,6 +1121,7 @@ function configZshAsDefault() {
     printf "${BLUE}[-] Setting zsh as default shell...${NC}\n"
     printf '\n export SHELL=$(which zsh)' >>~/.envrc
     printf '\n [[ -z "$ZSH_VERSION" ]] && exec "$SHELL" -l' >>~/.envrc
+    printf "${PURPLE}Please, restart your shell to use zsh.${NC}\n"
     # Alternative method
     # if [[ $(cat /etc/shells | grep -ic "$(which zsh)") -eq "0" ]]; then
     #    which zsh | sudo tee -a /etc/shells
