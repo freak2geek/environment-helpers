@@ -77,6 +77,7 @@ function disableZshAsDefault() {
     printf "${BLUE}[-] Disabling zsh...${NC}\n"
     sedi '/which zsh/d' ~/.envrc
     sedi '/$ZSH_VERSION/d' ~/.envrc
+    printf "${PURPLE}Please, restart your shell to use back your bash.${NC}\n"
 }
 
 function purgeZsh() {
