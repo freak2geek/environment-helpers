@@ -1087,7 +1087,7 @@ function setupZsh() {
         installOhMyZsh
     fi
 
-    configEnvrc
+    setupEnvrc
 }
 
 function disableZshAsDefault() {
@@ -1116,7 +1116,7 @@ function configZshAsDefault() {
         return
     fi
 
-    configEnvrc
+    setupEnvrc
 
     printf "${BLUE}[-] Setting zsh as default shell...${NC}\n"
     printf '\n export SHELL=$(which zsh)' >>~/.envrc
