@@ -328,12 +328,12 @@ function setupBashrc() {
 
 function hasEnvrcInBash() {
     hasBashrc && [[ "$(cat ~/.bashrc | grep -ic "source ~/.envrc")" -ne "0" ]] &&
-        [[ "$(cat ~/.bashrc | grep -ic "source ${PWD}/.envrc")" -ne "0" ]]
+        [[ "$(cat ~/.bashrc | grep -ic "${PWD}/.envrc")" -ne "0" ]]
 }
 
 function hasEnvrcInZsh() {
     hasZshrc && [[ "$(cat ~/.zshrc | grep -ic "source ~/.envrc")" -ne "0" ]] &&
-        [[ "$(cat ~/.zshrc | grep -ic "source ${PWD}/.envrc")" -ne "0" ]]
+        [[ "$(cat ~/.zshrc | grep -ic "${PWD}/.envrc")" -ne "0" ]]
 }
 
 function hasEnvrc() {
@@ -347,12 +347,12 @@ function configEnvrc() {
         setupBashrc
 
         echo "[[ -s ~/.envrc ]] && source ~/.envrc" >>~/.bashrc
-        echo "[[ -s ${PWD}/.envrc ]] && source ${PWD}/.envrc" >>~/.bashrc
+        echo "[[ -s ${PWD}/.envrc ]] && ${PWD}/.envrc" >>~/.bashrc
     fi
 
     if hasZshrc && ! hasEnvrcInZsh; then
         echo "[[ -s ~/.envrc ]] && source ~/.envrc" >>~/.zshrc
-        echo "[[ -s ${PWD}/.envrc ]] && source ${PWD}/.envrc" >>~/.zshrc
+        echo "[[ -s ${PWD}/.envrc ]] && ${PWD}/.envrc" >>~/.zshrc
     fi
 }
 
