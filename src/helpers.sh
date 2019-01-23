@@ -24,33 +24,51 @@ function setupBashrc() {
     configBashrc
 }
 
-function hasEnvrcInBash() {
-    hasBashrc && [[ "$(cat ~/.bashrc | grep -ic "source ~/.envrc")" -ne "0" ]] &&
-        [[ "$(cat ~/.bashrc | grep -ic "source ${PWD}/.envrc")" -ne "0" ]]
+function hasGlobalEnvrcInBash() {
+    [[ "$(cat ~/.bashrc | grep -ic "source ~/.envrc")" -ne "0" ]]
 }
 
-function hasEnvrcInZsh() {
-    hasZshrc && [[ "$(cat ~/.zshrc | grep -ic "source ~/.envrc")" -ne "0" ]] &&
-        [[ "$(cat ~/.zshrc | grep -ic "source ${PWD}/.envrc")" -ne "0" ]]
+function hasLocalEnvrcInBash() {
+    [[ "$(cat ~/.bashrc | grep -ic "source ${PWD}/.envrc")" -ne "0" ]]
+}
+
+function hasGlobalEnvrcInZsh() {
+    [[ "$(cat ~/.zshrc | grep -ic "source ~/.envrc")" -ne "0" ]]
+}
+
+function hasLocalEnvrcInZsh() {
+    [[ "$(cat ~/.zshrc | grep -ic "source ${PWD}/.envrc")" -ne "0" ]]
 }
 
 function hasEnvrc() {
-    (! hasZshrc && hasEnvrcInBash) || (hasZshrc && hasEnvrcInBash && hasEnvrcInZsh)
+    (! hasZshrc && hasGlobalEnvrcInBash && hasLocalEnvrcInBash) || (hasZshrc && hasGlobalEnvrcInZsh && hasLocalEnvrcInZsh)
 }
 
 function configEnvrc() {
     printf "${BLUE}[-] Configuring .envrc...${NC}\n"
 
-    if hasBashrc && ! hasEnvrcInBash; then
+    if ! hasBashrc; then
         setupBashrc
-
-        echo "[[ -s ~/.envrc ]] && source ~/.envrc" >>~/.bashrc
-        echo "[[ -s ${PWD}/.envrc ]] && source ${PWD}/.envrc" >>~/.bashrc
     fi
 
-    if hasZshrc && ! hasEnvrcInZsh; then
+    if ! hasGlobalEnvrcInBash; then
+        echo "[[ -s ~/.envrc ]] && source ~/.envrc" >>~/.bashrc
+        printf "${GREEN}[✔] global .envrc in bash${NC}\n"
+    fi
+
+    if ! hasLocalEnvrcInBash; then
+        echo "[[ -s ${PWD}/.envrc ]] && source ${PWD}/.envrc" >>~/.bashrc
+        printf "${GREEN}[✔] local .envrc in bash${NC}\n"
+    fi
+
+    if ! hasGlobalEnvrcInZsh; then
         echo "[[ -s ~/.envrc ]] && source ~/.envrc" >>~/.zshrc
+        printf "${GREEN}[✔] global .envrc in zsh${NC}\n"
+    fi
+
+    if ! hasLocalEnvrcInZsh; then
         echo "[[ -s ${PWD}/.envrc ]] && source ${PWD}/.envrc" >>~/.zshrc
+        printf "${GREEN}[✔] local .envrc in zsh${NC}\n"
     fi
 }
 
