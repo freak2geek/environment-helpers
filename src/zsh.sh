@@ -73,6 +73,12 @@ function setupZsh() {
     configEnvrc
 }
 
+function disableZshAsDefault() {
+    printf "${BLUE}[-] Disabling zsh...${NC}\n"
+    sedi '/which zsh/d' ~/.envrc
+    sedi '/$ZSH_VERSION/d' ~/.envrc
+}
+
 function purgeZsh() {
     if hasZsh; then
         uninstallZsh
@@ -80,6 +86,10 @@ function purgeZsh() {
 
     if hasOhMyZsh; then
         uninstallOhMyZsh
+    fi
+
+    if hasZshAsDefault; then
+        disableZshAsDefault
     fi
 }
 
