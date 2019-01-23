@@ -337,7 +337,7 @@ function hasEnvrcInZsh() {
 }
 
 function hasEnvrc() {
-    [[ ! hasZshrc && hasEnvrcInBash ]] || [[ hasZshrc && hasEnvrcInBash && hasEnvrcInZsh ]]
+    (! hasZshrc && hasEnvrcInBash) || (hasZshrc && hasEnvrcInBash && hasEnvrcInZsh)
 }
 
 function configEnvrc() {
