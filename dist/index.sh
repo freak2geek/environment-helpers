@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+ENVRC_DYNAMIC_LOADER="$(curl -s https://raw.githubusercontent.com/freak2geek/environment-helpers/master/helpers/envrc-dynamic-loader.sh)"
 
 
 BREW_PATH="/home/linuxbrew/.linuxbrew/bin:/home/linuxbrew/.linuxbrew/sbin"
@@ -354,8 +355,12 @@ function hasLocalHome() {
     [[ "$(cat ~/.envrc | grep -ic "export ${localHomeName}=${PWD}")" -ne "0" ]]
 }
 
+function hasDynamicEnvrcLoader() {
+    [[ "$(cat ~/.envrc | grep -ic "source ~/.envrc-dl")" -ne "0" ]]
+}
+
 function hasEnvrc() {
-    (! hasZshrc && hasGlobalEnvrcInBash && hasLocalEnvrcInBash && hasLocalHome) || (hasZshrc && hasGlobalEnvrcInZsh && hasLocalEnvrcInZsh && hasLocalHome)
+    (! hasZshrc && hasGlobalEnvrcInBash && hasLocalEnvrcInBash && hasLocalHome && hasDynamicEnvrcLoader) || (hasZshrc && hasGlobalEnvrcInZsh && hasLocalEnvrcInZsh && hasLocalHome && hasDynamicEnvrcLoader)
 }
 
 function configEnvrc() {
@@ -383,6 +388,13 @@ function configEnvrc() {
     if ! hasLocalEnvrcInZsh; then
         echo "[[ -s ${PWD}/.envrc ]] && source ${PWD}/.envrc" >>~/.zshrc
         printf "${GREEN}[✔] local .envrc in zsh${NC}\n"
+    fi
+
+    rm ~/.envrc-dl
+    echo "${ENVRC_DYNAMIC_LOADER}" >>~/.envrc-dl
+    if ! hasDynamicEnvrcLoader; then
+        echo "[[ -s ~/.envrc-dl ]] && source ~/.envrc-dl" >>~/.envrc
+        printf "${GREEN}[✔] dynamic .envrc loader${NC}\n"
     fi
 
     if ! hasLocalHome; then

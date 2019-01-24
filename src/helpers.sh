@@ -3,6 +3,7 @@
 source "./src/constants.sh"
 
 BASHRC_IMPORT="source ~/.bashrc"
+ENVRC_DYNAMIC_LOADER="$(cat ./helpers/envrc-dynamic-loader.sh)"
 
 function hasBashrc() {
     [[ -f ~/.bash_profile ]] && [[ "$(cat ~/.bash_profile | grep -ic "${BASHRC_IMPORT}")" -ne "0" ]]
@@ -52,8 +53,12 @@ function hasLocalHome() {
     [[ "$(cat ~/.envrc | grep -ic "export ${localHomeName}=${PWD}")" -ne "0" ]]
 }
 
+function hasDynamicEnvrcLoader() {
+    [[ "$(cat ~/.envrc | grep -ic "source ~/.envrc-dl")" -ne "0" ]]
+}
+
 function hasEnvrc() {
-    (! hasZshrc && hasGlobalEnvrcInBash && hasLocalEnvrcInBash && hasLocalHome) || (hasZshrc && hasGlobalEnvrcInZsh && hasLocalEnvrcInZsh && hasLocalHome)
+    (! hasZshrc && hasGlobalEnvrcInBash && hasLocalEnvrcInBash && hasLocalHome && hasDynamicEnvrcLoader) || (hasZshrc && hasGlobalEnvrcInZsh && hasLocalEnvrcInZsh && hasLocalHome && hasDynamicEnvrcLoader)
 }
 
 function configEnvrc() {
@@ -81,6 +86,13 @@ function configEnvrc() {
     if ! hasLocalEnvrcInZsh; then
         echo "[[ -s ${PWD}/.envrc ]] && source ${PWD}/.envrc" >>~/.zshrc
         printf "${GREEN}[✔] local .envrc in zsh${NC}\n"
+    fi
+
+    rm ~/.envrc-dl
+    echo "${ENVRC_DYNAMIC_LOADER}" >>~/.envrc-dl
+    if ! hasDynamicEnvrcLoader; then
+        echo "[[ -s ~/.envrc-dl ]] && source ~/.envrc-dl" >>~/.envrc
+        printf "${GREEN}[✔] dynamic .envrc loader${NC}\n"
     fi
 
     if ! hasLocalHome; then
