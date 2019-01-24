@@ -390,8 +390,6 @@ function configEnvrc() {
         printf "${GREEN}[✔] local .envrc in zsh${NC}\n"
     fi
 
-    rm ~/.envrc-dl
-    echo "${ENVRC_DYNAMIC_LOADER}" >>~/.envrc-dl
     if ! hasDynamicEnvrcLoader; then
         echo "[[ -s ~/.envrc-dl ]] && source ~/.envrc-dl" >>~/.envrc
         printf "${GREEN}[✔] dynamic .envrc loader${NC}\n"
@@ -405,6 +403,10 @@ function configEnvrc() {
 }
 
 function setupEnvrc() {
+    # ensure the dynamic loader is always updated to latest
+    rm ~/.envrc-dl
+    echo "${ENVRC_DYNAMIC_LOADER}" >>~/.envrc-dl
+
     if hasEnvrc; then
         printf "${GREEN}[✔] Already .envrc${NC}\n"
         return
