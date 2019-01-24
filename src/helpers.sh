@@ -40,8 +40,20 @@ function hasLocalEnvrcInZsh() {
     [[ "$(cat ~/.zshrc | grep -ic "source ${PWD}/.envrc")" -ne "0" ]]
 }
 
+function getLocalHomeVarName() {
+    localDirName=${PWD##*/}
+    localDirName=$(echo ${localDirName} | sed -r 's/\-/_/g')
+    localHomeName=${localDirName^^}
+    echo "${localHomeName}_HOME"
+}
+
+function hasLocalHome() {
+    localHomeName="$(getLocalHomeVarName)"
+    [[ "$(cat ~/.envrc | grep -ic "export ${localHomeName}=${PWD}")" -ne "0" ]]
+}
+
 function hasEnvrc() {
-    (! hasZshrc && hasGlobalEnvrcInBash && hasLocalEnvrcInBash) || (hasZshrc && hasGlobalEnvrcInZsh && hasLocalEnvrcInZsh)
+    (! hasZshrc && hasGlobalEnvrcInBash && hasLocalEnvrcInBash && hasLocalHome) || (hasZshrc && hasGlobalEnvrcInZsh && hasLocalEnvrcInZsh && hasLocalHome)
 }
 
 function configEnvrc() {
@@ -70,6 +82,12 @@ function configEnvrc() {
         echo "[[ -s ${PWD}/.envrc ]] && source ${PWD}/.envrc" >>~/.zshrc
         printf "${GREEN}[✔] local .envrc in zsh${NC}\n"
     fi
+
+    if ! hasLocalHome; then
+        localHomeName="$(getLocalHomeVarName)"
+        echo "export ${localHomeName}=${PWD}" >>~/.envrc
+        printf "${GREEN}[✔] local home${NC}\n"
+    fi
 }
 
 function setupEnvrc() {
@@ -93,10 +111,12 @@ function purgeEnvrc() {
     if ! hasEnvrc; then
         return
     fi
+    localHomeName="$(getLocalHomeVarName)"
 
     printf "${BLUE}[-] Purging .envrc...${NC}\n"
     sedi "/envrc/d" ~/.bashrc
     sedi "/envrc/d" ~/.zshrc
+    sedi "/export ${localHomeName}/d" ~/.envrc
 }
 
 function endsWithNewLine() {
