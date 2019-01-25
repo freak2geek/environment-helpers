@@ -191,5 +191,11 @@ function sudoSedi() {
 
 function killProcessByPort() {
     portToKill=${1-''}
-    sudo kill -9 "$(pgrep -f ${portToKill})"
+    portPid="$(pgrep -f ${portToKill})"
+
+    if [[ ${portPid} -eq '' ]]; then
+        return
+    fi
+
+    sudo kill -9 ${portPid}
 }
