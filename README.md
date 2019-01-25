@@ -7,7 +7,7 @@ This repository implements utilities to support the implementation or adoption o
 Import and use the helpers by running the next command in your shell scripts.
 
 ``` bash
-source <(curl -sSL https://raw.githubusercontent.com/freak2geek/environment-helpers/master/dist/index.sh)
+source /dev/stdin <<< "$(curl -s https://raw.githubusercontent.com/freak2geek/environment-helpers/master/dist/index.sh)"
 ```
 
 ## API
