@@ -675,6 +675,10 @@ function connectMongo() {
     while ! nc -z localhost 27017 </dev/null; do sleep 1; done
 }
 
+function isRunningMongo() {
+    ps -edaf | grep -icq "\-\-port 27017"
+}
+
 function shutdownMongo() {
     printf "${BLUE}[-] Disconnecting to mongo \"${MONGO_VERSION}\"...${NC}\n"
 
@@ -732,6 +736,12 @@ function connectMongoAndReplicas() {
     while ! nc -z localhost 27017 </dev/null; do sleep 1; done
     while ! nc -z localhost 27018 </dev/null; do sleep 1; done
     while ! nc -z localhost 27019 </dev/null; do sleep 1; done
+}
+
+function isRunningMongoAndReplicas() {
+    isRunningMongo &&
+        ps -edaf | grep -icq "\-\-port 27018" &&
+        ps -edaf | grep -icq "\-\-port 27019"
 }
 
 function shutdownMongoAndReplicas() {
@@ -799,7 +809,14 @@ function setupMongoOplog() {
         sudo touch ${MONGO_R2_LOGPATH}
     fi
 
-    connectMongoAndReplicas
+    isMongoConnected=0
+    if isRunningMongoAndReplicas; then
+        isMongoConnected=1
+    fi
+
+    if [[ ${isMongoConnected} -eq 0 ]]; then
+        connectMongoAndReplicas
+    fi
     if hasOplogInitialized; then
         printf "${GREEN}[✔] Already oplog initialized${NC}\n"
     else
@@ -810,16 +827,26 @@ function setupMongoOplog() {
             meteor m shell ${MONGO_VERSION} --port 27017 --eval "rs.initiate(${OPLOG_CONFIG})"
         fi
     fi
-    shutdownMongoAndReplicas 1>/dev/null
+    if [[ ${isMongoConnected} -eq 0 ]]; then
+        shutdownMongoAndReplicas 1>/dev/null
+    fi
 
-    connectMongo
+    if isRunningMongo; then
+        isMongoConnected=1
+    fi
+
+    if [[ ${isMongoConnected} -eq 0 ]]; then
+        connectMongo
+    fi
     if hasOplogUser; then
         printf "${GREEN}[✔] Already oplog user${NC}\n"
     else
 
         meteor m shell ${MONGO_VERSION} --port 27017 --eval "db.getSiblingDB('admin').createUser({\"user\":\"oplogger\",\"pwd\":\"PASSWORD\",\"roles\":[{\"role\":\"read\",\"db\":\"local\"}],\"passwordDigestor\":\"server\"})"
     fi
-    shutdownMongo 1>/dev/null
+    if [[ ${isMongoConnected} -eq 0 ]]; then
+        shutdownMongo 1>/dev/null
+    fi
 }
 
 function purgeMongoOplog() {
