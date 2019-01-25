@@ -667,8 +667,17 @@ function purgeMongo() {
     sudo rm ${MONGO_LOGPATH}
 }
 
+function isRunningMongo() {
+    ps -edaf | grep -icq "\-\-port ${MONGO_PORT}"
+}
+
 function connectMongo() {
     if ! hasMongo; then
+        return
+    fi
+
+    if isRunningMongo; then
+        printf "${GREEN}[✔] Already running mongo \"${MONGO_VERSION}\"${NC}\n"
         return
     fi
 
@@ -676,10 +685,6 @@ function connectMongo() {
     sudo meteor m use ${MONGO_VERSION} --port ${MONGO_PORT} --dbpath ${MONGO_DBPATH} --fork --logpath ${MONGO_LOGPATH} --journal
 
     while ! nc -z localhost ${MONGO_PORT} </dev/null; do sleep 1; done
-}
-
-function isRunningMongo() {
-    ps -edaf | grep -icq "\-\-port ${MONGO_PORT}"
 }
 
 function shutdownMongo() {
@@ -729,7 +734,18 @@ function hasMongoConnected() {
     ps -aux | grep -ic "$(meteor m bin ${MONGO_VERSION})"
 }
 
+function isRunningMongoAndReplicas() {
+    isRunningMongo &&
+        ps -edaf | grep -icq "\-\-port ${MONGO_R1_PORT}" &&
+        ps -edaf | grep -icq "\-\-port ${MONGO_R2_PORT}"
+}
+
 function connectMongoAndReplicas() {
+    if isRunningMongoAndReplicas; then
+        printf "${GREEN}[✔] Already running mongo \"${MONGO_VERSION}\" and replicas${NC}\n"
+        return
+    fi
+
     printf "${BLUE}[-] Connecting to mongo \"${MONGO_VERSION}\" and replicas...${NC}\n"
 
     sudo meteor m use ${MONGO_VERSION} --config ${MONGO_CONF} --port ${MONGO_PORT} --dbpath ${MONGO_DBPATH} --fork --logpath ${MONGO_LOGPATH} --replSet ${MONGO_REPLICA} --journal
@@ -739,12 +755,6 @@ function connectMongoAndReplicas() {
     while ! nc -z localhost ${MONGO_PORT} </dev/null; do sleep 1; done
     while ! nc -z localhost ${MONGO_R1_PORT} </dev/null; do sleep 1; done
     while ! nc -z localhost ${MONGO_R2_PORT} </dev/null; do sleep 1; done
-}
-
-function isRunningMongoAndReplicas() {
-    isRunningMongo &&
-        ps -edaf | grep -icq "\-\-port ${MONGO_R1_PORT}" &&
-        ps -edaf | grep -icq "\-\-port ${MONGO_R2_PORT}"
 }
 
 function shutdownMongoAndReplicas() {
