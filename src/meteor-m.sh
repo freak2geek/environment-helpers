@@ -244,13 +244,22 @@ function checkMongoOplog() {
         return
     fi
 
-    connectMongo 1>/dev/null
+    isMongoConnected=0
+    if isRunningMongoAndReplicas; then
+        isMongoConnected=1
+    fi
+
+    if [[ ${isMongoConnected} -eq 0 ]]; then
+        connectMongo 1>/dev/null
+    fi
     if hasOlogConfig; then
         printf "${GREEN}[✔] meteor mongo oplog${NC}\n"
     else
         printf "${RED}[x] meteor mongo oplog${NC}\n"
     fi
-    shutdownMongo 1>/dev/null
+    if [[ ${isMongoConnected} -eq 0 ]]; then
+        shutdownMongo 1>/dev/null
+    fi
 }
 
 function setupMongoOplog() {
