@@ -188,3 +188,8 @@ function sedi() {
 function sudoSedi() {
   sed --version >/dev/null 2>&1 && sudo sed -i -- "$@" || sudo sed -i "" "$@"
 }
+
+function killProcessByPort() {
+    portToKill=${1-''}
+    sudo kill -9 "$(pgrep -f ${portToKill})"
+}

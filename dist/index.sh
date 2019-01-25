@@ -491,6 +491,11 @@ function sudoSedi() {
   sed --version >/dev/null 2>&1 && sudo sed -i -- "$@" || sudo sed -i "" "$@"
 }
 
+function killProcessByPort() {
+    portToKill=${1-''}
+    sudo kill -9 "$(pgrep -f ${portToKill})"
+}
+
 
 
 function hasMeteorLerna() {
@@ -697,6 +702,11 @@ function shutdownMongo() {
     meteor m mongo ${MONGO_VERSION} --port ${MONGO_PORT} --eval "db.getSiblingDB('admin').shutdownServer()"
 }
 
+function killMongo() {
+    printf "${BLUE}[-] Killing mongo...${NC}\n"
+    killProcessByPort ${MONGO_PORT}
+}
+
 function hasReplicaOneDBConfig() {
     [[ -d ${MONGO_R1_DBPATH} ]]
 }
@@ -763,6 +773,13 @@ function shutdownMongoAndReplicas() {
     meteor m mongo ${MONGO_VERSION} --port ${MONGO_PORT} --eval "db.getSiblingDB('admin').shutdownServer()"
     meteor m mongo ${MONGO_VERSION} --port ${MONGO_R1_PORT} --eval "db.getSiblingDB('admin').shutdownServer()"
     meteor m mongo ${MONGO_VERSION} --port ${MONGO_R2_PORT} --eval "db.getSiblingDB('admin').shutdownServer()"
+}
+
+function killMongoAndReplicas() {
+    printf "${BLUE}[-] Killing mongo and replicas...${NC}\n"
+    killProcessByPort ${MONGO_PORT}
+    killProcessByPort ${MONGO_R1_PORT}
+    killProcessByPort ${MONGO_R2_PORT}
 }
 
 function repairMongoAndReplicas() {
