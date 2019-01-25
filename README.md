@@ -61,11 +61,14 @@ Variables:
 - MONGO_CONF - Path to the mongo configuration file - `["/etc/mongodb.conf"]`
 - MONGO_DBPATH - Path to the folder where the data is stored - `["/data/db"]`
 - MONGO_LOGPATH - Path to the file where the logs are stored - `["/var/log/mongod.log"]`
+- MONGO_PORT - Port to use for the master instance - `[27017]`
 - MONGO_REPLICA - Name of the replica set - `["rs0"]`
 - MONGO_R1_DBPATH - Path to the folder where the replica one data is stored - `["/data/db-rs0-0"]`
 - MONGO_R2_DBPATH - Path to the folder where the replica two data is stored - `["/data/db-rs0-1"]`
 - MONGO_R1_LOGPATH - Path to the file where the logs of the replica one are stored - `["/var/log/mongod-rs0-0.log"]`
 - MONGO_R2_LOGPATH - Path to the file where the logs of the replica two are stored - `["/var/log/mongod-rs0-1.log"]`
+- MONGO_R1_PORT - Port to use for the R1 instance - `[27018]`
+- MONGO_R2_PORT - Port to use for the R2 instance - `[27019]`
 
 ## Contribute
 

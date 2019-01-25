@@ -544,11 +544,14 @@ MONGO_VERSION="stable"
 MONGO_CONF="/etc/mongodb.conf"
 MONGO_DBPATH="/data/db"
 MONGO_LOGPATH="/var/log/mongod.log"
+MONGO_PORT=27017
 MONGO_REPLICA="rs0"
 MONGO_R1_DBPATH="/data/db-rs0-0"
 MONGO_R2_DBPATH="/data/db-rs0-1"
 MONGO_R1_LOGPATH="/var/log/mongod-rs0-0.log"
 MONGO_R2_LOGPATH="/var/log/mongod-rs0-1.log"
+MONGO_R1_PORT=27018
+MONGO_R2_PORT=27019
 
 function hasMeteorM() {
    hasMeteor && find ${METEOR_TOOL_DIR} -type d -name "m" | grep -icq "m"
@@ -670,13 +673,13 @@ function connectMongo() {
     fi
 
     printf "${BLUE}[-] Connecting to mongo \"${MONGO_VERSION}\"...${NC}\n"
-    sudo meteor m use ${MONGO_VERSION} --port 27017 --dbpath ${MONGO_DBPATH} --fork --logpath ${MONGO_LOGPATH} --journal
+    sudo meteor m use ${MONGO_VERSION} --port ${MONGO_PORT} --dbpath ${MONGO_DBPATH} --fork --logpath ${MONGO_LOGPATH} --journal
 
-    while ! nc -z localhost 27017 </dev/null; do sleep 1; done
+    while ! nc -z localhost ${MONGO_PORT} </dev/null; do sleep 1; done
 }
 
 function isRunningMongo() {
-    ps -edaf | grep -icq "\-\-port 27017"
+    ps -edaf | grep -icq "\-\-port ${MONGO_PORT}"
 }
 
 function shutdownMongo() {
@@ -686,7 +689,7 @@ function shutdownMongo() {
         return
     fi
 
-    meteor m mongo ${MONGO_VERSION} --port 27017 --eval "db.getSiblingDB('admin').shutdownServer()"
+    meteor m mongo ${MONGO_VERSION} --port ${MONGO_PORT} --eval "db.getSiblingDB('admin').shutdownServer()"
 }
 
 function hasReplicaOneDBConfig() {
@@ -729,35 +732,35 @@ function hasMongoConnected() {
 function connectMongoAndReplicas() {
     printf "${BLUE}[-] Connecting to mongo \"${MONGO_VERSION}\" and replicas...${NC}\n"
 
-    sudo meteor m use ${MONGO_VERSION} --config ${MONGO_CONF} --port 27017 --dbpath ${MONGO_DBPATH} --fork --logpath ${MONGO_LOGPATH} --replSet ${MONGO_REPLICA} --journal
-    sudo meteor m use ${MONGO_VERSION} --config ${MONGO_CONF} --port 27018 --dbpath ${MONGO_R1_DBPATH} --fork --logpath ${MONGO_R1_LOGPATH} --replSet ${MONGO_REPLICA} --journal
-    sudo meteor m use ${MONGO_VERSION} --config ${MONGO_CONF} --port 27019 --dbpath ${MONGO_R2_DBPATH} --fork --logpath ${MONGO_R2_LOGPATH} --replSet ${MONGO_REPLICA} --journal
+    sudo meteor m use ${MONGO_VERSION} --config ${MONGO_CONF} --port ${MONGO_PORT} --dbpath ${MONGO_DBPATH} --fork --logpath ${MONGO_LOGPATH} --replSet ${MONGO_REPLICA} --journal
+    sudo meteor m use ${MONGO_VERSION} --config ${MONGO_CONF} --port ${MONGO_R1_PORT} --dbpath ${MONGO_R1_DBPATH} --fork --logpath ${MONGO_R1_LOGPATH} --replSet ${MONGO_REPLICA} --journal
+    sudo meteor m use ${MONGO_VERSION} --config ${MONGO_CONF} --port ${MONGO_R2_PORT} --dbpath ${MONGO_R2_DBPATH} --fork --logpath ${MONGO_R2_LOGPATH} --replSet ${MONGO_REPLICA} --journal
 
-    while ! nc -z localhost 27017 </dev/null; do sleep 1; done
-    while ! nc -z localhost 27018 </dev/null; do sleep 1; done
-    while ! nc -z localhost 27019 </dev/null; do sleep 1; done
+    while ! nc -z localhost ${MONGO_PORT} </dev/null; do sleep 1; done
+    while ! nc -z localhost ${MONGO_R1_PORT} </dev/null; do sleep 1; done
+    while ! nc -z localhost ${MONGO_R2_PORT} </dev/null; do sleep 1; done
 }
 
 function isRunningMongoAndReplicas() {
     isRunningMongo &&
-        ps -edaf | grep -icq "\-\-port 27018" &&
-        ps -edaf | grep -icq "\-\-port 27019"
+        ps -edaf | grep -icq "\-\-port ${MONGO_R1_PORT}" &&
+        ps -edaf | grep -icq "\-\-port ${MONGO_R2_PORT}"
 }
 
 function shutdownMongoAndReplicas() {
     printf "${BLUE}[-] Disconnecting to mongo \"${MONGO_VERSION}\" and replicas...${NC}\n"
 
-    meteor m mongo ${MONGO_VERSION} --port 27017 --eval "db.getSiblingDB('admin').shutdownServer()"
-    meteor m mongo ${MONGO_VERSION} --port 27018 --eval "db.getSiblingDB('admin').shutdownServer()"
-    meteor m mongo ${MONGO_VERSION} --port 27019 --eval "db.getSiblingDB('admin').shutdownServer()"
+    meteor m mongo ${MONGO_VERSION} --port ${MONGO_PORT} --eval "db.getSiblingDB('admin').shutdownServer()"
+    meteor m mongo ${MONGO_VERSION} --port ${MONGO_R1_PORT} --eval "db.getSiblingDB('admin').shutdownServer()"
+    meteor m mongo ${MONGO_VERSION} --port ${MONGO_R2_PORT} --eval "db.getSiblingDB('admin').shutdownServer()"
 }
 
 function repairMongoAndReplicas() {
     printf "${BLUE}[-] Repairing mongo \"${MONGO_VERSION}\" and replicas...${NC}\n"
 
-    sudo meteor m use ${MONGO_VERSION} --config ${MONGO_CONF} --port 27017 --dbpath ${MONGO_DBPATH} --repair
-    sudo meteor m use ${MONGO_VERSION} --config ${MONGO_CONF} --port 27018 --dbpath ${MONGO_R1_DBPATH} --repair
-    sudo meteor m use ${MONGO_VERSION} --config ${MONGO_CONF} --port 27019 --dbpath ${MONGO_R2_DBPATH} --repair
+    sudo meteor m use ${MONGO_VERSION} --config ${MONGO_CONF} --port ${MONGO_PORT} --dbpath ${MONGO_DBPATH} --repair
+    sudo meteor m use ${MONGO_VERSION} --config ${MONGO_CONF} --port ${MONGO_R1_PORT} --dbpath ${MONGO_R1_DBPATH} --repair
+    sudo meteor m use ${MONGO_VERSION} --config ${MONGO_CONF} --port ${MONGO_R2_PORT} --dbpath ${MONGO_R2_DBPATH} --repair
 }
 
 function checkMongoOplog() {
@@ -820,11 +823,11 @@ function setupMongoOplog() {
     if hasOplogInitialized; then
         printf "${GREEN}[✔] Already oplog initialized${NC}\n"
     else
-        OPLOG_CONFIG="{\"_id\":\"${MONGO_REPLICA}\",\"members\":[{\"_id\":0,\"host\":\"127.0.0.1:27017\"},{\"_id\":1,\"host\":\"127.0.0.1:27018\"},{\"_id\":2,\"host\":\"127.0.0.1:27019\"}]}"
+        OPLOG_CONFIG="{\"_id\":\"${MONGO_REPLICA}\",\"members\":[{\"_id\":0,\"host\":\"127.0.0.1:${MONGO_PORT}\"},{\"_id\":1,\"host\":\"127.0.0.1:${MONGO_R1_PORT}\"},{\"_id\":2,\"host\":\"127.0.0.1:${MONGO_R2_PORT}\"}]}"
         if hasOplogConf; then
-            meteor m shell ${MONGO_VERSION} --port 27017 --eval "rs.reconfig(${OPLOG_CONFIG})"
+            meteor m shell ${MONGO_VERSION} --port ${MONGO_PORT} --eval "rs.reconfig(${OPLOG_CONFIG})"
         else
-            meteor m shell ${MONGO_VERSION} --port 27017 --eval "rs.initiate(${OPLOG_CONFIG})"
+            meteor m shell ${MONGO_VERSION} --port ${MONGO_PORT} --eval "rs.initiate(${OPLOG_CONFIG})"
         fi
     fi
     if [[ ${isMongoConnected} -eq 0 ]]; then
@@ -842,7 +845,7 @@ function setupMongoOplog() {
         printf "${GREEN}[✔] Already oplog user${NC}\n"
     else
 
-        meteor m shell ${MONGO_VERSION} --port 27017 --eval "db.getSiblingDB('admin').createUser({\"user\":\"oplogger\",\"pwd\":\"PASSWORD\",\"roles\":[{\"role\":\"read\",\"db\":\"local\"}],\"passwordDigestor\":\"server\"})"
+        meteor m shell ${MONGO_VERSION} --port ${MONGO_PORT} --eval "db.getSiblingDB('admin').createUser({\"user\":\"oplogger\",\"pwd\":\"PASSWORD\",\"roles\":[{\"role\":\"read\",\"db\":\"local\"}],\"passwordDigestor\":\"server\"})"
     fi
     if [[ ${isMongoConnected} -eq 0 ]]; then
         shutdownMongo 1>/dev/null
@@ -858,11 +861,11 @@ function purgeMongoOplog() {
     fi
 
     if hasOplogUser; then
-        meteor m shell ${MONGO_VERSION} --port 27017 --eval "db.getSiblingDB('admin').getCollection('system.users').deleteOne({\"user\":\"oplogger\"})"
+        meteor m shell ${MONGO_VERSION} --port ${MONGO_PORT} --eval "db.getSiblingDB('admin').getCollection('system.users').deleteOne({\"user\":\"oplogger\"})"
     fi
 
     if hasOplogInitialized; then
-        meteor m shell ${MONGO_VERSION} --port 27017 --eval "db.getSiblingDB('local').getCollection('system.replset').deleteOne({\"_id\":\"rs0\"})"
+        meteor m shell ${MONGO_VERSION} --port ${MONGO_PORT} --eval "db.getSiblingDB('local').getCollection('system.replset').deleteOne({\"_id\":\"rs0\"})"
     fi
 
     if [[ ${wasConnected} -eq 0 ]]; then
