@@ -150,6 +150,12 @@ function connectMongo() {
     sudo meteor m use ${MONGO_VERSION} --port ${MONGO_PORT} --dbpath ${MONGO_DBPATH} --fork --logpath ${MONGO_LOGPATH} --journal
 
     while ! nc -z localhost ${MONGO_PORT} </dev/null; do sleep 1; done
+
+    if isRunningMongo; then
+        printf "${GREEN}[✔] Already running mongo \"${MONGO_VERSION}\"${NC}\n"
+    else
+        printf "${RED}[x] An error running mongo \"${MONGO_VERSION}\"${NC}\n"
+    fi
 }
 
 function shutdownMongo() {
@@ -159,7 +165,13 @@ function shutdownMongo() {
         return
     fi
 
-    meteor m mongo ${MONGO_VERSION} --port ${MONGO_PORT} --eval "db.getSiblingDB('admin').shutdownServer()"
+    meteor m mongo ${MONGO_VERSION} --port ${MONGO_PORT} --eval "db.getSiblingDB('admin').shutdownServer()" 1> /dev/null
+
+    if ! isRunningMongo; then
+        printf "${GREEN}[✔] Already stopped mongo \"${MONGO_VERSION}\"${NC}\n"
+    else
+        printf "${RED}[x] An error stopping mongo \"${MONGO_VERSION}\"${NC}\n"
+    fi
 }
 
 function killMongo() {
@@ -225,14 +237,26 @@ function connectMongoAndReplicas() {
     while ! nc -z localhost ${MONGO_PORT} </dev/null; do sleep 1; done
     while ! nc -z localhost ${MONGO_R1_PORT} </dev/null; do sleep 1; done
     while ! nc -z localhost ${MONGO_R2_PORT} </dev/null; do sleep 1; done
+
+    if isRunningMongoAndReplicas; then
+        printf "${GREEN}[✔] Already running mongo \"${MONGO_VERSION}\" and replicas${NC}\n"
+    else
+        printf "${RED}[x] An error running mongo \"${MONGO_VERSION}\" and replicas${NC}\n"
+    fi
 }
 
 function shutdownMongoAndReplicas() {
     printf "${BLUE}[-] Disconnecting to mongo \"${MONGO_VERSION}\" and replicas...${NC}\n"
 
-    meteor m mongo ${MONGO_VERSION} --port ${MONGO_PORT} --eval "db.getSiblingDB('admin').shutdownServer()"
-    meteor m mongo ${MONGO_VERSION} --port ${MONGO_R1_PORT} --eval "db.getSiblingDB('admin').shutdownServer()"
-    meteor m mongo ${MONGO_VERSION} --port ${MONGO_R2_PORT} --eval "db.getSiblingDB('admin').shutdownServer()"
+    meteor m mongo ${MONGO_VERSION} --port ${MONGO_PORT} --eval "db.getSiblingDB('admin').shutdownServer()" 1> /dev/null
+    meteor m mongo ${MONGO_VERSION} --port ${MONGO_R1_PORT} --eval "db.getSiblingDB('admin').shutdownServer()" 1> /dev/null
+    meteor m mongo ${MONGO_VERSION} --port ${MONGO_R2_PORT} --eval "db.getSiblingDB('admin').shutdownServer()" 1> /dev/null
+
+    if ! isRunningMongo; then
+        printf "${GREEN}[✔] Already stopped mongo \"${MONGO_VERSION}\" and replicas${NC}\n"
+    else
+        printf "${RED}[x] An error stopping mongo \"${MONGO_VERSION}\" and replicas${NC}\n"
+    fi
 }
 
 function killMongoAndReplicas() {
