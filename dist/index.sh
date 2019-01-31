@@ -345,8 +345,8 @@ function hasLocalEnvrcInZsh() {
 
 function getLocalHomeVarName() {
     localDirName=${PWD##*/}
-    localDirName=$(echo ${localDirName} | sed -r 's/\-/_/g')
-    localHomeName=${localDirName^^}
+    localDirName=$(echo ${localDirName} | sedr 's/\-/_/g')
+    localHomeName=$(echo ${localDirName} | sed 'y/abcdefghijklmnopqrstuvwxyz/ABCDEFGHIJKLMNOPQRSTUVWXYZ/')
     echo "${localHomeName}_HOME"
 }
 
@@ -487,8 +487,16 @@ function sedi() {
   sed --version >/dev/null 2>&1 && sed -i -- "$@" || sed -i "" "$@"
 }
 
+function sedr() {
+    if isOSX; then
+        sed -E -- "$@"
+    else
+        sed -r -- "$@"
+    fi
+}
+
 function sudoSedi() {
-  sed --version >/dev/null 2>&1 && sudo sed -i -- "$@" || sudo sed -i "" "$@"
+    sed --version >/dev/null 2>&1 && sudo sed -i -- "$@" || sudo sed -i "" "$@"
 }
 
 function killProcessByPort() {
