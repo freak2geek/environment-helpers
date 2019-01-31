@@ -75,9 +75,10 @@ function setupZsh() {
 
 function disableZshAsDefault() {
     printf "${BLUE}[-] Disabling zsh...${NC}\n"
-    sedi '/which zsh/d' ~/.envrc
-    sedi '/$ZSH_VERSION/d' ~/.envrc
-    printf "${PURPLE}Please, restart your shell to use back your bash.${NC}\n"
+    sedi '/which zsh/d' ~/.bashrc
+    sedi '/exec "$SHELL"/d' ~/.bashrc
+    export SHELL=$(which bash)
+    [[ -s "$SHELL" ]] && exec "$SHELL" -l
 }
 
 function purgeZsh() {
@@ -103,9 +104,9 @@ function configZshAsDefault() {
     setupEnvrc
 
     printf "${BLUE}[-] Setting zsh as default shell...${NC}\n"
-    printf '\n export SHELL=$(which zsh)' >>~/.envrc
-    printf '\n [[ -z "$ZSH_VERSION" ]] && exec "$SHELL" -l' >>~/.envrc
-    printf "${PURPLE}Please, restart your shell to use zsh.${NC}\n"
+    printf '\n export SHELL=$(which zsh)' >>~/.bashrc
+    printf '\n [[ -s "$SHELL" ]] && exec "$SHELL" -l' >>~/.bashrc
+    [[ -s "$SHELL" ]] && exec "$SHELL" -l
     # Alternative method
     # if [[ $(cat /etc/shells | grep -ic "$(which zsh)") -eq "0" ]]; then
     #    which zsh | sudo tee -a /etc/shells
