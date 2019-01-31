@@ -35,8 +35,10 @@ function hasDnsmasqConfig() {
 }
 
 function hasDnsmasqConfig() {
-    isOSX && [[ -d /usr/local/etc ]] && [[ -f /usr/local/etc/dnsmasq.conf ]] && [[ -f /Library/LaunchDaemons/homebrew.mxcl.dnsmasq.plist ]] &&
-        [[ -d /etc/resolver ]] && [[ -f "/etc/resolver/${DNSMASQ_DOMAIN}" ]]
+    isOSX && [[ -d /usr/local/etc ]] && [[ -f /usr/local/etc/dnsmasq.conf ]] &&
+        [[ -f /Library/LaunchDaemons/homebrew.mxcl.dnsmasq.plist ]] &&
+        [[ -d /etc/resolver ]] && [[ -f "/etc/resolver/${DNSMASQ_DOMAIN}" ]] &&
+        [[ "$(cat /usr/local/etc/dnsmasq.conf | grep -ic "address=/.${DNSMASQ_DOMAIN}/${DNSMASQ_HOST}")" -eq "1" ]]
 }
 
 function purgeDnsmasqConfig() {
