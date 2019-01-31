@@ -104,8 +104,8 @@ function configZshAsDefault() {
     setupEnvrc
 
     printf "${BLUE}[-] Setting zsh as default shell...${NC}\n"
-    printf '\n export SHELL=$(which zsh)' >>~/.bashrc
-    printf '\n [[ -s "$SHELL" ]] && exec "$SHELL" -l' >>~/.bashrc
+    echo 'export SHELL=$(which zsh)' >>~/.bashrc
+    echo '[[ -s "$SHELL" ]] && exec "$SHELL" -l' >>~/.bashrc
     [[ -s "$SHELL" ]] && exec "$SHELL" -l
     # Alternative method
     # if [[ $(cat /etc/shells | grep -ic "$(which zsh)") -eq "0" ]]; then
