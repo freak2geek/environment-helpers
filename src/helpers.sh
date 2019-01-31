@@ -26,19 +26,19 @@ function setupBashrc() {
 }
 
 function hasGlobalEnvrcInBash() {
-    [[ "$(cat ~/.bashrc | grep -ic "source ~/.envrc")" -ne "0" ]]
+    [[ -f ~/.bashrc ]] && [[ "$(cat ~/.bashrc | grep -ic "source ~/.envrc")" -ne "0" ]]
 }
 
 function hasLocalEnvrcInBash() {
-    [[ "$(cat ~/.bashrc | grep -ic "source ${PWD}/.envrc")" -ne "0" ]]
+    [[ -f ~/.bashrc ]] && [[ "$(cat ~/.bashrc | grep -ic "source ${PWD}/.envrc")" -ne "0" ]]
 }
 
 function hasGlobalEnvrcInZsh() {
-    [[ "$(cat ~/.zshrc | grep -ic "source ~/.envrc")" -ne "0" ]]
+    [[ -f ~/.zshrc ]] && [[ "$(cat ~/.zshrc | grep -ic "source ~/.envrc")" -ne "0" ]]
 }
 
 function hasLocalEnvrcInZsh() {
-    [[ "$(cat ~/.zshrc | grep -ic "source ${PWD}/.envrc")" -ne "0" ]]
+    [[ -f ~/.zshrc ]] && [[ "$(cat ~/.zshrc | grep -ic "source ${PWD}/.envrc")" -ne "0" ]]
 }
 
 function getLocalHomeVarName() {
@@ -50,11 +50,11 @@ function getLocalHomeVarName() {
 
 function hasLocalHome() {
     localHomeName="$(getLocalHomeVarName)"
-    [[ "$(cat ~/.envrc | grep -ic "export ${localHomeName}=${PWD}")" -ne "0" ]]
+    [[ -f ~/.envrc ]] && [[ "$(cat ~/.envrc | grep -ic "export ${localHomeName}=${PWD}")" -ne "0" ]]
 }
 
 function hasDynamicEnvrcLoader() {
-    [[ "$(cat ~/.envrc | grep -ic "source ~/.envrc-dl")" -ne "0" ]]
+    [[ -f ~/.envrc ]] && [[ "$(cat ~/.envrc | grep -ic "source ~/.envrc-dl")" -ne "0" ]]
 }
 
 function hasEnvrc() {
