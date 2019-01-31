@@ -68,6 +68,21 @@ function configEnvrc() {
         setupBashrc
     fi
 
+    if ! hasLocalHome; then
+        localHomeName="$(getLocalHomeVarName)"
+        echo "export ${localHomeName}=${PWD}" >>~/.envrc
+        export ${localHomeName}=${PWD}
+        printf "${GREEN}[✔] local home${NC}\n"
+    fi
+
+    if ! hasGlobalEnvrcInBash || ! hasGlobalEnvrcInZsh; then
+        [[ -s ~/.envrc ]] && source ~/.envrc
+    fi
+
+    if ! hasLocalEnvrcInBash || ! hasLocalEnvrcInZsh; then
+        [[ -s ${PWD}/.envrc ]] && source ${PWD}/.envrc
+    fi
+
     if ! hasGlobalEnvrcInBash; then
         echo "[[ -s ~/.envrc ]] && source ~/.envrc" >>~/.bashrc
         printf "${GREEN}[✔] global .envrc in bash${NC}\n"
@@ -91,12 +106,6 @@ function configEnvrc() {
     if ! hasDynamicEnvrcLoader; then
         echo "[[ -s ~/.envrc-dl ]] && source ~/.envrc-dl" >>~/.envrc
         printf "${GREEN}[✔] dynamic .envrc loader${NC}\n"
-    fi
-
-    if ! hasLocalHome; then
-        localHomeName="$(getLocalHomeVarName)"
-        echo "export ${localHomeName}=${PWD}" >>~/.envrc
-        printf "${GREEN}[✔] local home${NC}\n"
     fi
 }
 
