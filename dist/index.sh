@@ -165,6 +165,11 @@ function purgeDnsmasqConfig() {
 }
 
 function configDnsmasq() {
+    if ! isOSX; then
+        printf "${PURPLE}[-] OS not supported yet. Please configure dnsmasq manually.${NC}\n"
+        return
+    fi
+
     printf "${BLUE}[-] Configuring dnsmasq...${NC}\n"
 
     purgeDnsmasqConfig
@@ -192,6 +197,11 @@ function checkDnsmasq() {
 }
 
 function setupDnsmasq() {
+    if ! isOSX; then
+        printf "${PURPLE}[-] OS not supported yet. Please install dnsmasq manually.${NC}\n"
+        return
+    fi
+
     if hasDnsmasq && hasDnsmasqConfig; then
         printf "${GREEN}[✔] Already dnsmasq${NC}\n"
         return
