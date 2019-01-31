@@ -15,6 +15,7 @@ source /dev/stdin <<< "$(curl -s https://raw.githubusercontent.com/freak2geek/en
 The helpers available are for:
 
 - Brew
+- Dnsmasq
 - Docker
 - Git
 - Git Flow
@@ -38,6 +39,11 @@ All these groups contain the next kind of helpers:
 - `uninstall[PROGRAM]` to just uninstall program
 
 - `config[PROGRAM]` to just configure program
+
+### Dnsmasq
+
+- DNSMASQ_DOMAIN - `["dev"]`
+- DNSMASQ_HOST - `["127.0.0.1"]`
 
 ### Git Flow
 
