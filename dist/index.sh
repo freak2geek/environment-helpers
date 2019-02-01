@@ -179,6 +179,7 @@ function configDnsmasq() {
     [[ ! -d /usr/local/etc ]] && mkdir -p /usr/local/etc
     echo "address=/.${DNSMASQ_DOMAIN}/${DNSMASQ_HOST}" >> /usr/local/etc/dnsmasq.conf
     sudo cp -fv /usr/local/opt/dnsmasq/*.plist /Library/LaunchDaemons
+    sudo launchctl unload /Library/LaunchDaemons/homebrew.mxcl.dnsmasq.plist
     sudo launchctl load /Library/LaunchDaemons/homebrew.mxcl.dnsmasq.plist
 
     [[ ! -d /etc/resolver ]] && sudo mkdir -p /etc/resolver

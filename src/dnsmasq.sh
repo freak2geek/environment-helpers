@@ -4,7 +4,7 @@ source "./src/constants.sh"
 source "./src/helpers.sh"
 
 # DNSMASQ default config
-DNSMASQ_DOMAIN="dev"
+DNSMASQ_DOMAIN="nachito"
 DNSMASQ_HOST="127.0.0.1"
 
 function hasDnsmasq() {
@@ -59,6 +59,7 @@ function configDnsmasq() {
     [[ ! -d /usr/local/etc ]] && mkdir -p /usr/local/etc
     echo "address=/.${DNSMASQ_DOMAIN}/${DNSMASQ_HOST}" >> /usr/local/etc/dnsmasq.conf
     sudo cp -fv /usr/local/opt/dnsmasq/*.plist /Library/LaunchDaemons
+    sudo launchctl unload /Library/LaunchDaemons/homebrew.mxcl.dnsmasq.plist
     sudo launchctl load /Library/LaunchDaemons/homebrew.mxcl.dnsmasq.plist
 
     [[ ! -d /etc/resolver ]] && sudo mkdir -p /etc/resolver
