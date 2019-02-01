@@ -4,7 +4,7 @@ source "./src/constants.sh"
 source "./src/helpers.sh"
 
 # DNSMASQ default config
-DNSMASQ_DOMAIN="nachito"
+DNSMASQ_DOMAIN="dev"
 DNSMASQ_HOST="127.0.0.1"
 
 function hasDnsmasq() {
