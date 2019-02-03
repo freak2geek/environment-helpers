@@ -163,7 +163,7 @@ function hasDnsmasqConfig() {
 
 function purgeDnsmasqConfig() {
     sedi "/address=\/\.${DNSMASQ_DOMAIN}/d" /usr/local/etc/dnsmasq.conf
-    [[ -d "/etc/resolver/${DNSMASQ_DOMAIN}" ]] && sudo rm "/etc/resolver/${DNSMASQ_DOMAIN}"
+    [[ -d "/etc/resolver/${DNSMASQ_DOMAIN}" ]] && sudo rm -rf "/etc/resolver/${DNSMASQ_DOMAIN}"
 }
 
 function configDnsmasq() {
