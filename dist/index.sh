@@ -144,7 +144,8 @@ function uninstallDnsmasq() {
     printf "${BLUE}[-] Uninstalling dnsmasq...${NC}\n"
     if isOSX; then
         brew uninstall dnsmasq
-        rm /Library/LaunchDaemons/homebrew.mxcl.dnsmasq.plist
+        sudo launchctl unload /Library/LaunchDaemons/homebrew.mxcl.dnsmasq.plist
+        sudo rm -rf /Library/LaunchDaemons/homebrew.mxcl.dnsmasq.plist
     else
         printf "${RED}[x] OS not supported yet${NC}\n"
     fi
