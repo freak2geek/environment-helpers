@@ -468,7 +468,8 @@ function hasDynamicEnvrcLoader() {
 }
 
 function hasEnvrc() {
-    (! hasZshrc && hasGlobalEnvrcInBash && hasLocalEnvrcInBash && hasLocalHome && hasDynamicEnvrcLoader) || (hasZshrc && hasGlobalEnvrcInZsh && hasLocalEnvrcInZsh && hasLocalHome && hasDynamicEnvrcLoader)
+    hasBashrc && hasLocalHome && hasGlobalEnvrcInBash && hasGlobalEnvrcInZsh && hasLocalEnvrcInBash &&
+        hasLocalEnvrcInZsh && hasDynamicEnvrcLoader
 }
 
 function configEnvrc() {
