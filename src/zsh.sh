@@ -20,7 +20,7 @@ function hasZshAndOhMyZsh() {
 }
 
 function hasZshAsDefault() {
-  [[ $(cat ~/.envrc | grep -ic 'export SHELL=$(which zsh)') -ne "0" ]]
+  [[ $(cat ~/.bashrc | grep -ic 'export SHELL=$(which zsh)') -ne "0" ]]
 }
 
 function installZsh() {
