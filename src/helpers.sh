@@ -14,6 +14,7 @@ function hasZshrc() {
 }
 
 function configBashrc() {
+    tryPrintNewLine ~/.bash_profile
     echo "[[ -s ~/.bashrc ]] && ${BASHRC_IMPORT}" >>~/.bash_profile
 }
 
@@ -70,6 +71,7 @@ function configEnvrc() {
     fi
 
     if ! hasLocalHome; then
+        tryPrintNewLine ~/.envrc
         localHomeName="$(getLocalHomeVarName)"
         echo "export ${localHomeName}=${PWD}" >>~/.envrc
         export ${localHomeName}=${PWD}
@@ -77,34 +79,41 @@ function configEnvrc() {
     fi
 
     if ! hasGlobalEnvrcInBash || ! hasGlobalEnvrcInZsh; then
+        tryPrintNewLine ~/.envrc
         [[ -s ~/.envrc ]] && source ~/.envrc
     fi
 
     if ! hasLocalEnvrcInBash || ! hasLocalEnvrcInZsh; then
+        tryPrintNewLine ~/.envrc
         [[ -s ${PWD}/.envrc ]] && source ${PWD}/.envrc
     fi
 
     if ! hasGlobalEnvrcInBash; then
+        tryPrintNewLine ~/.bashrc
         echo "[[ -s ~/.envrc ]] && source ~/.envrc" >>~/.bashrc
         printf "${GREEN}[✔] global .envrc in bash${NC}\n"
     fi
 
     if ! hasLocalEnvrcInBash; then
+        tryPrintNewLine ~/.bashrc
         echo "[[ -s ${PWD}/.envrc ]] && source ${PWD}/.envrc" >>~/.bashrc
         printf "${GREEN}[✔] local .envrc in bash${NC}\n"
     fi
 
     if ! hasGlobalEnvrcInZsh; then
+        tryPrintNewLine ~/.zshrc
         echo "[[ -s ~/.envrc ]] && source ~/.envrc" >>~/.zshrc
         printf "${GREEN}[✔] global .envrc in zsh${NC}\n"
     fi
 
     if ! hasLocalEnvrcInZsh; then
+        tryPrintNewLine ~/.zshrc
         echo "[[ -s ${PWD}/.envrc ]] && source ${PWD}/.envrc" >>~/.zshrc
         printf "${GREEN}[✔] local .envrc in zsh${NC}\n"
     fi
 
     if ! hasDynamicEnvrcLoader; then
+        tryPrintNewLine ~/.envrc
         echo "[[ -s ~/.envrc-dl ]] && source ~/.envrc-dl" >>~/.envrc
         printf "${GREEN}[✔] dynamic .envrc loader${NC}\n"
     fi
@@ -144,7 +153,14 @@ function purgeEnvrc() {
 }
 
 function endsWithNewLine() {
-    test "$(tail -c 1 "$1" | wc -l)" -ne 0
+    [[ -f $1 ]] && test "$(tail -c 1 "$1" | wc -l)" -ne 0
+}
+
+function tryPrintNewLine() {
+    fileToPrint=${1-}
+    if ! endsWithNewLine ${fileToPrint}; then
+        printf "\n" >> ${fileToPrint}
+    fi
 }
 
 VISUDO_NOPASSWD="${USER} ALL=(ALL) NOPASSWD: ALL"

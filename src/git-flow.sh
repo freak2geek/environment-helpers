@@ -55,9 +55,7 @@ function configGitFlow() {
         purgeGitFlowConfig
     fi
 
-    if ! endsWithNewLine "./.git/config"; then
-        printf "\n" >>./.git/config
-    fi
+    tryPrintNewLine ./.git/config
 
     printf "[gitflow \"prefix\"]" >>./.git/config
     printf "\n\tbugfix = ${GITFLOW_BUGFIX}" >>./.git/config

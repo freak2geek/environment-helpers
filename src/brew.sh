@@ -56,10 +56,12 @@ function configBrew() {
     printf "${BLUE}[-] Configuring brew...${NC}\n"
 
     if ! hasBrewPathConfig; then
+        tryPrintNewLine ~/.envrc
         echo "export PATH='${BREW_PATH}'":'"$PATH"' >>~/.envrc
     fi
 
     if ! hasBrewUmaskConfig; then
+        tryPrintNewLine ~/.envrc
         echo "${BREW_UMASK}" >>~/.envrc
     fi
 }
