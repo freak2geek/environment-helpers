@@ -126,7 +126,7 @@ METEOR_TOOL_DIR=~/.meteor/packages/meteor-tool
 
 
 function hasCurl() {
-    which curl >/dev/null && [[ "$(which git-flow | grep -ic "not found")" -eq "0" ]]
+    which curl >/dev/null && [[ "$(which curl | grep -ic "not found")" -eq "0" ]]
 }
 
 function installCurl() {
