@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 source "./src/constants.sh"
+source "./src/helpers.sh"
 
 function hasMeteor() {
     which meteor >/dev/null && [[ "$(which meteor | grep -ic "not found")" -eq "0" ]]
@@ -52,22 +53,29 @@ ENV_OVERRIDE=''
 
 function loadMeteorEnv() {
     meteorEnvPath=./${APPS_PATH}/${APP_TO}/${APP_CONFIG_PATH}/${ENV_TO}/.env
-    echo ${meteorEnvPath}
+    printf "${PURPLE} - Env Path: ${meteorEnvPath}${NC}\n"
     loadEnv ${meteorEnvPath}
 }
 
 function startMeteorApp() {
     printf "${BLUE}[-] Starting \"${APP_TO}\" app...${NC}\n"
+    printf "${PURPLE} - Env: ${ENV_TO}${NC}\n"
 
     loadMeteorEnv
+
+    printf "${PURPLE} - Env Override: ${ENV_OVERRIDE}${NC}\n"
     eval ${ENV_OVERRIDE}
 
     cd ./${APPS_PATH}/${APP_TO}
-    meteor run --settings ./${APP_CONFIG_PATH}/${ENV_TO}/settings.json --port ${PORT} $@
+    meteorSettingsPath=./${APP_CONFIG_PATH}/${ENV_TO}/settings.json
+    printf "${PURPLE} - Settings Path: ${meteorSettingsPath}${NC}\n"
+    printf "${PURPLE} - Port: ${PORT}${NC}\n"
+    meteor run --settings ${meteorSettingsPath} --port ${PORT} $@
 }
 
 function killMeteorApp() {
-    printf "${BLUE}[-] Killing \"${APP_TO}\"...${NC}\n"
+    printf "${BLUE}[-] Killing \"${APP_TO}\" app...${NC}\n"
+    printf "${PURPLE} - Port: ${PORT}${NC}\n"
 
     loadMeteorEnv
 
