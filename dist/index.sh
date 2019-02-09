@@ -1321,7 +1321,6 @@ function setupApp() {
 function cleanApp() {
     APP_TO=${1-${APP_TO}}
     printf "${BLUE}[-] Cleaning \"${APP_TO}\" app...${NC}\n"
-
     rm -rf ./${APPS_PATH}/${APP_TO}/node_modules
 }
 
@@ -1409,9 +1408,10 @@ function killMeteorApp() {
 
 function cleanMeteorApp() {
     APP_TO=${1-${APP_TO}}
-    printf "${BLUE}[-] Cleaning \"${APP_TO}\" app...${NC}\n"
+    printf "${BLUE}[-] Cleaning \"${APP_TO}\" meteor app...${NC}\n"
     cd ./${APPS_PATH}/${APP_TO}
     meteor reset
+    rm -rf ./node_modules
 }
 
 
