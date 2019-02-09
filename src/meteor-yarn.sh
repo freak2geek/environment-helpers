@@ -116,15 +116,22 @@ function setupYarnDeps() {
 }
 
 function checkApp() {
-    APP_TO=${1}
+    APP_TO=${1-${APP_TO}}
     printf "${BLUE}[-] Checking \"${APP_TO}\" app...${NC}\n"
 
     checkYarnDeps ./${APPS_PATH}/${APP_TO}
 }
 
 function setupApp() {
-    APP_TO=${1}
+    APP_TO=${1-${APP_TO}}
     printf "${BLUE}[-] Installing \"${APP_TO}\" app...${NC}\n"
 
     meteor yarn --cwd ./${APPS_PATH}/${APP_TO} install ${@:2}
+}
+
+function cleanApp() {
+    APP_TO=${1-${APP_TO}}
+    printf "${BLUE}[-] Cleaning \"${APP_TO}\" app...${NC}\n"
+
+    rm -rf ./${APPS_PATH}/${APP_TO}/node_modules
 }

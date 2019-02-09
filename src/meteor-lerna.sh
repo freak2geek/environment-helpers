@@ -52,3 +52,8 @@ function setupProject() {
     printf "${BLUE}[-] Installing \"${PROJECT_NAME}\" project...${NC}\n"
     meteor lerna bootstrap $@
 }
+
+function cleanProject() {
+    printf "${BLUE}[-] Cleaning \"${PROJECT_NAME}\" project...${NC}\n"
+    rm -rf ./node_modules
+}

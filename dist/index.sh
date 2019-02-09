@@ -781,6 +781,11 @@ function setupProject() {
     meteor lerna bootstrap $@
 }
 
+function cleanProject() {
+    printf "${BLUE}[-] Cleaning \"${PROJECT_NAME}\" project...${NC}\n"
+    rm -rf ./node_modules
+}
+
 
 # MONGO default config
 MONGO_VERSION="stable"
@@ -1300,17 +1305,24 @@ function setupYarnDeps() {
 }
 
 function checkApp() {
-    APP_TO=${1}
+    APP_TO=${1-${APP_TO}}
     printf "${BLUE}[-] Checking \"${APP_TO}\" app...${NC}\n"
 
     checkYarnDeps ./${APPS_PATH}/${APP_TO}
 }
 
 function setupApp() {
-    APP_TO=${1}
+    APP_TO=${1-${APP_TO}}
     printf "${BLUE}[-] Installing \"${APP_TO}\" app...${NC}\n"
 
     meteor yarn --cwd ./${APPS_PATH}/${APP_TO} install ${@:2}
+}
+
+function cleanApp() {
+    APP_TO=${1-${APP_TO}}
+    printf "${BLUE}[-] Cleaning \"${APP_TO}\" app...${NC}\n"
+
+    rm -rf ./${APPS_PATH}/${APP_TO}/node_modules
 }
 
 
@@ -1369,6 +1381,7 @@ function loadMeteorEnv() {
 }
 
 function startMeteorApp() {
+    APP_TO=${1-${APP_TO}}
     printf "${BLUE}[-] Starting \"${APP_TO}\" app...${NC}\n"
     printf "${PURPLE} - Env: ${ENV_TO}${NC}\n"
 
@@ -1381,16 +1394,24 @@ function startMeteorApp() {
     meteorSettingsPath=./${APP_CONFIG_PATH}/${ENV_TO}/settings.json
     printf "${PURPLE} - Settings Path: ${meteorSettingsPath}${NC}\n"
     printf "${PURPLE} - Port: ${PORT}${NC}\n"
-    meteor run --settings ${meteorSettingsPath} --port ${PORT} $@
+    meteor run --settings ${meteorSettingsPath} --port ${PORT} ${@:2}
 }
 
 function killMeteorApp() {
+    APP_TO=${1-${APP_TO}}
     printf "${BLUE}[-] Killing \"${APP_TO}\" app...${NC}\n"
-    printf "${PURPLE} - Port: ${PORT}${NC}\n"
 
     loadMeteorEnv
+    printf "${PURPLE} - Port: ${PORT}${NC}\n"
 
     killProcessByPort ${PORT}
+}
+
+function cleanMeteorApp() {
+    APP_TO=${1-${APP_TO}}
+    printf "${BLUE}[-] Cleaning \"${APP_TO}\" app...${NC}\n"
+    cd ./${APPS_PATH}/${APP_TO}
+    meteor reset
 }
 
 
