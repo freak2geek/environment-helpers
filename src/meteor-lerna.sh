@@ -47,3 +47,8 @@ function purgeMeteorLerna() {
 
     uninstallMeteorLerna
 }
+
+function setupProject() {
+    printf "${BLUE}[-] Installing \"${PROJECT_NAME}\" project...${NC}\n"
+    meteor lerna bootstrap $@
+}

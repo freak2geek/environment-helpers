@@ -776,6 +776,11 @@ function purgeMeteorLerna() {
     uninstallMeteorLerna
 }
 
+function setupProject() {
+    printf "${BLUE}[-] Installing \"${PROJECT_NAME}\" project...${NC}\n"
+    meteor lerna bootstrap $@
+}
+
 
 # MONGO default config
 MONGO_VERSION="stable"
@@ -1292,6 +1297,20 @@ function setupYarnDeps() {
     fi
 
     installYarnDeps $@
+}
+
+function checkApp() {
+    APP_TO=${1}
+    printf "${BLUE}[-] Checking \"${APP_TO}\" app...${NC}\n"
+
+    checkYarnDeps ./${APPS_PATH}/${APP_TO}
+}
+
+function setupApp() {
+    APP_TO=${1}
+    printf "${BLUE}[-] Installing \"${APP_TO}\" app...${NC}\n"
+
+    meteor yarn --cwd ./${APPS_PATH}/${APP_TO} install ${@:2}
 }
 
 
