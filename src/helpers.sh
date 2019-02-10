@@ -79,8 +79,10 @@ function configEnvrc() {
 
     if ! hasLocalHomeAlias; then
         tryPrintNewLine ~/.envrc
-        echo "alias @${PROJECT_NAME}=\"cd \$\{${localHomeName}\}\"" >>~/.envrc
-        alias @${PROJECT_NAME}="cd \$\{${localHomeName}\}"
+        echo "alias @${PROJECT_NAME}=\"export OLD_PWD=\${PWD}; cd \${${localHomeName}}\"" >>~/.envrc
+        echo "alias @old-pwd=\"cd \${OLD_PWD}\"" >>~/.envrc
+        alias @${PROJECT_NAME}="export OLD_PWD=\${PWD}; cd \${${localHomeName}}"
+        alias @old-pwd="cd \${OLD_PWD}"
         printf "${GREEN}[✔] local home alias${NC}\n"
     fi
 
@@ -131,6 +133,7 @@ function purgeEnvrc() {
     sedi "/envrc/d" ~/.zshrc
     sedi "/export ${localHomeName}/d" ~/.envrc
     sedi "/alias @${PROJECT_NAME}/d" ~/.envrc
+    sedi "/alias @old-pwd/d" ~/.envrc
 }
 
 function endsWithNewLine() {
