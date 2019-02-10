@@ -1365,12 +1365,12 @@ function purgeMeteor() {
     uninstallMeteor
 }
 
-APPS_PATH='.'
+APPS_PATH='apps'
 APP_CONFIG_PATH='private/config'
 
 PORT=3000
 APP_TO=''
-ENV_TO=''
+ENV_TO='development'
 ENV_OVERRIDE=''
 
 function loadMeteorEnv() {
@@ -1389,11 +1389,15 @@ function startMeteorApp() {
     printf "${PURPLE} - Env Override: ${ENV_OVERRIDE}${NC}\n"
     eval ${ENV_OVERRIDE}
 
+    oldPWD=${PWD}
     cd ./${APPS_PATH}/${APP_TO}
     meteorSettingsPath=./${APP_CONFIG_PATH}/${ENV_TO}/settings.json
     printf "${PURPLE} - Settings Path: ${meteorSettingsPath}${NC}\n"
     printf "${PURPLE} - Port: ${PORT}${NC}\n"
     meteor run --settings ${meteorSettingsPath} --port ${PORT} ${@:2}
+
+    wait
+    trap "killMeteorApp ${@} && cd ${oldPWD}" SIGINT SIGTERM
 }
 
 function killMeteorApp() {
@@ -1409,9 +1413,11 @@ function killMeteorApp() {
 function cleanMeteorApp() {
     APP_TO=${1-${APP_TO}}
     printf "${BLUE}[-] Cleaning \"${APP_TO}\" meteor app...${NC}\n"
+    oldPWD=${PWD}
     cd ./${APPS_PATH}/${APP_TO}
     meteor reset
     rm -rf ./node_modules
+    cd ${oldPWD}
 }
 
 
