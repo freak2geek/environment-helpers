@@ -30,20 +30,16 @@ function hasGlobalEnvrcInBash() {
     [[ -f ~/.bashrc ]] && [[ "$(cat ~/.bashrc | grep -ic "source ~/.envrc")" -ne "0" ]]
 }
 
-function hasLocalEnvrcInBash() {
-    [[ -f ~/.bashrc ]] && [[ "$(cat ~/.bashrc | grep -ic "source ${PWD}/.envrc")" -ne "0" ]]
-}
-
 function hasGlobalEnvrcInZsh() {
     [[ -f ~/.zshrc ]] && [[ "$(cat ~/.zshrc | grep -ic "source ~/.envrc")" -ne "0" ]]
 }
 
-function hasLocalEnvrcInZsh() {
-    [[ -f ~/.zshrc ]] && [[ "$(cat ~/.zshrc | grep -ic "source ${PWD}/.envrc")" -ne "0" ]]
+function hasLocalHomeAlias() {
+    [[ -f ~/.envrc ]] && [[ "$(cat ~/.envrc | grep -ic "alias @${PROJECT_NAME}")" -ne "0" ]]
 }
 
 function getLocalHomeVarName() {
-    localDirName=${PWD##*/}
+    localDirName=${PROJECT_NAME-PWD##*/}
     localDirName=$(echo ${localDirName} | sedr 's/\-/_/g')
     localHomeName=$(echo ${localDirName} | sed 'y/abcdefghijklmnopqrstuvwxyz/ABCDEFGHIJKLMNOPQRSTUVWXYZ/')
     echo "${localHomeName}_HOME"
@@ -59,8 +55,11 @@ function hasDynamicEnvrcLoader() {
 }
 
 function hasEnvrc() {
-    hasBashrc && hasLocalHome && hasGlobalEnvrcInBash && hasGlobalEnvrcInZsh && hasLocalEnvrcInBash &&
-        hasLocalEnvrcInZsh && hasDynamicEnvrcLoader
+    hasBashrc && hasLocalHome && hasLocalHomeAlias && hasGlobalEnvrcInBash && hasGlobalEnvrcInZsh && hasDynamicEnvrcLoader
+}
+
+function loadEnvrc() {
+    [[ -s ~/.envrc ]] && source ~/.envrc
 }
 
 function configEnvrc() {
@@ -78,44 +77,25 @@ function configEnvrc() {
         printf "${GREEN}[✔] local home${NC}\n"
     fi
 
-    if ! hasGlobalEnvrcInBash || ! hasGlobalEnvrcInZsh; then
+    if ! hasLocalHomeAlias; then
         tryPrintNewLine ~/.envrc
-        [[ -s ~/.envrc ]] && source ~/.envrc
-    fi
-
-    if ! hasLocalEnvrcInBash || ! hasLocalEnvrcInZsh; then
-        tryPrintNewLine ~/.envrc
-        [[ -s ${PWD}/.envrc ]] && source ${PWD}/.envrc
+        echo "alias @${PROJECT_NAME}=\"cd \$\{${localHomeName}\}\"" >>~/.envrc
+        cd ${PWD}
+        printf "${GREEN}[✔] local home alias${NC}\n"
     fi
 
     if ! hasGlobalEnvrcInBash; then
         tryPrintNewLine ~/.bashrc
         echo "[[ -s ~/.envrc ]] && source ~/.envrc" >>~/.bashrc
+        loadEnvrc
         printf "${GREEN}[✔] global .envrc in bash${NC}\n"
-    fi
-
-    if ! hasLocalEnvrcInBash; then
-        tryPrintNewLine ~/.bashrc
-        echo "[[ -s ${PWD}/.envrc ]] && source ${PWD}/.envrc" >>~/.bashrc
-        printf "${GREEN}[✔] local .envrc in bash${NC}\n"
     fi
 
     if ! hasGlobalEnvrcInZsh; then
         tryPrintNewLine ~/.zshrc
         echo "[[ -s ~/.envrc ]] && source ~/.envrc" >>~/.zshrc
+        loadEnvrc
         printf "${GREEN}[✔] global .envrc in zsh${NC}\n"
-    fi
-
-    if ! hasLocalEnvrcInZsh; then
-        tryPrintNewLine ~/.zshrc
-        echo "[[ -s ${PWD}/.envrc ]] && source ${PWD}/.envrc" >>~/.zshrc
-        printf "${GREEN}[✔] local .envrc in zsh${NC}\n"
-    fi
-
-    if ! hasDynamicEnvrcLoader; then
-        tryPrintNewLine ~/.envrc
-        echo "[[ -s ~/.envrc-dl ]] && source ~/.envrc-dl" >>~/.envrc
-        printf "${GREEN}[✔] dynamic .envrc loader${NC}\n"
     fi
 }
 
@@ -150,6 +130,7 @@ function purgeEnvrc() {
     sedi "/envrc/d" ~/.bashrc
     sedi "/envrc/d" ~/.zshrc
     sedi "/export ${localHomeName}/d" ~/.envrc
+    sedi "/alias @${PROJECT_NAME}/d" ~/.envrc
 }
 
 function endsWithNewLine() {
