@@ -146,7 +146,7 @@ function connectMongo() {
         return
     fi
 
-    printf "${BLUE}[-] Connecting to mongo \"${MONGO_VERSION}\"...${NC}\n"
+    printf "${BLUE}[-] Starting to mongo \"${MONGO_VERSION}\"...${NC}\n"
     sudo meteor m use ${MONGO_VERSION} --port ${MONGO_PORT} --dbpath ${MONGO_DBPATH} --fork --logpath ${MONGO_LOGPATH} --journal
 
     while ! nc -z localhost ${MONGO_PORT} </dev/null; do sleep 1; done
@@ -159,7 +159,7 @@ function connectMongo() {
 }
 
 function shutdownMongo() {
-    printf "${BLUE}[-] Disconnecting to mongo \"${MONGO_VERSION}\"...${NC}\n"
+    printf "${BLUE}[-] Shutting down to mongo \"${MONGO_VERSION}\"...${NC}\n"
 
     if ! hasMongo; then
         return
@@ -228,7 +228,7 @@ function connectMongoAndReplicas() {
         return
     fi
 
-    printf "${BLUE}[-] Connecting to mongo \"${MONGO_VERSION}\" and replicas...${NC}\n"
+    printf "${BLUE}[-] Starting to mongo \"${MONGO_VERSION}\" and replicas...${NC}\n"
 
     sudo meteor m use ${MONGO_VERSION} --config ${MONGO_CONF} --port ${MONGO_PORT} --dbpath ${MONGO_DBPATH} --fork --logpath ${MONGO_LOGPATH} --replSet ${MONGO_REPLICA} --journal
     sudo meteor m use ${MONGO_VERSION} --config ${MONGO_CONF} --port ${MONGO_R1_PORT} --dbpath ${MONGO_R1_DBPATH} --fork --logpath ${MONGO_R1_LOGPATH} --replSet ${MONGO_REPLICA} --journal
@@ -246,7 +246,7 @@ function connectMongoAndReplicas() {
 }
 
 function shutdownMongoAndReplicas() {
-    printf "${BLUE}[-] Disconnecting to mongo \"${MONGO_VERSION}\" and replicas...${NC}\n"
+    printf "${BLUE}[-] Shutting down to mongo \"${MONGO_VERSION}\" and replicas...${NC}\n"
 
     meteor m mongo ${MONGO_VERSION} --port ${MONGO_PORT} --eval "db.getSiblingDB('admin').shutdownServer()" 1> /dev/null
     meteor m mongo ${MONGO_VERSION} --port ${MONGO_R1_PORT} --eval "db.getSiblingDB('admin').shutdownServer()" 1> /dev/null
