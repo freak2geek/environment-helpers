@@ -537,7 +537,7 @@ function configEnvrc() {
     if ! hasLocalHomeAlias; then
         tryPrintNewLine ~/.envrc
         echo "alias @${PROJECT_NAME}=\"cd \$\{${localHomeName}\}\"" >>~/.envrc
-        cd ${PWD}
+        alias @${PROJECT_NAME}="cd \$\{${localHomeName}\}"
         printf "${GREEN}[✔] local home alias${NC}\n"
     fi
 
