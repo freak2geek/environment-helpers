@@ -79,10 +79,9 @@ function configEnvrc() {
 
     if ! hasLocalHomeAlias; then
         tryPrintNewLine ~/.envrc
-        echo "alias @${PROJECT_NAME}=\"export OLD_PWD=\${PWD}; cd \${${localHomeName}}\"" >>~/.envrc
-        echo "alias @old-pwd=\"cd \${OLD_PWD}\"" >>~/.envrc
-        alias @${PROJECT_NAME}="export OLD_PWD=\${PWD}; cd \${${localHomeName}}"
-        alias @old-pwd="cd \${OLD_PWD}"
+        echo "alias @${PROJECT_NAME}=\"_${PROJECT_NAME}() { export OLD_PWD=\${PWD}; cd \${${localHomeName}} }; _${PROJECT_NAME}\"" >>~/.envrc
+        echo "alias @old-pwd=\"_oldpwd() { cd \${OLD_PWD} }; _oldpwd\"" >>~/.envrc
+        loadEnvrc
         printf "${GREEN}[✔] local home alias${NC}\n"
     fi
 
