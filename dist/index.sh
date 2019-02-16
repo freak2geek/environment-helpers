@@ -1376,10 +1376,9 @@ function startMeteorApp() {
     meteorSettingsPath=./${APP_CONFIG_PATH}/${ENV_TO}/settings.json
     printf "${PURPLE} - Settings Path: ${meteorSettingsPath}${NC}\n"
     printf "${PURPLE} - Port: ${PORT}${NC}\n"
-    meteor run --settings ${meteorSettingsPath} --port ${PORT} ${@:2}
 
-    wait
     trap "killMeteorApp ${@} && cd ${oldPWD}" SIGINT SIGTERM
+    meteor run --settings ${meteorSettingsPath} --port ${PORT} ${@:2}
 }
 
 function killMeteorApp() {
