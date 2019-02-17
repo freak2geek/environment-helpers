@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# @freak2geek/scripts - 1.0.0
+
 ENVRC_DYNAMIC_LOADER="$(curl -s https://raw.githubusercontent.com/freak2geek/environment-helpers/master/helpers/envrc-dynamic-loader.sh)"
 
 
@@ -1399,6 +1401,16 @@ function cleanMeteorApp() {
     meteor reset
     rm -rf ./node_modules
     cd ${oldPWD}
+}
+
+function getNpmPackageName() {
+    packagePath=${1-'package.json'}
+    cat ${packagePath} | grep name | head -1 | awk -F: '{ print $2 }' | sed 's/[\",]//g' | tr -d '[[:space:]]'
+}
+
+function getNpmPackageVersion() {
+    packagePath=${1-'package.json'}
+    cat ${packagePath} | grep version | head -1 | awk -F: '{ print $2 }' | sed 's/[\",]//g' | tr -d '[[:space:]]'
 }
 
 
