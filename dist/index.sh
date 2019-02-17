@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# @freak2geek/scripts - 1.1.0
+# @freak2geek/scripts - 1.1.1
 
 ENVRC_DYNAMIC_LOADER="$(curl -s https://raw.githubusercontent.com/freak2geek/environment-helpers/master/helpers/envrc-dynamic-loader.sh)"
 
@@ -1435,6 +1435,7 @@ function bootProject() {
                 localPackageName=$(echo ${localPackageName} | sed 'y/abcdefghijklmnopqrstuvwxyz/ABCDEFGHIJKLMNOPQRSTUVWXYZ/')
                 eval "${localPackageName}_NAME=\"${packageName}\""
                 eval "${localPackageName}_VERSION=\"${packageVersion}\""
+                eval "${localPackageName}_APP=\"$(basename ${packageName})\""
                 eval "${localPackageName}_PATH=\"${dir}\""
             fi
         done

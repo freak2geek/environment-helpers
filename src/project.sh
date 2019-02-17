@@ -21,6 +21,7 @@ function bootProject() {
                 localPackageName=$(echo ${localPackageName} | sed 'y/abcdefghijklmnopqrstuvwxyz/ABCDEFGHIJKLMNOPQRSTUVWXYZ/')
                 eval "${localPackageName}_NAME=\"${packageName}\""
                 eval "${localPackageName}_VERSION=\"${packageVersion}\""
+                eval "${localPackageName}_APP=\"$(basename ${packageName})\""
                 eval "${localPackageName}_PATH=\"${dir}\""
             fi
         done
