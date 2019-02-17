@@ -67,6 +67,10 @@ function configBrew() {
 }
 
 function uninstallBrew() {
+    if isOSX; then
+        return
+    fi
+
     if hasBrew; then
         printf "${BLUE}[-] Uninstall brew...${NC}\n"
         yes | ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Linuxbrew/install/master/uninstall)"
