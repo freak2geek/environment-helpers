@@ -485,6 +485,15 @@ function setupBashrc() {
     configBashrc
 }
 
+function purgeBashrc() {
+    if ! hasBashrc; then
+        return
+    fi
+
+    printf "${BLUE}[-] Purging .bashrc...${NC}\n"
+    sedi "/[[ -s ~/.bashrc ]] &&/d" ~/.bash_profile
+}
+
 function hasGlobalEnvrcInBash() {
     [[ -f ~/.bashrc ]] && [[ "$(cat ~/.bashrc | grep -ic "source ~/.envrc")" -ne "0" ]]
 }
