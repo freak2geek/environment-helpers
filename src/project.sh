@@ -10,7 +10,7 @@ function bootProject() {
     PROJECT_VERSION=$(getNpmPackageVersion)
 
     if [[ -d ./${APPS_PATH} ]]; then
-        for dir in `find ./${APPS_PATH} -type d -maxdepth 1`
+        for dir in `find ./${APPS_PATH} -maxdepth 1 -type d`
         do
             if [[ -f ${dir}/package.json ]]; then
                 packageName=$(getNpmPackageName ${dir}/package.json)
