@@ -10,6 +10,15 @@ Import and use the helpers by running the next command in your shell scripts.
 source /dev/stdin <<< "$(curl -s https://raw.githubusercontent.com/freak2geek/scripts/master/dist/index.sh)"
 ```
 
+The previous command only works when online as always it attempts to fetch the scripts remotely.
+
+To support offline persist and import the script in your project by using:
+
+```bash
+curl -o ./freak2geek-scripts.sh -s https://raw.githubusercontent.com/freak2geek/scripts/master/dist/index.sh
+source ./freak2geek-scripts.sh
+```
+
 ## API
 
 The helpers available are for:
