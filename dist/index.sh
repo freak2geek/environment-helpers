@@ -500,6 +500,8 @@ function hasLocalHomeAlias() {
 function getLocalHomeVarName() {
     localDirName=${PROJECT_NAME-PWD##*/}
     localDirName=$(echo ${localDirName} | sedr 's/\-/_/g')
+    localDirName=$(echo ${localDirName} | sedr 's/@//g')
+    localDirName=$(echo ${localDirName} | sedr 's/\//_/g')
     localHomeName=$(echo ${localDirName} | sed 'y/abcdefghijklmnopqrstuvwxyz/ABCDEFGHIJKLMNOPQRSTUVWXYZ/')
     echo "${localHomeName}_HOME"
 }
@@ -1412,6 +1414,9 @@ function getNpmPackageVersion() {
     packagePath=${1-'package.json'}
     cat ${packagePath} | grep version | head -1 | awk -F: '{ print $2 }' | sed 's/[\",]//g' | tr -d '[[:space:]]'
 }
+
+
+PROJECT_NAME=$(getNpmPackageName)
 
 
 function hasRvm() {
