@@ -1418,6 +1418,9 @@ function getNpmPackageVersion() {
 
 PROJECT_NAME=$(getNpmPackageName)
 
+ENV_DEVELOPMENT='development'
+ENV_PRODUCTION='production'
+
 
 function hasRvm() {
     which rvm >/dev/null && [[ "$(which rvm | grep -ic "not found")" -eq "0" ]]
