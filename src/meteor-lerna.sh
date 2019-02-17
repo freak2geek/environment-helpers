@@ -48,12 +48,12 @@ function purgeMeteorLerna() {
     uninstallMeteorLerna
 }
 
-function setupProject() {
+function setupLernaProject() {
     printf "${BLUE}[-] Installing \"${PROJECT_NAME}\" project...${NC}\n"
     meteor lerna bootstrap $@
 }
 
-function cleanProject() {
+function cleanLernaProject() {
     printf "${BLUE}[-] Cleaning \"${PROJECT_NAME}\" project...${NC}\n"
     rm -rf ./node_modules
 }
