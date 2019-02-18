@@ -5,16 +5,14 @@ source "./src/helpers.sh"
 source "./src/meteor.sh"
 
 function hasMeteorYarn() {
-    hasMeteor && checkMeteorLib yarn
+    hasMeteor && hasMeteorLib yarn
 }
 
 function installMeteorYarn() {
-    printf "${BLUE}[-] Installing meteor yarn...${NC}\n"
     installMeteorLib yarn
 }
 
 function uninstallMeteorYarn() {
-    printf "${BLUE}[-] Uninstalling meteor yarn...${NC}\n"
     uninstallMeteorLib yarn
 }
 

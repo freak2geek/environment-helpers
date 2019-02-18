@@ -19,16 +19,14 @@ MONGO_R1_PORT=27018
 MONGO_R2_PORT=27019
 
 function hasMeteorM() {
-   hasMeteor && checkMeteorLib m
+   hasMeteor && hasMeteorLib m
 }
 
 function installMeteorM() {
-    printf "${BLUE}[-] Installing meteor m...${NC}\n"
     installMeteorLib m
 }
 
 function uninstallMeteorM() {
-    printf "${BLUE}[-] Uninstalling meteor m...${NC}\n"
     uninstallMeteorLib m
 }
 
@@ -38,11 +36,7 @@ function configMeteorM() {
 }
 
 function checkMeteorM() {
-    if hasMeteorM; then
-        printf "${GREEN}[✔] meteor m${NC}\n"
-    else
-        printf "${RED}[x] meteor m${NC}\n"
-    fi
+    checkMeteorLib m
 }
 
 function setupMeteorM() {

@@ -4,25 +4,19 @@ source "./src/constants.sh"
 source "./src/meteor.sh"
 
 function hasMeteorLerna() {
-    hasMeteor && checkMeteorLib lerna
+    hasMeteor && hasMeteorLib lerna
 }
 
 function installMeteorLerna() {
-    printf "${BLUE}[-] Installing meteor lerna...${NC}\n"
     installMeteorLib lerna
 }
 
 function uninstallMeteorLerna() {
-    printf "${BLUE}[-] Uninstalling meteor lerna...${NC}\n"
     uninstallMeteorLib lerna
 }
 
 function checkMeteorLerna() {
-    if hasMeteorLerna; then
-        printf "${GREEN}[✔] meteor lerna${NC}\n"
-    else
-        printf "${RED}[x] meteor lerna${NC}\n"
-    fi
+    checkMeteorLib lerna
 }
 
 function setupMeteorLerna() {

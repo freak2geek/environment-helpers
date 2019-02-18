@@ -728,25 +728,19 @@ function setupIfconfig() {
 
 
 function hasMeteorLerna() {
-    hasMeteor && checkMeteorLib lerna
+    hasMeteor && hasMeteorLib lerna
 }
 
 function installMeteorLerna() {
-    printf "${BLUE}[-] Installing meteor lerna...${NC}\n"
     installMeteorLib lerna
 }
 
 function uninstallMeteorLerna() {
-    printf "${BLUE}[-] Uninstalling meteor lerna...${NC}\n"
     uninstallMeteorLib lerna
 }
 
 function checkMeteorLerna() {
-    if hasMeteorLerna; then
-        printf "${GREEN}[✔] meteor lerna${NC}\n"
-    else
-        printf "${RED}[x] meteor lerna${NC}\n"
-    fi
+    checkMeteorLib lerna
 }
 
 function setupMeteorLerna() {
@@ -798,16 +792,14 @@ MONGO_R1_PORT=27018
 MONGO_R2_PORT=27019
 
 function hasMeteorM() {
-   hasMeteor && checkMeteorLib m
+   hasMeteor && hasMeteorLib m
 }
 
 function installMeteorM() {
-    printf "${BLUE}[-] Installing meteor m...${NC}\n"
     installMeteorLib m
 }
 
 function uninstallMeteorM() {
-    printf "${BLUE}[-] Uninstalling meteor m...${NC}\n"
     uninstallMeteorLib m
 }
 
@@ -817,11 +809,7 @@ function configMeteorM() {
 }
 
 function checkMeteorM() {
-    if hasMeteorM; then
-        printf "${GREEN}[✔] meteor m${NC}\n"
-    else
-        printf "${RED}[x] meteor m${NC}\n"
-    fi
+    checkMeteorLib m
 }
 
 function setupMeteorM() {
@@ -1190,16 +1178,14 @@ function purgeMongoOplog() {
 
 
 function hasMeteorYarn() {
-    hasMeteor && checkMeteorLib yarn
+    hasMeteor && hasMeteorLib yarn
 }
 
 function installMeteorYarn() {
-    printf "${BLUE}[-] Installing meteor yarn...${NC}\n"
     installMeteorLib yarn
 }
 
 function uninstallMeteorYarn() {
-    printf "${BLUE}[-] Uninstalling meteor yarn...${NC}\n"
     uninstallMeteorLib yarn
 }
 
