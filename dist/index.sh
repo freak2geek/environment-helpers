@@ -1352,6 +1352,7 @@ function purgeMeteor() {
 }
 
 function hasMeteorLib() {
+    libToInstall=${1-''}
     meteorCounts="$(find ${METEOR_TOOL_DIR} -maxdepth 3 -type f -name "meteor" | wc -l | tr -d '[:space:]')"
     libCounts="$(find ${METEOR_TOOL_DIR} -maxdepth 5 -type l -name ${libToInstall} | wc -l | tr -d '[:space:]')"
     [[ ${meteorCounts} -eq ${libCounts} ]]
