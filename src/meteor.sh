@@ -3,6 +3,8 @@
 source "./src/constants.sh"
 source "./src/helpers.sh"
 
+METEOR_TOOL_DIR=~/.meteor/packages/meteor-tool
+
 function hasMeteor() {
     which meteor >/dev/null && [[ "$(which meteor | grep -ic "not found")" -eq "0" ]]
 }
@@ -41,6 +43,67 @@ function purgeMeteor() {
     fi
 
     uninstallMeteor
+}
+
+function hasMeteorLib() {
+    meteorCounts="$(find ${METEOR_TOOL_DIR} -maxdepth 3 -type f -name "meteor" | wc -l | tr -d '[:space:]')"
+    libCounts="$(find ${METEOR_TOOL_DIR} -maxdepth 5 -type l -name ${libToInstall} | wc -l | tr -d '[:space:]')"
+    [[ ${meteorCounts} -eq ${libCounts} ]]
+}
+
+function installMeteorLib() {
+    libToInstall=${1-''}
+
+    printf "${BLUE}[-] Installing meteor ${libToInstall}...${NC}\n"
+
+    for meteor in `find ${METEOR_TOOL_DIR} -maxdepth 3 -type f -name "meteor"`
+    do
+        eval "${meteor} npm install -g ${libToInstall}"
+    done
+
+}
+
+function uninstallMeteorLib() {
+    libToInstall=${1-''}
+
+    printf "${BLUE}[-] Uninstalling meteor ${libToInstall}...${NC}\n"
+
+    for meteor in `find ${METEOR_TOOL_DIR} -maxdepth 3 -type f -name "meteor"`
+    do
+        eval "${meteor} npm uninstall -g ${libToInstall}"
+    done
+
+}
+
+function checkMeteorLib() {
+    libToInstall=${1-''}
+
+    if hasMeteorLib $@; then
+        printf "${GREEN}[✔] meteor ${libToInstall}${NC}\n"
+    else
+        printf "${RED}[x] meteor ${libToInstall}${NC}\n"
+    fi
+}
+
+function setupMeteorLib() {
+    libToInstall=${1-''}
+
+    if hasMeteorLib $@; then
+        printf "${GREEN}[✔] Already meteor ${libToInstall}${NC}\n"
+        return;
+    fi
+
+    installMeteorLib $@
+}
+
+function purgeMeteorLib() {
+    libToInstall=${1-''}
+
+    if ! hasMeteorLib $@; then
+        return;
+    fi
+
+    uninstallMeteorLib $@
 }
 
 APPS_PATH='apps'

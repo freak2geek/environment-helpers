@@ -12,6 +12,3 @@ NC='\033[0m'
 BRED='\033[1;31m'
 BGREEN='\033[1;32m'
 BBLUE='\033[1;34m'
-
-# Dirs
-METEOR_TOOL_DIR=~/.meteor/packages/meteor-tool

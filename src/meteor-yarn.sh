@@ -5,18 +5,17 @@ source "./src/helpers.sh"
 source "./src/meteor.sh"
 
 function hasMeteorYarn() {
-    hasMeteor && find ${METEOR_TOOL_DIR} -type d -name "yarn" | grep -icq "yarn"
+    hasMeteor && checkMeteorLib yarn
 }
 
 function installMeteorYarn() {
     printf "${BLUE}[-] Installing meteor yarn...${NC}\n"
-    sudo chmod -R 777 ~/.npm
-    meteor npm install yarn -g
+    installMeteorLib yarn
 }
 
 function uninstallMeteorYarn() {
     printf "${BLUE}[-] Uninstalling meteor yarn...${NC}\n"
-    meteor npm uninstall yarn -g
+    uninstallMeteorLib yarn
 }
 
 function hasMeteorYarnConfig() {
@@ -48,6 +47,7 @@ function setupMeteorYarn() {
     fi
 
     if ! hasMeteorYarn; then
+        sudo chmod -R 777 ~/.npm
         installMeteorYarn
     fi
 
@@ -73,8 +73,7 @@ function getPackageName() {
 
 function hasYarnDeps() {
     packagePath=${1-"."}
-    cd ${packagePath}
-    hasMeteorYarn && [[ "$(meteor yarn check --verify-tree 2>&1 >/dev/null | grep -ic "error")" -eq "0" ]]
+    [[ "$(meteor yarn check --verify-tree 2>&1 >/dev/null | grep -ic "error")" -eq "0" ]]
 }
 
 function checkYarnDeps() {
@@ -82,12 +81,12 @@ function checkYarnDeps() {
     packagePath=${1-"."}
     package=${2-$(getPackageName $@)}
 
-    if hasYarnDeps $@; then
+    cd ${packagePath}
+    if hasMeteorYarn && hasYarnDeps $@; then
         printf "${GREEN}[✔] \"${package}\" dependencies${NC}\n"
     else
         printf "${RED}[x] \"${package}\" dependencies${NC}\n"
     fi
-
     cd ${oldPath}
 }
 
@@ -98,6 +97,9 @@ function installYarnDeps() {
 
     printf "${BLUE}[-] Installing \"${package}\" dependencies...${NC}\n"
     cd ${packagePath}
+    if ! hasMeteorYarn; then
+        installMeteorYarn
+    fi
     meteor yarn install
     cd ${oldPath}
 }

@@ -128,9 +128,6 @@ BRED='\033[1;31m'
 BGREEN='\033[1;32m'
 BBLUE='\033[1;34m'
 
-# Dirs
-METEOR_TOOL_DIR=~/.meteor/packages/meteor-tool
-
 
 function hasCurl() {
     which curl >/dev/null && [[ "$(which curl | grep -ic "not found")" -eq "0" ]]
@@ -731,17 +728,17 @@ function setupIfconfig() {
 
 
 function hasMeteorLerna() {
-    hasMeteor && find ${METEOR_TOOL_DIR} -type d -name "lerna" | grep -icq "lerna"
+    hasMeteor && checkMeteorLib lerna
 }
 
 function installMeteorLerna() {
     printf "${BLUE}[-] Installing meteor lerna...${NC}\n"
-    meteor npm install lerna -g
+    installMeteorLib lerna
 }
 
 function uninstallMeteorLerna() {
     printf "${BLUE}[-] Uninstalling meteor lerna...${NC}\n"
-    meteor npm uninstall lerna -g
+    uninstallMeteorLib lerna
 }
 
 function checkMeteorLerna() {
@@ -801,17 +798,17 @@ MONGO_R1_PORT=27018
 MONGO_R2_PORT=27019
 
 function hasMeteorM() {
-   hasMeteor && find ${METEOR_TOOL_DIR} -type d -name "m" | grep -icq "m"
+   hasMeteor && checkMeteorLib m
 }
 
 function installMeteorM() {
     printf "${BLUE}[-] Installing meteor m...${NC}\n"
-    meteor npm install m -g
+    installMeteorLib m
 }
 
 function uninstallMeteorM() {
     printf "${BLUE}[-] Uninstalling meteor m...${NC}\n"
-    meteor npm uninstall m -g
+    uninstallMeteorLib m
 }
 
 function configMeteorM() {
@@ -1193,18 +1190,17 @@ function purgeMongoOplog() {
 
 
 function hasMeteorYarn() {
-    hasMeteor && find ${METEOR_TOOL_DIR} -type d -name "yarn" | grep -icq "yarn"
+    hasMeteor && checkMeteorLib yarn
 }
 
 function installMeteorYarn() {
     printf "${BLUE}[-] Installing meteor yarn...${NC}\n"
-    sudo chmod -R 777 ~/.npm
-    meteor npm install yarn -g
+    installMeteorLib yarn
 }
 
 function uninstallMeteorYarn() {
     printf "${BLUE}[-] Uninstalling meteor yarn...${NC}\n"
-    meteor npm uninstall yarn -g
+    uninstallMeteorLib yarn
 }
 
 function hasMeteorYarnConfig() {
@@ -1236,6 +1232,7 @@ function setupMeteorYarn() {
     fi
 
     if ! hasMeteorYarn; then
+        sudo chmod -R 777 ~/.npm
         installMeteorYarn
     fi
 
@@ -1261,8 +1258,7 @@ function getPackageName() {
 
 function hasYarnDeps() {
     packagePath=${1-"."}
-    cd ${packagePath}
-    hasMeteorYarn && [[ "$(meteor yarn check --verify-tree 2>&1 >/dev/null | grep -ic "error")" -eq "0" ]]
+    [[ "$(meteor yarn check --verify-tree 2>&1 >/dev/null | grep -ic "error")" -eq "0" ]]
 }
 
 function checkYarnDeps() {
@@ -1270,12 +1266,12 @@ function checkYarnDeps() {
     packagePath=${1-"."}
     package=${2-$(getPackageName $@)}
 
-    if hasYarnDeps $@; then
+    cd ${packagePath}
+    if hasMeteorYarn && hasYarnDeps $@; then
         printf "${GREEN}[✔] \"${package}\" dependencies${NC}\n"
     else
         printf "${RED}[x] \"${package}\" dependencies${NC}\n"
     fi
-
     cd ${oldPath}
 }
 
@@ -1286,6 +1282,9 @@ function installYarnDeps() {
 
     printf "${BLUE}[-] Installing \"${package}\" dependencies...${NC}\n"
     cd ${packagePath}
+    if ! hasMeteorYarn; then
+        installMeteorYarn
+    fi
     meteor yarn install
     cd ${oldPath}
 }
@@ -1323,6 +1322,8 @@ function cleanApp() {
     rm -rf ./${APPS_PATH}/${APP_TO}/node_modules
 }
 
+
+METEOR_TOOL_DIR=~/.meteor/packages/meteor-tool
 
 function hasMeteor() {
     which meteor >/dev/null && [[ "$(which meteor | grep -ic "not found")" -eq "0" ]]
@@ -1362,6 +1363,67 @@ function purgeMeteor() {
     fi
 
     uninstallMeteor
+}
+
+function hasMeteorLib() {
+    meteorCounts="$(find ${METEOR_TOOL_DIR} -maxdepth 3 -type f -name "meteor" | wc -l | tr -d '[:space:]')"
+    libCounts="$(find ${METEOR_TOOL_DIR} -maxdepth 5 -type l -name ${libToInstall} | wc -l | tr -d '[:space:]')"
+    [[ ${meteorCounts} -eq ${libCounts} ]]
+}
+
+function installMeteorLib() {
+    libToInstall=${1-''}
+
+    printf "${BLUE}[-] Installing meteor ${libToInstall}...${NC}\n"
+
+    for meteor in `find ${METEOR_TOOL_DIR} -maxdepth 3 -type f -name "meteor"`
+    do
+        eval "${meteor} npm install -g ${libToInstall}"
+    done
+
+}
+
+function uninstallMeteorLib() {
+    libToInstall=${1-''}
+
+    printf "${BLUE}[-] Uninstalling meteor ${libToInstall}...${NC}\n"
+
+    for meteor in `find ${METEOR_TOOL_DIR} -maxdepth 3 -type f -name "meteor"`
+    do
+        eval "${meteor} npm uninstall -g ${libToInstall}"
+    done
+
+}
+
+function checkMeteorLib() {
+    libToInstall=${1-''}
+
+    if hasMeteorLib $@; then
+        printf "${GREEN}[✔] meteor ${libToInstall}${NC}\n"
+    else
+        printf "${RED}[x] meteor ${libToInstall}${NC}\n"
+    fi
+}
+
+function setupMeteorLib() {
+    libToInstall=${1-''}
+
+    if hasMeteorLib $@; then
+        printf "${GREEN}[✔] Already meteor ${libToInstall}${NC}\n"
+        return;
+    fi
+
+    installMeteorLib $@
+}
+
+function purgeMeteorLib() {
+    libToInstall=${1-''}
+
+    if ! hasMeteorLib $@; then
+        return;
+    fi
+
+    uninstallMeteorLib $@
 }
 
 APPS_PATH='apps'

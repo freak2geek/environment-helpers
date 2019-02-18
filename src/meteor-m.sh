@@ -19,17 +19,17 @@ MONGO_R1_PORT=27018
 MONGO_R2_PORT=27019
 
 function hasMeteorM() {
-   hasMeteor && find ${METEOR_TOOL_DIR} -type d -name "m" | grep -icq "m"
+   hasMeteor && checkMeteorLib m
 }
 
 function installMeteorM() {
     printf "${BLUE}[-] Installing meteor m...${NC}\n"
-    meteor npm install m -g
+    installMeteorLib m
 }
 
 function uninstallMeteorM() {
     printf "${BLUE}[-] Uninstalling meteor m...${NC}\n"
-    meteor npm uninstall m -g
+    uninstallMeteorLib m
 }
 
 function configMeteorM() {

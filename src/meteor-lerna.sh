@@ -4,17 +4,17 @@ source "./src/constants.sh"
 source "./src/meteor.sh"
 
 function hasMeteorLerna() {
-    hasMeteor && find ${METEOR_TOOL_DIR} -type d -name "lerna" | grep -icq "lerna"
+    hasMeteor && checkMeteorLib lerna
 }
 
 function installMeteorLerna() {
     printf "${BLUE}[-] Installing meteor lerna...${NC}\n"
-    meteor npm install lerna -g
+    installMeteorLib lerna
 }
 
 function uninstallMeteorLerna() {
     printf "${BLUE}[-] Uninstalling meteor lerna...${NC}\n"
-    meteor npm uninstall lerna -g
+    uninstallMeteorLib lerna
 }
 
 function checkMeteorLerna() {
