@@ -1371,9 +1371,11 @@ function installMeteorLib() {
 
     for meteor in `find ${METEOR_TOOL_DIR} -maxdepth 3 -type f -name "meteor"`
     do
-        eval "${meteor} npm install -g ${libToInstall}"
+        libCount="$(find "$(dirname ${meteor})" -maxdepth 3 -type l -name ${libToInstall} | wc -l | tr -d '[:space:]')"
+        if [[ ${libCount} -eq "0" ]]; then
+            eval "${meteor} npm install -g ${libToInstall}"
+        fi
     done
-
 }
 
 function uninstallMeteorLib() {
