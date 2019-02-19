@@ -24,18 +24,18 @@ function setupMeteorLerna() {
         setupMeteor
     fi
 
-    if hasMeteorLerna; then
+    if hasMeteorLib lerna; then
         printf "${GREEN}[✔] Already meteor lerna${NC}\n"
         return
     fi
 
-    if ! hasMeteorLerna; then
+    if ! hasMeteorLib lerna; then
         installMeteorLerna
     fi
 }
 
 function purgeMeteorLerna() {
-    if ! hasMeteorLerna; then
+    if ! hasMeteorLib lerna; then
         return
     fi
 

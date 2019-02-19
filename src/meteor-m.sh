@@ -44,7 +44,7 @@ function setupMeteorM() {
         setupMeteor
     fi
 
-    if hasMeteorM; then
+    if hasMeteorLib m; then
         printf "${GREEN}[✔] Already meteor m${NC}\n"
         return
     fi
@@ -53,7 +53,7 @@ function setupMeteorM() {
 }
 
 function purgeMeteorM() {
-    if ! hasMeteorM; then
+    if ! hasMeteorLib m; then
         return
     fi
 
@@ -113,7 +113,9 @@ function checkMongo() {
 }
 
 function setupMongo() {
-    setupMeteorM
+    if ! hasMeteorLib m; then
+        setupMeteorM
+    fi
     installMongo
     configMongo
 }

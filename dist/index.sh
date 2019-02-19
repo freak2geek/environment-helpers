@@ -749,18 +749,18 @@ function setupMeteorLerna() {
         setupMeteor
     fi
 
-    if hasMeteorLerna; then
+    if hasMeteorLib lerna; then
         printf "${GREEN}[✔] Already meteor lerna${NC}\n"
         return
     fi
 
-    if ! hasMeteorLerna; then
+    if ! hasMeteorLib lerna; then
         installMeteorLerna
     fi
 }
 
 function purgeMeteorLerna() {
-    if ! hasMeteorLerna; then
+    if ! hasMeteorLib lerna; then
         return
     fi
 
@@ -818,7 +818,7 @@ function setupMeteorM() {
         setupMeteor
     fi
 
-    if hasMeteorM; then
+    if hasMeteorLib m; then
         printf "${GREEN}[✔] Already meteor m${NC}\n"
         return
     fi
@@ -827,7 +827,7 @@ function setupMeteorM() {
 }
 
 function purgeMeteorM() {
-    if ! hasMeteorM; then
+    if ! hasMeteorLib m; then
         return
     fi
 
@@ -887,7 +887,9 @@ function checkMongo() {
 }
 
 function setupMongo() {
-    setupMeteorM
+    if ! hasMeteorLib m; then
+        setupMeteorM
+    fi
     installMongo
     configMongo
 }
@@ -1213,12 +1215,12 @@ function setupMeteorYarn() {
         setupMeteor
     fi
 
-    if hasMeteorYarn && hasMeteorYarnConfig; then
+    if hasMeteorLib yarn && hasMeteorYarnConfig; then
         printf "${GREEN}[✔] Already meteor yarn${NC}\n"
         return
     fi
 
-    if ! hasMeteorYarn; then
+    if ! hasMeteorLib yarn; then
         sudo chmod -R 777 ~/.npm
         installMeteorYarn
     fi
@@ -1229,7 +1231,7 @@ function setupMeteorYarn() {
 }
 
 function purgeMeteorYarn() {
-    if ! hasMeteorYarn; then
+    if ! hasMeteorLib yarn; then
         return
     fi
 

@@ -39,12 +39,12 @@ function setupMeteorYarn() {
         setupMeteor
     fi
 
-    if hasMeteorYarn && hasMeteorYarnConfig; then
+    if hasMeteorLib yarn && hasMeteorYarnConfig; then
         printf "${GREEN}[✔] Already meteor yarn${NC}\n"
         return
     fi
 
-    if ! hasMeteorYarn; then
+    if ! hasMeteorLib yarn; then
         sudo chmod -R 777 ~/.npm
         installMeteorYarn
     fi
@@ -55,7 +55,7 @@ function setupMeteorYarn() {
 }
 
 function purgeMeteorYarn() {
-    if ! hasMeteorYarn; then
+    if ! hasMeteorLib yarn; then
         return
     fi
 
