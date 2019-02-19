@@ -5,7 +5,7 @@ source "./src/helpers.sh"
 source "./src/meteor.sh"
 
 function hasMeteorYarn() {
-    hasMeteor && hasMeteorLib yarn
+    hasMeteor && hasLibForCurrentMeteor yarn
 }
 
 function installMeteorYarn() {

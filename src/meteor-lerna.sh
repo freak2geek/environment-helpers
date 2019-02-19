@@ -4,7 +4,7 @@ source "./src/constants.sh"
 source "./src/meteor.sh"
 
 function hasMeteorLerna() {
-    hasMeteor && hasMeteorLib lerna
+    hasMeteor && hasLibForCurrentMeteor lerna
 }
 
 function installMeteorLerna() {

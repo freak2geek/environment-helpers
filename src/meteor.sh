@@ -45,6 +45,11 @@ function purgeMeteor() {
     uninstallMeteor
 }
 
+function hasLibForCurrentMeteor() {
+    libToInstall=${1-''}
+    [[ "$(meteor ${libToInstall} --help 2>&1 | grep -ic "is not a Meteor command")" -eq "0" ]]
+}
+
 function hasMeteorLib() {
     libToInstall=${1-''}
     meteorCounts="$(find ${METEOR_TOOL_DIR} -maxdepth 3 -type f -name "meteor" | wc -l | tr -d '[:space:]')"
@@ -79,8 +84,10 @@ function uninstallMeteorLib() {
 function checkMeteorLib() {
     libToInstall=${1-''}
 
-    if hasMeteorLib $@; then
+    if hasMeteorLib $@ && hasLibForCurrentMeteor $@; then
         printf "${GREEN}[✔] meteor ${libToInstall}${NC}\n"
+    elif hasLibForCurrentMeteor $@; then
+        printf "${YELLOW}[✔] meteor ${libToInstall} (A new meteor version is available. Please, re-setup your environment)${NC}\n"
     else
         printf "${RED}[x] meteor ${libToInstall}${NC}\n"
     fi

@@ -122,6 +122,7 @@ GREEN='\033[0;32m'
 BLUE='\033[0;34m'
 PURPLE='\033[0;35m'
 CYAN='\033[0;36m'
+YELLOW='\033[0;33m'
 NC='\033[0m'
 
 BRED='\033[1;31m'
@@ -728,7 +729,7 @@ function setupIfconfig() {
 
 
 function hasMeteorLerna() {
-    hasMeteor && hasMeteorLib lerna
+    hasMeteor && hasLibForCurrentMeteor lerna
 }
 
 function installMeteorLerna() {
@@ -792,7 +793,7 @@ MONGO_R1_PORT=27018
 MONGO_R2_PORT=27019
 
 function hasMeteorM() {
-   hasMeteor && hasMeteorLib m
+   hasMeteor && hasLibForCurrentMeteor m
 }
 
 function installMeteorM() {
@@ -1178,7 +1179,7 @@ function purgeMongoOplog() {
 
 
 function hasMeteorYarn() {
-    hasMeteor && hasMeteorLib yarn
+    hasMeteor && hasLibForCurrentMeteor yarn
 }
 
 function installMeteorYarn() {
@@ -1351,6 +1352,11 @@ function purgeMeteor() {
     uninstallMeteor
 }
 
+function hasLibForCurrentMeteor() {
+    libToInstall=${1-''}
+    [[ "$(meteor ${libToInstall} --help 2>&1 | grep -ic "is not a Meteor command")" -eq "0" ]]
+}
+
 function hasMeteorLib() {
     libToInstall=${1-''}
     meteorCounts="$(find ${METEOR_TOOL_DIR} -maxdepth 3 -type f -name "meteor" | wc -l | tr -d '[:space:]')"
@@ -1385,8 +1391,10 @@ function uninstallMeteorLib() {
 function checkMeteorLib() {
     libToInstall=${1-''}
 
-    if hasMeteorLib $@; then
+    if hasMeteorLib $@ && hasLibForCurrentMeteor $@; then
         printf "${GREEN}[✔] meteor ${libToInstall}${NC}\n"
+    elif hasLibForCurrentMeteor $@; then
+        printf "${YELLOW}[✔] meteor ${libToInstall} (A new meteor version is available. Please, re-setup your environment)${NC}\n"
     else
         printf "${RED}[x] meteor ${libToInstall}${NC}\n"
     fi

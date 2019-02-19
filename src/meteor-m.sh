@@ -19,7 +19,7 @@ MONGO_R1_PORT=27018
 MONGO_R2_PORT=27019
 
 function hasMeteorM() {
-   hasMeteor && hasMeteorLib m
+   hasMeteor && hasLibForCurrentMeteor m
 }
 
 function installMeteorM() {
