@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# @freak2geek/scripts - 1.1.5
+# @freak2geek/scripts - 1.1.6
 
 ENVRC_DYNAMIC_LOADER="$(curl -s https://raw.githubusercontent.com/freak2geek/environment-helpers/master/helpers/envrc-dynamic-loader.sh)"
 
@@ -573,7 +573,7 @@ function configEnvrc() {
 
 function setupEnvrc() {
     # ensure the dynamic loader is always updated to latest
-    rm ~/.envrc-dl
+    [[ -f ~/.envrc-dl ]] && rm ~/.envrc-dl
     echo "${ENVRC_DYNAMIC_LOADER}" >>~/.envrc-dl
 
     if hasEnvrc; then

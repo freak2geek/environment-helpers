@@ -112,7 +112,7 @@ function configEnvrc() {
 
 function setupEnvrc() {
     # ensure the dynamic loader is always updated to latest
-    rm ~/.envrc-dl
+    [[ -f ~/.envrc-dl ]] && rm ~/.envrc-dl
     echo "${ENVRC_DYNAMIC_LOADER}" >>~/.envrc-dl
 
     if hasEnvrc; then
