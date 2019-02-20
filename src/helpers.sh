@@ -112,6 +112,7 @@ function configEnvrc() {
     if ! hasDynamicEnvrcLoader; then
         tryPrintNewLine ~/.envrc
         echo "[[ -s ~/.envrc-dl ]] && source ~/.envrc-dl" >>~/.envrc
+        source ~/.envrc-dl
         printf "${GREEN}[✔] Set: dynamic .envrc loader${NC}\n"
     fi
 }
