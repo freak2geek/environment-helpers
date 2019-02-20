@@ -85,28 +85,34 @@ function configEnvrc() {
         localHomeName="$(getLocalHomeVarName)"
         echo "export ${localHomeName}=${PWD}" >>~/.envrc
         export ${localHomeName}=${PWD}
-        printf "${GREEN}[✔] local home${NC}\n"
+        printf "${GREEN}[✔] Set: local home${NC}\n"
     fi
 
     if ! hasLocalHomeAlias; then
         tryPrintNewLine ~/.envrc
         echo "alias @${PROJECT_NAME}=\"cd \${${localHomeName}}\"" >>~/.envrc
         eval "alias @${PROJECT_NAME}=\"cd \${${localHomeName}}\""
-        printf "${GREEN}[✔] local home alias${NC}\n"
+        printf "${GREEN}[✔] Set: local home alias${NC}\n"
     fi
 
     if ! hasGlobalEnvrcInBash; then
         tryPrintNewLine ~/.bashrc
         echo "[[ -s ~/.envrc ]] && source ~/.envrc" >>~/.bashrc
         loadEnvrc
-        printf "${GREEN}[✔] global .envrc in bash${NC}\n"
+        printf "${GREEN}[✔] Set: global .envrc in bash${NC}\n"
     fi
 
     if ! hasGlobalEnvrcInZsh; then
         tryPrintNewLine ~/.zshrc
         echo "[[ -s ~/.envrc ]] && source ~/.envrc" >>~/.zshrc
         loadEnvrc
-        printf "${GREEN}[✔] global .envrc in zsh${NC}\n"
+        printf "${GREEN}[✔] Set: global .envrc in zsh${NC}\n"
+    fi
+
+    if ! hasDynamicEnvrcLoader; then
+        tryPrintNewLine ~/.envrc
+        echo "[[ -s ~/.envrc-dl ]] && source ~/.envrc-dl" >>~/.envrc
+        printf "${GREEN}[✔] Set: dynamic .envrc loader${NC}\n"
     fi
 }
 
