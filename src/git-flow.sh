@@ -2,6 +2,7 @@
 
 source "./src/constants.sh"
 source "./src/helpers.sh"
+source "./src/brew.sh"
 
 # GIT FLOW default config
 GITFLOW_BUGFIX="fix/"
@@ -14,7 +15,7 @@ GITFLOW_MASTER="master"
 GITFLOW_DEVELOP="develop"
 
 function hasGitFlow() {
-    [[ "$(brew ls git-flow | grep -ic "not found")" -eq "0" ]]
+    hasBrew && [[ "$(brew ls git-flow | grep -ic "not found")" -eq "0" ]]
 }
 
 function installGitFlow() {

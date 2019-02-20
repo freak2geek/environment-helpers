@@ -22,7 +22,7 @@ function purgeBrewOS() {
 }
 
 function hasBrew() {
-    [[ "$(brew --version | grep -ic "not found")" -eq "0" ]]
+    [[ "$(brew --version 2>&1 | grep -ic "not found")" -eq "0" ]]
 }
 
 function hasBrewPathConfig() {
@@ -182,7 +182,7 @@ DNSMASQ_DOMAIN="dev"
 DNSMASQ_HOST="127.0.0.1"
 
 function hasDnsmasq() {
-    [[ "$(brew list | grep -ic "dnsmasq")" -eq "1" ]]
+    hasBrew && [[ "$(brew list | grep -ic "dnsmasq")" -eq "1" ]]
 }
 
 function installDnsmasq() {
@@ -336,7 +336,7 @@ GITFLOW_MASTER="master"
 GITFLOW_DEVELOP="develop"
 
 function hasGitFlow() {
-    [[ "$(brew ls git-flow | grep -ic "not found")" -eq "0" ]]
+    hasBrew && [[ "$(brew ls git-flow | grep -ic "not found")" -eq "0" ]]
 }
 
 function installGitFlow() {
@@ -1567,7 +1567,7 @@ function uninstallRuby() {
 
 
 function hasZsh() {
-    which zsh >/dev/null && [[ "$(which zsh | grep -ic "not found")" -eq "0" ]]
+    hasBrew && [[ "$(brew ls zsh | grep -ic "not found")" -eq "0" ]]
 }
 
 function hasOhMyZsh() {

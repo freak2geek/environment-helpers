@@ -2,13 +2,14 @@
 
 source "./src/constants.sh"
 source "./src/helpers.sh"
+source "./src/brew.sh"
 
 # DNSMASQ default config
 DNSMASQ_DOMAIN="dev"
 DNSMASQ_HOST="127.0.0.1"
 
 function hasDnsmasq() {
-    [[ "$(brew list | grep -ic "dnsmasq")" -eq "1" ]]
+    hasBrew && [[ "$(brew list | grep -ic "dnsmasq")" -eq "1" ]]
 }
 
 function installDnsmasq() {

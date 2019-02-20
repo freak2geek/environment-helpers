@@ -2,9 +2,10 @@
 
 source "./src/constants.sh"
 source "./src/helpers.sh"
+source "./src/brew.sh"
 
 function hasZsh() {
-    which zsh >/dev/null && [[ "$(which zsh | grep -ic "not found")" -eq "0" ]]
+    hasBrew && [[ "$(brew ls zsh | grep -ic "not found")" -eq "0" ]]
 }
 
 function hasOhMyZsh() {

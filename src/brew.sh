@@ -22,7 +22,7 @@ function purgeBrewOS() {
 }
 
 function hasBrew() {
-    [[ "$(brew --version | grep -ic "not found")" -eq "0" ]]
+    [[ "$(brew --version 2>&1 | grep -ic "not found")" -eq "0" ]]
 }
 
 function hasBrewPathConfig() {
