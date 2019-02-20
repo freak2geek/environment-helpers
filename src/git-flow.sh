@@ -14,7 +14,7 @@ GITFLOW_MASTER="master"
 GITFLOW_DEVELOP="develop"
 
 function hasGitFlow() {
-    which git-flow >/dev/null && [[ "$(which git-flow | grep -ic "not found")" -eq "0" ]]
+    [[ "$(brew ls git-flow | grep -ic "not found")" -eq "0" ]]
 }
 
 function installGitFlow() {

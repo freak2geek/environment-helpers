@@ -4,7 +4,7 @@ source "./src/constants.sh"
 source "./src/helpers.sh"
 source "./src/ruby.sh"
 
-BREW_PATH="/home/linuxbrew/.linuxbrew/bin:/home/linuxbrew/.linuxbrew/sbin"
+BREW_PATH="/home/linuxbrew/.linuxbrew/bin:/home/linuxbrew/.linuxbrew/sbin:~/.linuxbrew/bin:~/.linuxbrew/sbin"
 BREW_UMASK="umask 002"
 
 BREW_OS_DEPENDENCIES="build-essential curl g++ file git m4 texinfo libbz2-dev libcurl4-openssl-dev libexpat-dev libncurses-dev zlib1g-dev gawk make patch tcl"
@@ -22,7 +22,7 @@ function purgeBrewOS() {
 }
 
 function hasBrew() {
-    which brew >/dev/null && [[ "$(which brew | grep -ic "not found")" -eq "0" ]]
+    [[ "$(brew --version | grep -ic "not found")" -eq "0" ]]
 }
 
 function hasBrewPathConfig() {
@@ -72,6 +72,7 @@ function uninstallBrew() {
     fi
 
     if hasBrew; then
+        brew install ruby
         printf "${BLUE}[-] Uninstall brew...${NC}\n"
         yes | ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Linuxbrew/install/master/uninstall)"
     fi
