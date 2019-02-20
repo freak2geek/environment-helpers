@@ -21,8 +21,12 @@ function purgeBrewOS() {
         sudo apt autoremove -y
 }
 
-function hasBrew() {
-    [[ "$(brew --version 2>&1 | grep -ic "not found")" -eq "0" ]]
+function hasLinuxBrew() {
+    [[ "$(brew --version 2>&1 | grep -ic "not")" -eq "0" ]]
+}
+
+function hasOsxBrew() {
+    which brew >/dev/null && [[ "$(which brew | grep -ic "not found")" -eq "0" ]]
 }
 
 function hasBrewPathConfig() {
@@ -38,7 +42,7 @@ function hasBrewConfig() {
 }
 
 function hasBrewByOS() {
-    (isLinux && hasBrew && hasBrewConfig) || (isOSX && hasBrew)
+    (isLinux && hasLinuxBrew && hasBrewConfig) || (isOSX && hasOsxBrew)
 }
 
 function installBrew() {
