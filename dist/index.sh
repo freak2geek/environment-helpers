@@ -336,7 +336,7 @@ GITFLOW_MASTER="master"
 GITFLOW_DEVELOP="develop"
 
 function hasGitFlow() {
-    hasBrew && [[ "$(brew ls git-flow | grep -ic "not found")" -eq "0" ]]
+    hasBrew && [[ "$(brew ls git-flow 2>&1 | grep -ic "No such keg")" -eq "0" ]]
 }
 
 function installGitFlow() {
@@ -1567,7 +1567,7 @@ function uninstallRuby() {
 
 
 function hasZsh() {
-    hasBrew && [[ "$(brew ls zsh | grep -ic "not found")" -eq "0" ]]
+    hasBrew && [[ "$(brew ls zsh 2>&1 | grep -ic "No such keg")" -eq "0" ]]
 }
 
 function hasOhMyZsh() {
