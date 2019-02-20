@@ -5,7 +5,7 @@ source "./src/helpers.sh"
 source "./src/brew.sh"
 
 function hasZsh() {
-    hasBrew && [[ "$(brew ls zsh 2>&1 | grep -ic "No such keg")" -eq "0" ]]
+    hasBrewByOS && [[ "$(brew ls zsh 2>&1 | grep -ic "No such keg")" -eq "0" ]]
 }
 
 function hasOhMyZsh() {

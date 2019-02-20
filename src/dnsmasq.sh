@@ -9,7 +9,7 @@ DNSMASQ_DOMAIN="dev"
 DNSMASQ_HOST="127.0.0.1"
 
 function hasDnsmasq() {
-    hasBrew && [[ "$(brew list | grep -ic "dnsmasq")" -eq "1" ]]
+    hasBrewByOS && [[ "$(brew list | grep -ic "dnsmasq")" -eq "1" ]]
 }
 
 function installDnsmasq() {

@@ -186,7 +186,7 @@ DNSMASQ_DOMAIN="dev"
 DNSMASQ_HOST="127.0.0.1"
 
 function hasDnsmasq() {
-    hasBrew && [[ "$(brew list | grep -ic "dnsmasq")" -eq "1" ]]
+    hasBrewByOS && [[ "$(brew list | grep -ic "dnsmasq")" -eq "1" ]]
 }
 
 function installDnsmasq() {
@@ -340,7 +340,7 @@ GITFLOW_MASTER="master"
 GITFLOW_DEVELOP="develop"
 
 function hasGitFlow() {
-    hasBrew && [[ "$(brew ls git-flow 2>&1 | grep -ic "No such keg")" -eq "0" ]]
+    hasBrewByOS && [[ "$(brew ls git-flow 2>&1 | grep -ic "No such keg")" -eq "0" ]]
 }
 
 function installGitFlow() {
@@ -1571,7 +1571,7 @@ function uninstallRuby() {
 
 
 function hasZsh() {
-    hasBrew && [[ "$(brew ls zsh 2>&1 | grep -ic "No such keg")" -eq "0" ]]
+    hasBrewByOS && [[ "$(brew ls zsh 2>&1 | grep -ic "No such keg")" -eq "0" ]]
 }
 
 function hasOhMyZsh() {
