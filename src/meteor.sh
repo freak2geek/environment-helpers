@@ -86,9 +86,9 @@ function uninstallMeteorLib() {
 function checkMeteorLib() {
     libToInstall=${1-''}
 
-    if hasMeteorLib $@ && hasLibForCurrentMeteor $@; then
+    if hasMeteor && hasMeteorLib $@ && hasLibForCurrentMeteor $@; then
         printf "${GREEN}[✔] meteor ${libToInstall}${NC}\n"
-    elif hasLibForCurrentMeteor $@; then
+    elif hasMeteor && hasLibForCurrentMeteor $@; then
         printf "${YELLOW}[✔] meteor ${libToInstall} (A new meteor version is available. Please, re-setup your environment)${NC}\n"
     else
         printf "${RED}[x] meteor ${libToInstall}${NC}\n"
