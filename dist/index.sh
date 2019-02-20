@@ -75,7 +75,7 @@ function uninstallBrew() {
         return
     fi
 
-    if hasBrew; then
+    if hasBrewByOS; then
         brew install ruby
         printf "${BLUE}[-] Uninstall brew...${NC}\n"
         yes | ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Linuxbrew/install/master/uninstall)"
@@ -102,7 +102,7 @@ function setupBrew() {
         return
     fi
 
-    if ! hasBrew; then
+    if ! hasBrewByOS; then
         installBrew
     fi
 
@@ -112,7 +112,7 @@ function setupBrew() {
 }
 
 function purgeBrew() {
-    if ! hasBrew; then
+    if ! hasBrewByOS; then
         return
     fi
 
