@@ -3,12 +3,18 @@
 # Load behavior of local `.envrc` files
 function tryLoadEnvrc() {
 	local current="${PWD}"
-
-	# Look for the script and load it
-	if [[ -f ./.envrc ]] && [[ "$current" != ~ ]]; then
-		source ./.envrc
-		LOADED_ENVRC+="$current"
-	fi
+	local maxDepth=20
+	local depth=0
+    while [[ ${current} != ~ ]] && [[ ${current} != "/" ]] && [[ ${depth} -lt ${maxDepth} ]]
+    do
+        envrcPath=${current}/.envrc
+        # Look for the script and load it
+        if [[ -f ${envrcPath} ]]; then
+            source ${envrcPath}
+        fi
+        current="$(dirname "${current}")"
+        depth=$((${depth}+1))
+    done
 }
 
 # Wrapper of the custom cd to inject the load behavior
