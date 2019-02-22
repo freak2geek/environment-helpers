@@ -246,8 +246,13 @@ function configDnsmasq() {
 }
 
 function checkDnsmasq() {
-    if ! isOSX; then
-        printf "${PURPLE}[-] OS not supported yet. Please install dnsmasq manually.${NC}\n"
+    if ! isOSX && [[ "${DNSMASQ_DOMAIN}" != "localhost" ]]; then
+        printf "${PURPLE}[-] OS not supports yet. Please install dnsmasq manually.${NC}\n"
+        return
+    fi
+
+    if isLinux && [[ "${DNSMASQ_DOMAIN}" = "localhost" ]]; then
+        printf "${GREEN}[✔] dnsmasq${NC}\n"
         return
     fi
 
