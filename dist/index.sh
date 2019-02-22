@@ -264,8 +264,13 @@ function checkDnsmasq() {
 }
 
 function setupDnsmasq() {
-    if ! isOSX; then
-        printf "${PURPLE}[-] OS not supported yet. Please install dnsmasq manually.${NC}\n"
+    if ! isOSX && [[ "${DNSMASQ_DOMAIN}" != "localhost" ]]; then
+        printf "${PURPLE}[-] OS not supports yet. Please install dnsmasq manually.${NC}\n"
+        return
+    fi
+
+    if isLinux && [[ "${DNSMASQ_DOMAIN}" = "localhost" ]]; then
+        printf "${GREEN}[✔] Already dnsmasq${NC}\n"
         return
     fi
 
@@ -284,6 +289,10 @@ function setupDnsmasq() {
 }
 
 function purgeDnsmasq() {
+    if ! isOSX; then
+        return
+    fi
+
     if hasDnsmasq; then
         uninstallDnsmasq
     fi
