@@ -1594,7 +1594,7 @@ function installCodeInsiders() {
         brew tap homebrew/cask-versions
         brew cask install visual-studio-code-insiders
     else
-        sudo apt-get install snapd
+        sudo apt-get install snapd -y
         sudo snap install code-insiders --classic
     fi
 }
@@ -1625,7 +1625,7 @@ function getSyncPluginConfigPath() {
 }
 
 function hasCodeInsidersConfig() {
-    [[ "$($(which code-insiders) --list-extensions | grep -ic "shan.code-settings-sync")" -eq "1" ]] &&
+    hasCodeInsiders && [[ "$($(which code-insiders) --list-extensions | grep -ic "shan.code-settings-sync")" -eq "1" ]] &&
         [[ -f "$(getSyncPluginConfigPath)" ]] && [[ "$(cat "$(getSyncPluginConfigPath)" | grep -ic "\"downloadPublicGist\":true")" -eq "1" ]]
 }
 
