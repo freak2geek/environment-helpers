@@ -56,6 +56,8 @@ function configCodeInsiders() {
     if isOSX; then
         brew install jq
     elif isLinux; then
+        sudo add-apt-repository universe
+        sudo apt-get update
         sudo apt-get install jq -y
     fi
 
