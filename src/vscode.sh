@@ -36,7 +36,7 @@ function getSyncPluginConfigPath() {
     if isOSX; then
         configFile=~/Library/Application\ Support/Code\ -\ Insiders/User/syncLocalSettings.json
     elif isLinux; then
-        configFile=~
+        configFile=~/.config/Code\ -\ Insiders/User/syncLocalSettings.json
     fi
     echo "${configFile}"
 }
@@ -71,12 +71,8 @@ function configCodeInsiders() {
 function purgeCodeInsidersConfig() {
     printf "${BLUE}[-] Purging code-insiders config...${NC}\n"
     local configFile;
-    if isOSX; then
-        configFile=~/Library/Application\ Support/Code\ -\ Insiders/User/syncLocalSettings.json
-    elif isLinux; then
-        sudo apt-get install jq
-    fi
-    rm ~/Library/Application\ Support/Code\ -\ Insiders/User/syncLocalSettings.json
+    local configFile="$(getSyncPluginConfigPath)";
+    rm "${configFile}"
 }
 
 function checkCodeInsiders() {
