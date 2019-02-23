@@ -70,35 +70,35 @@ function configDnsmasq() {
 
 function checkDnsmasq() {
     if ! isOSX && [[ "${DNSMASQ_DOMAIN}" != "localhost" ]]; then
-        printf "${PURPLE}[-] OS not supports yet. Please install dnsmasq manually.${NC}\n"
+        printf "${PURPLE}[-] OS not supports yet. Please install dnsmasq manually, \"*.${DNSMASQ_DOMAIN}\".${NC}\n"
         return
     fi
 
     if isLinux && [[ "${DNSMASQ_DOMAIN}" = "localhost" ]]; then
-        printf "${GREEN}[✔] dnsmasq${NC}\n"
+        printf "${GREEN}[✔] dnsmasq \"*.${DNSMASQ_DOMAIN}\"${NC}\n"
         return
     fi
 
     if hasDnsmasq && hasDnsmasqConfig; then
-        printf "${GREEN}[✔] dnsmasq${NC}\n"
+        printf "${GREEN}[✔] dnsmasq \"*.${DNSMASQ_DOMAIN}\"${NC}\n"
     else
-        printf "${RED}[x] dnsmasq${NC}\n"
+        printf "${RED}[x] dnsmasq \"*.${DNSMASQ_DOMAIN}\"${NC}\n"
     fi
 }
 
 function setupDnsmasq() {
     if ! isOSX && [[ "${DNSMASQ_DOMAIN}" != "localhost" ]]; then
-        printf "${PURPLE}[-] OS not supports yet. Please install dnsmasq manually.${NC}\n"
+        printf "${PURPLE}[-] OS not supports yet. Please install dnsmasq manually, \"*.${DNSMASQ_DOMAIN}\".${NC}\n"
         return
     fi
 
     if isLinux && [[ "${DNSMASQ_DOMAIN}" = "localhost" ]]; then
-        printf "${GREEN}[✔] Already dnsmasq${NC}\n"
+        printf "${GREEN}[✔] Already dnsmasq \"*.${DNSMASQ_DOMAIN}\"${NC}\n"
         return
     fi
 
     if hasDnsmasq && hasDnsmasqConfig; then
-        printf "${GREEN}[✔] Already dnsmasq${NC}\n"
+        printf "${GREEN}[✔] Already dnsmasq \"*.${DNSMASQ_DOMAIN}\"${NC}\n"
         return
     fi
 
