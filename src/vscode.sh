@@ -4,7 +4,7 @@ source "./src/constants.sh"
 source "./src/helpers.sh"
 
 function hasCodeInsiders() {
-    [[ "$(which code-insiders | grep -ic "not found")" -eq "0" ]]
+    which code-insiders >/dev/null && [[ "$(which code-insiders | grep -ic "not found")" -eq "0" ]]
 }
 
 function installCodeInsiders() {
