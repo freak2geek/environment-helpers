@@ -24,7 +24,7 @@ function uninstallCodeInsiders() {
         $(which code-insiders) --uninstall-extension shan.code-settings-sync
         brew cask uninstall visual-studio-code-insiders
     else
-        sudo snap remove code-insiders --classic
+        sudo snap remove code-insiders
     fi
 }
 
@@ -45,7 +45,7 @@ function getSyncPluginConfigPath() {
 
 function hasCodeInsidersConfig() {
     [[ "$($(which code-insiders) --list-extensions | grep -ic "shan.code-settings-sync")" -eq "1" ]] &&
-        [[ "$(cat "$(getSyncPluginConfigPath)" | grep -ic "\"downloadPublicGist\":true")" -eq "1" ]]
+        [[ -f "$(getSyncPluginConfigPath)"]] && [[ "$(cat "$(getSyncPluginConfigPath)" | grep -ic "\"downloadPublicGist\":true")" -eq "1" ]]
 }
 
 function configCodeInsiders() {
