@@ -13,7 +13,8 @@ function installCodeInsiders() {
         brew tap homebrew/cask-versions
         brew cask install visual-studio-code-insiders
     else
-        printf "${PURPLE}[-] OS not supported yet.${NC}\n"
+        sudo apt-get install snapd
+        sudo snap install code-insiders --classic
     fi
 }
 
@@ -23,7 +24,7 @@ function uninstallCodeInsiders() {
         $(which code-insiders) --uninstall-extension shan.code-settings-sync
         brew cask uninstall visual-studio-code-insiders
     else
-        printf "${PURPLE}[-] OS not supported yet.${NC}\n"
+        sudo snap remove code-insiders --classic
     fi
 }
 
@@ -50,12 +51,10 @@ function configCodeInsiders() {
 
     $(which code-insiders) --install-extension shan.code-settings-sync
 
-    if [[ "$(which jq | grep -ic "not found")" -eq "1" ]]; then
-        if isOSX; then
-            brew install jq
-        elif isLinux; then
-            sudo apt-get install jq -y
-        fi
+    if isOSX; then
+        brew install jq
+    elif isLinux; then
+        sudo apt-get install jq -y
     fi
 
     local configFile="$(getSyncPluginConfigPath)";
