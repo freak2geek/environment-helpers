@@ -27,6 +27,10 @@ function uninstallCodeInsiders() {
     fi
 }
 
+function runCodeInsiders() {
+    $(which code-insiders) .
+}
+
 function getSyncPluginConfigPath() {
     if isOSX; then
         configFile=~/Library/Application\ Support/Code\ -\ Insiders/User/syncLocalSettings.json
@@ -62,7 +66,7 @@ function configCodeInsiders() {
         echo "$(jq -c '. + { "downloadPublicGist":true }' <<<"{}")" > "${configFile}"
     fi
 
-    $(which code-insiders) .
+    runCodeInsiders
 }
 
 function purgeCodeInsidersConfig() {
