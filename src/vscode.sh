@@ -29,7 +29,9 @@ function uninstallCodeInsiders() {
 }
 
 function runCodeInsiders() {
-    $(which code-insiders) .
+    workspaceFile=$(find . -type f -iname \"*.code-workspace\")
+    fileToOpen=${workspaceFile-"."}
+    $(which code-insiders) ${fileToOpen}
 }
 
 function getSyncPluginConfigPath() {
