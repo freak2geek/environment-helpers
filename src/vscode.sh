@@ -29,7 +29,7 @@ function uninstallCodeInsiders() {
 }
 
 function runCodeInsiders() {
-    workspaceFile=$(find . -type f -iname \"*.code-workspace\")
+    workspaceFile=$(find . -type f -iname "*.code-workspace")
     fileToOpen=${workspaceFile-"."}
     $(which code-insiders) ${fileToOpen}
 }

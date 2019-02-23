@@ -1585,7 +1585,7 @@ function uninstallRuby() {
 
 
 function hasCodeInsiders() {
-    [[ "$(which code-insiders | grep -ic "not found")" -eq "0" ]]
+    which code-insiders >/dev/null && [[ "$(which code-insiders | grep -ic "not found")" -eq "0" ]]
 }
 
 function installCodeInsiders() {
@@ -1610,7 +1610,7 @@ function uninstallCodeInsiders() {
 }
 
 function runCodeInsiders() {
-    workspaceFile=$(find . -type f -iname \"*.code-workspace\")
+    workspaceFile=$(find . -type f -iname "*.code-workspace")
     fileToOpen=${workspaceFile-"."}
     $(which code-insiders) ${fileToOpen}
 }
