@@ -33,6 +33,7 @@ The helpers available are for:
 - Meteor m (mongo manager)
 - Meteor yarn
 - sudo nopasswd
+- VSCode + Sync Settings
 - Zsh
 
 All these groups contain the next kind of helpers:
