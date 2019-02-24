@@ -116,6 +116,11 @@ function purgeMeteorLib() {
     uninstallMeteorLib $@
 }
 
+DEVICE_EMULATOR_ANDROID='android'
+DEVICE_EMULATOR_IOS='ios'
+DEVICE_ANDROID='android-device'
+DEVICE_IOS='ios-device'
+
 APPS_PATH='apps'
 APP_CONFIG_PATH='private/config'
 
@@ -123,6 +128,7 @@ PORT=3000
 APP_TO=''
 ENV_TO='development'
 ENV_OVERRIDE=''
+DEVICES_TO=''
 
 function loadMeteorEnv() {
     meteorEnvPath=./${APPS_PATH}/${APP_TO}/${APP_CONFIG_PATH}/${ENV_TO}/.env
@@ -132,7 +138,12 @@ function loadMeteorEnv() {
 
 function startMeteorApp() {
     APP_TO=${1-${APP_TO}}
-    printf "${BLUE}[-] Starting \"${APP_TO}\" app...${NC}\n"
+
+    if [[ DEVICES_TO != '' ]]; then
+        printf "${BLUE}[-] Starting \"${APP_TO}\" in ${DEVICES_TO}...${NC}\n"
+    else
+        printf "${BLUE}[-] Starting \"${APP_TO}\" app...${NC}\n"
+    fi
     printf "${PURPLE} - Env: ${ENV_TO}${NC}\n"
 
     loadMeteorEnv
@@ -147,7 +158,16 @@ function startMeteorApp() {
     printf "${PURPLE} - Port: ${PORT}${NC}\n"
 
     trap "killMeteorApp ${@} && cd ${oldPWD}" SIGINT SIGTERM
-    meteor run --settings ${meteorSettingsPath} --port ${PORT} ${@:2}
+    meteor run ${DEVICES_TO} --settings ${meteorSettingsPath} --port ${PORT} ${@:2}
+}
+
+function startMeteorAppInDevice() {
+    if ! hasIfconfig; then
+        setupIfconfig
+    fi
+
+    MOBILE_SERVER_TO=$(ifconfig | grep '\<inet\>' | cut -d ' ' -f2 | grep -v '127.0.0.1')
+    startMeteorApp ${1} "--mobile-server ${MOBILE_SERVER_TO}:${PORT}" ${@:2}
 }
 
 function killMeteorApp() {
