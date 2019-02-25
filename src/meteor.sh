@@ -139,7 +139,7 @@ function loadMeteorEnv() {
 function startMeteorApp() {
     APP_TO=${1-${APP_TO}}
 
-    if [[ DEVICES_TO != '' ]]; then
+    if [[ "${DEVICES_TO}" != '' ]]; then
         printf "${BLUE}[-] Starting \"${APP_TO}\" in ${DEVICES_TO}...${NC}\n"
     else
         printf "${BLUE}[-] Starting \"${APP_TO}\" app...${NC}\n"
