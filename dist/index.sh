@@ -1205,6 +1205,33 @@ function purgeMongoOplog() {
     fi
 }
 
+MONGO_OUT_DIR='dump'
+MONGO_HOST='localhost'
+MONGO_DB='config'
+
+function copyMongoDb() {
+    printf "${BLUE}[-] Copying db..${NC}\n"
+    printf "${PURPLE} - Host: ${MONGO_HOST}${NC}\n"
+    printf "${PURPLE} - Port: ${MONGO_PORT}${NC}\n"
+    printf "${PURPLE} - DB: ${MONGO_DB}${NC}\n"
+    printf "${PURPLE} - Out: ${MONGO_OUT_DIR}${NC}\n"
+    printf "${PURPLE} - Options: ${MONGO_OPTIONS}${NC}\n"
+
+    rm -rf ${MONGO_DB_OUT}
+    "$(meteor m bin ${MONGO_VERSION})/mongodump" --host ${MONGO_HOST} --port ${MONGO_PORT} --db ${MONGO_DB} --out ${MONGO_OUT_DIR} ${MONGO_OPTIONS}
+}
+
+function restoreMongoDb() {
+    printf "${BLUE}[-] Restoring db..${NC}\n"
+    printf "${PURPLE} - Host: ${MONGO_HOST}${NC}\n"
+    printf "${PURPLE} - Port: ${MONGO_PORT}${NC}\n"
+    printf "${PURPLE} - DB copied: ${MONGO_OUT_DIR}/${MONGO_DB_COPIED}${NC}\n"
+    printf "${PURPLE} - DB to restore: ${MONGO_DB}${NC}\n"
+    printf "${PURPLE} - Options: ${MONGO_OPTIONS}${NC}\n"
+
+    "$(meteor m bin ${MONGO_VERSION})/mongorestore" --host ${MONGO_HOST} --port ${MONGO_PORT} --dir ${MONGO_OUT_DIR}/${MONGO_DB_COPIED} --db ${MONGO_DB} ${MONGO_OPTIONS}
+}
+
 
 function hasMeteorYarn() {
     hasMeteor && hasLibForCurrentMeteor yarn
