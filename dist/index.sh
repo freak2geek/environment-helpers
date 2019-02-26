@@ -1217,7 +1217,7 @@ function copyMongoDb() {
     printf "${PURPLE} - Out: ${MONGO_OUT_DIR}${NC}\n"
     printf "${PURPLE} - Options: ${MONGO_OPTIONS}${NC}\n"
 
-    rm -rf ${MONGO_DB_OUT}
+    rm -rf ${MONGO_DB_OUT}/${MONGO_DB}
     "$(meteor m bin ${MONGO_VERSION})/mongodump" --host ${MONGO_HOST} --port ${MONGO_PORT} --db ${MONGO_DB} --out ${MONGO_OUT_DIR} ${MONGO_OPTIONS}
 }
 
