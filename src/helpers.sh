@@ -238,7 +238,7 @@ function loadEnv {
   if [[ -f $1 ]] ; then
     while read -r line
     do
-      export ${line}
+      eval "export ${line}"
     done < "$1"
   fi
 }

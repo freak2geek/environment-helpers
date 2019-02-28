@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# @freak2geek/scripts - 1.3.0
+# @freak2geek/scripts - 1.3.1
 
 ENVRC_DYNAMIC_LOADER="$(curl -s https://raw.githubusercontent.com/freak2geek/environment-helpers/master/helpers/envrc-dynamic-loader.sh)"
 
@@ -718,7 +718,7 @@ function loadEnv {
   if [[ -f $1 ]] ; then
     while read -r line
     do
-      export ${line}
+      eval "export ${line}"
     done < "$1"
   fi
 }
