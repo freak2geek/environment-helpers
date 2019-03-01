@@ -1573,7 +1573,7 @@ ENV_DEVELOPMENT='development'
 ENV_PRODUCTION='production'
 
 function bootProject() {
-    local projectPath=${1-"."}
+    local projectPath=${PROJECT_PATH:-"."}
     PROJECT_NAME=$(getNpmPackageName)
     PROJECT_VERSION=$(getNpmPackageVersion)
 
