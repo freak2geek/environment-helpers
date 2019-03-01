@@ -71,6 +71,7 @@ function hasEnvrc() {
 
 function loadEnvrc() {
     [[ -s ~/.envrc ]] && source ~/.envrc
+    [[ -s ./.envrc ]] && source ./.envrc
 }
 
 function configEnvrc() {
