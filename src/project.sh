@@ -8,8 +8,8 @@ ENV_DEVELOPMENT='development'
 ENV_PRODUCTION='production'
 
 function bootProject() {
-    PROJECT_NAME=$(getNpmPackageName)
-    PROJECT_VERSION=$(getNpmPackageVersion)
+    PROJECT_NAME=$(getNpmPackageName ${PROJECT_PATH}/package.json)
+    PROJECT_VERSION=$(getNpmPackageVersion ${PROJECT_PATH}/package.json)
 
     if [[ -d ${PROJECT_PATH}/${APPS_PATH} ]]; then
         for dir in `find ${PROJECT_PATH}/${APPS_PATH} -maxdepth 1 -type d`

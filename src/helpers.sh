@@ -48,7 +48,7 @@ function hasLocalHomeAlias() {
 }
 
 function getLocalHomeVarName() {
-    localDirName=${PROJECT_NAME-PWD##*/}
+    localDirName="$(getNpmPackageName ${PROJECT_PATH}/package.json)"
     localDirName=$(echo ${localDirName} | sedr 's/\-/_/g')
     localDirName=$(echo ${localDirName} | sedr 's/@//g')
     localDirName=$(echo ${localDirName} | sedr 's/\//_/g')
@@ -127,15 +127,21 @@ function setupEnvrc() {
         return
     fi
 
+    OLD_PWD=${PWD}
+    cd ${PROJECT_PATH}
     configEnvrc
+    cd ${OLD_PWD}
 }
 
 function checkEnvrc() {
+    OLD_PWD=${PWD}
+    cd ${PROJECT_PATH}
     if hasEnvrc; then
         printf "${GREEN}[✔] .envrc${NC}\n"
     else
         printf "${RED}[x] .envrc${NC}\n"
     fi
+    cd ${OLD_PWD}
 }
 
 function purgeEnvrc() {
