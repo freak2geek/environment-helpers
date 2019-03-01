@@ -210,10 +210,6 @@ function uninstallDnsmasq() {
 }
 
 function hasDnsmasqConfig() {
-    [[ -f ./.git/config ]]
-}
-
-function hasDnsmasqConfig() {
     isOSX && [[ -d /usr/local/etc ]] && [[ -f /usr/local/etc/dnsmasq.conf ]] &&
         [[ -f /Library/LaunchDaemons/homebrew.mxcl.dnsmasq.plist ]] &&
         [[ -d /etc/resolver ]] && [[ -f "/etc/resolver/${DNSMASQ_DOMAIN}" ]] &&
@@ -368,24 +364,24 @@ function uninstallGitFlow() {
 }
 
 function hasGitConfig() {
-    [[ -f ./.git/config ]]
+    [[ -f ${PROJECT_PATH}/.git/config ]]
 }
 
 function hasGitFlowConfig() {
-    hasGitConfig && cat ./.git/config | grep -icq "\[gitflow \"prefix\"\]" && cat ./.git/config | grep -icq "\[gitflow \"branch\"\]"
+    hasGitConfig && cat ${PROJECT_PATH}/.git/config | grep -icq "\[gitflow \"prefix\"\]" && cat ${PROJECT_PATH}/.git/config | grep -icq "\[gitflow \"branch\"\]"
 }
 
 function purgeGitFlowConfig() {
-    sedi '/\[gitflow \"prefix\"\]/d' ./.git/config
-    sedi '/bugfix =/d' ./.git/config
-    sedi '/feature =/d' ./.git/config
-    sedi '/release =/d' ./.git/config
-    sedi '/hotfix =/d' ./.git/config
-    sedi '/support =/d' ./.git/config
-    sedi '/versiontag =/d' ./.git/config
-    sedi '/\[gitflow \"branch\"\]/d' ./.git/config
-    sedi '/master =/d' ./.git/config
-    sedi '/develop =/d' ./.git/config
+    sedi '/\[gitflow \"prefix\"\]/d' ${PROJECT_PATH}/.git/config
+    sedi '/bugfix =/d' ${PROJECT_PATH}/.git/config
+    sedi '/feature =/d' ${PROJECT_PATH}/.git/config
+    sedi '/release =/d' ${PROJECT_PATH}/.git/config
+    sedi '/hotfix =/d' ${PROJECT_PATH}/.git/config
+    sedi '/support =/d' ${PROJECT_PATH}/.git/config
+    sedi '/versiontag =/d' ${PROJECT_PATH}/.git/config
+    sedi '/\[gitflow \"branch\"\]/d' ${PROJECT_PATH}/.git/config
+    sedi '/master =/d' ${PROJECT_PATH}/.git/config
+    sedi '/develop =/d' ${PROJECT_PATH}/.git/config
 }
 
 function configGitFlow() {
@@ -395,18 +391,18 @@ function configGitFlow() {
         purgeGitFlowConfig
     fi
 
-    tryPrintNewLine ./.git/config
+    tryPrintNewLine ${PROJECT_PATH}/.git/config
 
-    printf "[gitflow \"prefix\"]" >>./.git/config
-    printf "\n\tbugfix = ${GITFLOW_BUGFIX}" >>./.git/config
-    printf "\n\tfeature = ${GITFLOW_FEATURE}" >>./.git/config
-    printf "\n\trelease = ${GITFLOW_RELEASE}" >>./.git/config
-    printf "\n\thotfix = ${GITFLOW_HOTFIX}" >>./.git/config
-    printf "\n\tsupport = ${GITFLOW_SUPPORT}" >>./.git/config
-    printf "\n\tversiontag = ${GITFLOW_VERSIONTAG}" >>./.git/config
-    printf "\n[gitflow \"branch\"]" >>./.git/config
-    printf "\n\tmaster = ${GITFLOW_MASTER}" >>./.git/config
-    printf "\n\tdevelop = ${GITFLOW_DEVELOP}" >>./.git/config
+    printf "[gitflow \"prefix\"]" >>${PROJECT_PATH}/.git/config
+    printf "\n\tbugfix = ${GITFLOW_BUGFIX}" >>${PROJECT_PATH}/.git/config
+    printf "\n\tfeature = ${GITFLOW_FEATURE}" >>${PROJECT_PATH}/.git/config
+    printf "\n\trelease = ${GITFLOW_RELEASE}" >>${PROJECT_PATH}/.git/config
+    printf "\n\thotfix = ${GITFLOW_HOTFIX}" >>${PROJECT_PATH}/.git/config
+    printf "\n\tsupport = ${GITFLOW_SUPPORT}" >>${PROJECT_PATH}/.git/config
+    printf "\n\tversiontag = ${GITFLOW_VERSIONTAG}" >>${PROJECT_PATH}/.git/config
+    printf "\n[gitflow \"branch\"]" >>${PROJECT_PATH}/.git/config
+    printf "\n\tmaster = ${GITFLOW_MASTER}" >>${PROJECT_PATH}/.git/config
+    printf "\n\tdevelop = ${GITFLOW_DEVELOP}" >>${PROJECT_PATH}/.git/config
 }
 
 function checkGitFlow() {
@@ -1294,8 +1290,7 @@ function purgeMeteorYarn() {
 
 function getPackageName() {
     packagePath=${1-"."}
-    projectPath=${PROJECT_PATH:-'.'}
-    cd ${projectPath}/${packagePath}
+    cd ${PROJECT_PATH}/${packagePath}
     cat package.json | sed -n 's@.*"name": "\(.*\)".*@\1@p'
 }
 
@@ -1306,11 +1301,10 @@ function hasYarnDeps() {
 
 function checkYarnDeps() {
     oldPath=${PWD}
-    projectPath=${PROJECT_PATH:-'.'}
     packagePath=${1-"."}
     package=${2-$(getPackageName $@)}
 
-    cd ${projectPath}/${packagePath}
+    cd ${PROJECT_PATH}/${packagePath}
     if hasMeteorYarn && hasYarnDeps $@; then
         printf "${GREEN}[✔] \"${package}\" dependencies${NC}\n"
     else
@@ -1321,12 +1315,11 @@ function checkYarnDeps() {
 
 function installYarnDeps() {
     oldPath=${PWD}
-    projectPath=${PROJECT_PATH:-'.'}
     packagePath=${1-"."}
     package=${2-$(getPackageName $@)}
 
     printf "${BLUE}[-] Installing \"${package}\" dependencies...${NC}\n"
-    cd ${projectPath}/${packagePath}
+    cd ${PROJECT_PATH}/${packagePath}
     if ! hasMeteorYarn; then
         installMeteorYarn
     fi
@@ -1348,7 +1341,6 @@ function setupYarnDeps() {
 }
 
 function checkApp() {
-    projectPath=${PROJECT_PATH:-'.'}
     APP_TO=${1-${APP_TO}}
     printf "${BLUE}[-] Checking \"${APP_TO}\" app...${NC}\n"
 
@@ -1356,18 +1348,16 @@ function checkApp() {
 }
 
 function setupApp() {
-    projectPath=${PROJECT_PATH:-'.'}
     APP_TO=${1-${APP_TO}}
     printf "${BLUE}[-] Installing \"${APP_TO}\" app...${NC}\n"
 
-    meteor yarn --cwd ${projectPath}/${APPS_PATH}/${APP_TO} install ${@:2}
+    meteor yarn --cwd ${PROJECT_PATH}/${APPS_PATH}/${APP_TO} install ${@:2}
 }
 
 function cleanApp() {
-    projectPath=${PROJECT_PATH:-'.'}
     APP_TO=${1-${APP_TO}}
     printf "${BLUE}[-] Cleaning \"${APP_TO}\" app...${NC}\n"
-    rm -rf ${projectPath}/${APPS_PATH}/${APP_TO}/node_modules
+    rm -rf ${PROJECT_PATH}/${APPS_PATH}/${APP_TO}/node_modules
 }
 
 
@@ -1569,16 +1559,17 @@ function getNpmPackageVersion() {
 }
 
 
+PROJECT_PATH=${PROJECT_PATH:-'.'}
+
 ENV_DEVELOPMENT='development'
 ENV_PRODUCTION='production'
 
 function bootProject() {
-    local projectPath=${PROJECT_PATH:-"."}
     PROJECT_NAME=$(getNpmPackageName)
     PROJECT_VERSION=$(getNpmPackageVersion)
 
-    if [[ -d ${projectPath}/${APPS_PATH} ]]; then
-        for dir in `find ${projectPath}/${APPS_PATH} -maxdepth 1 -type d`
+    if [[ -d ${PROJECT_PATH}/${APPS_PATH} ]]; then
+        for dir in `find ${PROJECT_PATH}/${APPS_PATH} -maxdepth 1 -type d`
         do
             if [[ -f ${dir}/package.json ]]; then
                 packageName=$(getNpmPackageName ${dir}/package.json)

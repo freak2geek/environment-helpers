@@ -33,10 +33,6 @@ function uninstallDnsmasq() {
 }
 
 function hasDnsmasqConfig() {
-    [[ -f ./.git/config ]]
-}
-
-function hasDnsmasqConfig() {
     isOSX && [[ -d /usr/local/etc ]] && [[ -f /usr/local/etc/dnsmasq.conf ]] &&
         [[ -f /Library/LaunchDaemons/homebrew.mxcl.dnsmasq.plist ]] &&
         [[ -d /etc/resolver ]] && [[ -f "/etc/resolver/${DNSMASQ_DOMAIN}" ]] &&

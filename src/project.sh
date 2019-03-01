@@ -2,16 +2,17 @@
 
 source "./src/npm.sh"
 
+PROJECT_PATH=${PROJECT_PATH:-'.'}
+
 ENV_DEVELOPMENT='development'
 ENV_PRODUCTION='production'
 
 function bootProject() {
-    local projectPath=${PROJECT_PATH:-"."}
     PROJECT_NAME=$(getNpmPackageName)
     PROJECT_VERSION=$(getNpmPackageVersion)
 
-    if [[ -d ${projectPath}/${APPS_PATH} ]]; then
-        for dir in `find ${projectPath}/${APPS_PATH} -maxdepth 1 -type d`
+    if [[ -d ${PROJECT_PATH}/${APPS_PATH} ]]; then
+        for dir in `find ${PROJECT_PATH}/${APPS_PATH} -maxdepth 1 -type d`
         do
             if [[ -f ${dir}/package.json ]]; then
                 packageName=$(getNpmPackageName ${dir}/package.json)

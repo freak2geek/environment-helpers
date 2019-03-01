@@ -29,24 +29,24 @@ function uninstallGitFlow() {
 }
 
 function hasGitConfig() {
-    [[ -f ./.git/config ]]
+    [[ -f ${PROJECT_PATH}/.git/config ]]
 }
 
 function hasGitFlowConfig() {
-    hasGitConfig && cat ./.git/config | grep -icq "\[gitflow \"prefix\"\]" && cat ./.git/config | grep -icq "\[gitflow \"branch\"\]"
+    hasGitConfig && cat ${PROJECT_PATH}/.git/config | grep -icq "\[gitflow \"prefix\"\]" && cat ${PROJECT_PATH}/.git/config | grep -icq "\[gitflow \"branch\"\]"
 }
 
 function purgeGitFlowConfig() {
-    sedi '/\[gitflow \"prefix\"\]/d' ./.git/config
-    sedi '/bugfix =/d' ./.git/config
-    sedi '/feature =/d' ./.git/config
-    sedi '/release =/d' ./.git/config
-    sedi '/hotfix =/d' ./.git/config
-    sedi '/support =/d' ./.git/config
-    sedi '/versiontag =/d' ./.git/config
-    sedi '/\[gitflow \"branch\"\]/d' ./.git/config
-    sedi '/master =/d' ./.git/config
-    sedi '/develop =/d' ./.git/config
+    sedi '/\[gitflow \"prefix\"\]/d' ${PROJECT_PATH}/.git/config
+    sedi '/bugfix =/d' ${PROJECT_PATH}/.git/config
+    sedi '/feature =/d' ${PROJECT_PATH}/.git/config
+    sedi '/release =/d' ${PROJECT_PATH}/.git/config
+    sedi '/hotfix =/d' ${PROJECT_PATH}/.git/config
+    sedi '/support =/d' ${PROJECT_PATH}/.git/config
+    sedi '/versiontag =/d' ${PROJECT_PATH}/.git/config
+    sedi '/\[gitflow \"branch\"\]/d' ${PROJECT_PATH}/.git/config
+    sedi '/master =/d' ${PROJECT_PATH}/.git/config
+    sedi '/develop =/d' ${PROJECT_PATH}/.git/config
 }
 
 function configGitFlow() {
@@ -56,18 +56,18 @@ function configGitFlow() {
         purgeGitFlowConfig
     fi
 
-    tryPrintNewLine ./.git/config
+    tryPrintNewLine ${PROJECT_PATH}/.git/config
 
-    printf "[gitflow \"prefix\"]" >>./.git/config
-    printf "\n\tbugfix = ${GITFLOW_BUGFIX}" >>./.git/config
-    printf "\n\tfeature = ${GITFLOW_FEATURE}" >>./.git/config
-    printf "\n\trelease = ${GITFLOW_RELEASE}" >>./.git/config
-    printf "\n\thotfix = ${GITFLOW_HOTFIX}" >>./.git/config
-    printf "\n\tsupport = ${GITFLOW_SUPPORT}" >>./.git/config
-    printf "\n\tversiontag = ${GITFLOW_VERSIONTAG}" >>./.git/config
-    printf "\n[gitflow \"branch\"]" >>./.git/config
-    printf "\n\tmaster = ${GITFLOW_MASTER}" >>./.git/config
-    printf "\n\tdevelop = ${GITFLOW_DEVELOP}" >>./.git/config
+    printf "[gitflow \"prefix\"]" >>${PROJECT_PATH}/.git/config
+    printf "\n\tbugfix = ${GITFLOW_BUGFIX}" >>${PROJECT_PATH}/.git/config
+    printf "\n\tfeature = ${GITFLOW_FEATURE}" >>${PROJECT_PATH}/.git/config
+    printf "\n\trelease = ${GITFLOW_RELEASE}" >>${PROJECT_PATH}/.git/config
+    printf "\n\thotfix = ${GITFLOW_HOTFIX}" >>${PROJECT_PATH}/.git/config
+    printf "\n\tsupport = ${GITFLOW_SUPPORT}" >>${PROJECT_PATH}/.git/config
+    printf "\n\tversiontag = ${GITFLOW_VERSIONTAG}" >>${PROJECT_PATH}/.git/config
+    printf "\n[gitflow \"branch\"]" >>${PROJECT_PATH}/.git/config
+    printf "\n\tmaster = ${GITFLOW_MASTER}" >>${PROJECT_PATH}/.git/config
+    printf "\n\tdevelop = ${GITFLOW_DEVELOP}" >>${PROJECT_PATH}/.git/config
 }
 
 function checkGitFlow() {

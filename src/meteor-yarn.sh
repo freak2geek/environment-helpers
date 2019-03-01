@@ -65,8 +65,7 @@ function purgeMeteorYarn() {
 
 function getPackageName() {
     packagePath=${1-"."}
-    projectPath=${PROJECT_PATH:-'.'}
-    cd ${projectPath}/${packagePath}
+    cd ${PROJECT_PATH}/${packagePath}
     cat package.json | sed -n 's@.*"name": "\(.*\)".*@\1@p'
 }
 
@@ -77,11 +76,10 @@ function hasYarnDeps() {
 
 function checkYarnDeps() {
     oldPath=${PWD}
-    projectPath=${PROJECT_PATH:-'.'}
     packagePath=${1-"."}
     package=${2-$(getPackageName $@)}
 
-    cd ${projectPath}/${packagePath}
+    cd ${PROJECT_PATH}/${packagePath}
     if hasMeteorYarn && hasYarnDeps $@; then
         printf "${GREEN}[✔] \"${package}\" dependencies${NC}\n"
     else
@@ -92,12 +90,11 @@ function checkYarnDeps() {
 
 function installYarnDeps() {
     oldPath=${PWD}
-    projectPath=${PROJECT_PATH:-'.'}
     packagePath=${1-"."}
     package=${2-$(getPackageName $@)}
 
     printf "${BLUE}[-] Installing \"${package}\" dependencies...${NC}\n"
-    cd ${projectPath}/${packagePath}
+    cd ${PROJECT_PATH}/${packagePath}
     if ! hasMeteorYarn; then
         installMeteorYarn
     fi
@@ -119,7 +116,6 @@ function setupYarnDeps() {
 }
 
 function checkApp() {
-    projectPath=${PROJECT_PATH:-'.'}
     APP_TO=${1-${APP_TO}}
     printf "${BLUE}[-] Checking \"${APP_TO}\" app...${NC}\n"
 
@@ -127,16 +123,14 @@ function checkApp() {
 }
 
 function setupApp() {
-    projectPath=${PROJECT_PATH:-'.'}
     APP_TO=${1-${APP_TO}}
     printf "${BLUE}[-] Installing \"${APP_TO}\" app...${NC}\n"
 
-    meteor yarn --cwd ${projectPath}/${APPS_PATH}/${APP_TO} install ${@:2}
+    meteor yarn --cwd ${PROJECT_PATH}/${APPS_PATH}/${APP_TO} install ${@:2}
 }
 
 function cleanApp() {
-    projectPath=${PROJECT_PATH:-'.'}
     APP_TO=${1-${APP_TO}}
     printf "${BLUE}[-] Cleaning \"${APP_TO}\" app...${NC}\n"
-    rm -rf ${projectPath}/${APPS_PATH}/${APP_TO}/node_modules
+    rm -rf ${PROJECT_PATH}/${APPS_PATH}/${APP_TO}/node_modules
 }
