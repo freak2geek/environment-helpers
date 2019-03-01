@@ -16,8 +16,6 @@ done
 # Remove imports and shebang lines
 sedi '/^source .*/d' ./dist/tmp.sh
 sedi '/\#\!\/usr\/bin\/env bash/d' ./dist/tmp.sh
-# Remove ENVRC_DYNAMIC_LOADER
-sedi '/ENVRC_DYNAMIC_LOADER=/d' ./dist/tmp.sh
 
 # Include shebang line and all the scripts
 echo "#!/usr/bin/env bash" >> ./dist/index.sh

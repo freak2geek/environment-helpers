@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# @freak2geek/scripts - 1.3.3
+# @freak2geek/scripts - 1.3.4
 
 
 
@@ -486,6 +486,7 @@ function purgeGit() {
 
 
 BASHRC_IMPORT="source ~/.bashrc"
+ENVRC_DYNAMIC_LOADER="$(cat ./helpers/envrc-dynamic-loader.sh)"
 
 function hasBashrc() {
     [[ -f ~/.bash_profile ]] && [[ "$(cat ~/.bash_profile | grep -ic "${BASHRC_IMPORT}")" -ne "0" ]]
@@ -605,6 +606,7 @@ function setupEnvrc() {
     fi
 
     # ensure the dynamic loader is always updated to latest
+    ENVRC_DYNAMIC_LOADER="$(curl -s https://raw.githubusercontent.com/freak2geek/environment-helpers/master/helpers/envrc-dynamic-loader.sh)"
     [[ -f ~/.envrc-dl ]] && rm ~/.envrc-dl
     echo "${ENVRC_DYNAMIC_LOADER}" >>~/.envrc-dl
 
