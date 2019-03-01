@@ -486,7 +486,6 @@ function purgeGit() {
 
 
 BASHRC_IMPORT="source ~/.bashrc"
-ENVRC_DYNAMIC_LOADER="$(cat ./helpers/envrc-dynamic-loader.sh)"
 
 function hasBashrc() {
     [[ -f ~/.bash_profile ]] && [[ "$(cat ~/.bash_profile | grep -ic "${BASHRC_IMPORT}")" -ne "0" ]]
