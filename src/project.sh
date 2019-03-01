@@ -6,11 +6,12 @@ ENV_DEVELOPMENT='development'
 ENV_PRODUCTION='production'
 
 function bootProject() {
+    local projectPath=${1-"."}
     PROJECT_NAME=$(getNpmPackageName)
     PROJECT_VERSION=$(getNpmPackageVersion)
 
-    if [[ -d ./${APPS_PATH} ]]; then
-        for dir in `find ./${APPS_PATH} -maxdepth 1 -type d`
+    if [[ -d ${projectPath}/${APPS_PATH} ]]; then
+        for dir in `find ${projectPath}/${APPS_PATH} -maxdepth 1 -type d`
         do
             if [[ -f ${dir}/package.json ]]; then
                 packageName=$(getNpmPackageName ${dir}/package.json)
