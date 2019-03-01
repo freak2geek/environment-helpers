@@ -66,7 +66,7 @@ function hasDynamicEnvrcLoader() {
 }
 
 function hasEnvrc() {
-    hasBashrc && hasLocalHome && hasLocalHomeAlias && hasGlobalEnvrcInBash && hasGlobalEnvrcInZsh && hasDynamicEnvrcLoader
+    hasCurl && hasBashrc && hasLocalHome && hasLocalHomeAlias && hasGlobalEnvrcInBash && hasGlobalEnvrcInZsh && hasDynamicEnvrcLoader
 }
 
 function loadEnvrc() {
@@ -118,7 +118,12 @@ function configEnvrc() {
 }
 
 function setupEnvrc() {
+    if ! hasCurl; then
+        setupCurl
+    fi
+
     # ensure the dynamic loader is always updated to latest
+    ENVRC_DYNAMIC_LOADER="$(curl -s https://raw.githubusercontent.com/freak2geek/environment-helpers/master/helpers/envrc-dynamic-loader.sh)"
     [[ -f ~/.envrc-dl ]] && rm ~/.envrc-dl
     echo "${ENVRC_DYNAMIC_LOADER}" >>~/.envrc-dl
 

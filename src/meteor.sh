@@ -6,10 +6,14 @@ source "./src/helpers.sh"
 METEOR_TOOL_DIR=~/.meteor/packages/meteor-tool
 
 function hasMeteor() {
-    which meteor >/dev/null && [[ "$(which meteor | grep -ic "not found")" -eq "0" ]]
+    hasCurl && which meteor >/dev/null && [[ "$(which meteor | grep -ic "not found")" -eq "0" ]]
 }
 
 function installMeteor() {
+    if ! hasCurl; then
+        setupCurl
+    fi
+
     printf "${BLUE}[-] Installing meteor...${NC}\n"
     curl https://install.meteor.com/ | sh
 }

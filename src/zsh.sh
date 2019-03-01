@@ -9,11 +9,11 @@ function hasZsh() {
 }
 
 function hasOhMyZsh() {
-    [[ -d "${HOME}/.oh-my-zsh" ]]
+    hasCurl && [[ -d "${HOME}/.oh-my-zsh" ]]
 }
 
 function hasZshrc() {
-    [[ -f "${HOME}/.oh-my-zsh/custom/plugins/zshrc/zshrc.plugin.zsh" ]]
+    hasCurl && [[ -f "${HOME}/.oh-my-zsh/custom/plugins/zshrc/zshrc.plugin.zsh" ]]
 }
 
 function hasZshAndOhMyZsh() {
@@ -35,6 +35,9 @@ function uninstallZsh() {
 }
 
 function installOhMyZsh() {
+    if ! hasCurl; then
+        setupCurl
+    fi
     printf "${BLUE}[-] Installing zsh...${NC}\n"
     yes | curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh | bash
 }
@@ -45,6 +48,9 @@ function uninstallOhMyZsh() {
 }
 
 function installZshrc() {
+    if ! hasCurl; then
+        setupCurl
+    fi
     printf "${BLUE}[-] Installing zshrc...${NC}\n"
     yes | curl -sSL https://raw.githubusercontent.com/freak2geek/zshrc/master/install.sh | bash
 }

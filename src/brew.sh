@@ -42,10 +42,14 @@ function hasBrewConfig() {
 }
 
 function hasBrewByOS() {
-    (isLinux && hasLinuxBrew && hasBrewConfig) || (isOSX && hasOsxBrew)
+    (isLinux && hasCurl && hasLinuxBrew && hasBrewConfig) || (isOSX && hasCurl && hasOsxBrew)
 }
 
 function installBrew() {
+    if ! hasCurl; then
+        setupCurl
+    fi
+
     printf "${BLUE}[-] Installing brew...${NC}\n"
     setupBrewOS
     yes | sh -c "$(curl -fsSL https://raw.githubusercontent.com/Linuxbrew/install/master/install.sh)"
@@ -76,6 +80,9 @@ function uninstallBrew() {
     fi
 
     if hasBrewByOS; then
+        if ! hasCurl; then
+            setupCurl
+        fi
         brew install ruby
         printf "${BLUE}[-] Uninstall brew...${NC}\n"
         yes | ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Linuxbrew/install/master/uninstall)"

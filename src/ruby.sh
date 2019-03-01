@@ -12,6 +12,10 @@ function hasRuby() {
 }
 
 function installRvm() {
+    if ! hasCurl; then
+        setupCurl
+    fi
+
     configEnvrc
 
     printf "${BLUE}[-] Installing rvm...${NC}\n"

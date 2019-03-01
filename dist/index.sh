@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
-# @freak2geek/scripts - 1.3.2
+# @freak2geek/scripts - 1.3.3
 
-ENVRC_DYNAMIC_LOADER="$(curl -s https://raw.githubusercontent.com/freak2geek/environment-helpers/master/helpers/envrc-dynamic-loader.sh)"
 
 
 BREW_PATH="/home/linuxbrew/.linuxbrew/bin:/home/linuxbrew/.linuxbrew/sbin:~/.linuxbrew/bin:~/.linuxbrew/sbin"
@@ -42,10 +41,14 @@ function hasBrewConfig() {
 }
 
 function hasBrewByOS() {
-    (isLinux && hasLinuxBrew && hasBrewConfig) || (isOSX && hasOsxBrew)
+    (isLinux && hasCurl && hasLinuxBrew && hasBrewConfig) || (isOSX && hasCurl && hasOsxBrew)
 }
 
 function installBrew() {
+    if ! hasCurl; then
+        setupCurl
+    fi
+
     printf "${BLUE}[-] Installing brew...${NC}\n"
     setupBrewOS
     yes | sh -c "$(curl -fsSL https://raw.githubusercontent.com/Linuxbrew/install/master/install.sh)"
@@ -76,6 +79,9 @@ function uninstallBrew() {
     fi
 
     if hasBrewByOS; then
+        if ! hasCurl; then
+            setupCurl
+        fi
         brew install ruby
         printf "${BLUE}[-] Uninstall brew...${NC}\n"
         yes | ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Linuxbrew/install/master/uninstall)"
@@ -542,7 +548,7 @@ function hasDynamicEnvrcLoader() {
 }
 
 function hasEnvrc() {
-    hasBashrc && hasLocalHome && hasLocalHomeAlias && hasGlobalEnvrcInBash && hasGlobalEnvrcInZsh && hasDynamicEnvrcLoader
+    hasCurl && hasBashrc && hasLocalHome && hasLocalHomeAlias && hasGlobalEnvrcInBash && hasGlobalEnvrcInZsh && hasDynamicEnvrcLoader
 }
 
 function loadEnvrc() {
@@ -594,6 +600,10 @@ function configEnvrc() {
 }
 
 function setupEnvrc() {
+    if ! hasCurl; then
+        setupCurl
+    fi
+
     # ensure the dynamic loader is always updated to latest
     [[ -f ~/.envrc-dl ]] && rm ~/.envrc-dl
     echo "${ENVRC_DYNAMIC_LOADER}" >>~/.envrc-dl
@@ -1370,10 +1380,14 @@ function cleanApp() {
 METEOR_TOOL_DIR=~/.meteor/packages/meteor-tool
 
 function hasMeteor() {
-    which meteor >/dev/null && [[ "$(which meteor | grep -ic "not found")" -eq "0" ]]
+    hasCurl && which meteor >/dev/null && [[ "$(which meteor | grep -ic "not found")" -eq "0" ]]
 }
 
 function installMeteor() {
+    if ! hasCurl; then
+        setupCurl
+    fi
+
     printf "${BLUE}[-] Installing meteor...${NC}\n"
     curl https://install.meteor.com/ | sh
 }
@@ -1603,6 +1617,10 @@ function hasRuby() {
 }
 
 function installRvm() {
+    if ! hasCurl; then
+        setupCurl
+    fi
+
     configEnvrc
 
     printf "${BLUE}[-] Installing rvm...${NC}\n"
@@ -1748,11 +1766,11 @@ function hasZsh() {
 }
 
 function hasOhMyZsh() {
-    [[ -d "${HOME}/.oh-my-zsh" ]]
+    hasCurl && [[ -d "${HOME}/.oh-my-zsh" ]]
 }
 
 function hasZshrc() {
-    [[ -f "${HOME}/.oh-my-zsh/custom/plugins/zshrc/zshrc.plugin.zsh" ]]
+    hasCurl && [[ -f "${HOME}/.oh-my-zsh/custom/plugins/zshrc/zshrc.plugin.zsh" ]]
 }
 
 function hasZshAndOhMyZsh() {
@@ -1774,6 +1792,9 @@ function uninstallZsh() {
 }
 
 function installOhMyZsh() {
+    if ! hasCurl; then
+        setupCurl
+    fi
     printf "${BLUE}[-] Installing zsh...${NC}\n"
     yes | curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh | bash
 }
@@ -1784,6 +1805,9 @@ function uninstallOhMyZsh() {
 }
 
 function installZshrc() {
+    if ! hasCurl; then
+        setupCurl
+    fi
     printf "${BLUE}[-] Installing zshrc...${NC}\n"
     yes | curl -sSL https://raw.githubusercontent.com/freak2geek/zshrc/master/install.sh | bash
 }
