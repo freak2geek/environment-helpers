@@ -1352,7 +1352,7 @@ function checkApp() {
     APP_TO=${1-${APP_TO}}
     printf "${BLUE}[-] Checking \"${APP_TO}\" app...${NC}\n"
 
-    checkYarnDeps ${projectPath}/${APPS_PATH}/${APP_TO}
+    checkYarnDeps ./${APPS_PATH}/${APP_TO}
 }
 
 function setupApp() {
