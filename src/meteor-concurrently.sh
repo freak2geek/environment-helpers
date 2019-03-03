@@ -3,23 +3,23 @@
 source "./src/constants.sh"
 source "./src/meteor.sh"
 
-function hasConcurrently() {
+function hasMeteorConcurrently() {
     hasMeteor && hasLibForCurrentMeteor concurrently
 }
 
-function installConcurrently() {
+function installMeteorConcurrently() {
     installMeteorLib concurrently
 }
 
-function uninstallConcurrently() {
+function uninstallMeteorConcurrently() {
     uninstallMeteorLib concurrently
 }
 
-function checkConcurrently() {
+function checkMeteorConcurrently() {
     checkMeteorLib concurrently
 }
 
-function setupConcurrently() {
+function setupMeteorConcurrently() {
     if ! hasMeteor; then
         setupMeteor
     fi
@@ -30,14 +30,14 @@ function setupConcurrently() {
     fi
 
     if ! hasMeteorLib concurrently; then
-        installConcurrently
+        installMeteorConcurrently
     fi
 }
 
-function purgeConcurrently() {
+function purgeMeteorConcurrently() {
     if ! hasMeteorLib concurrently; then
         return
     fi
 
-    uninstallConcurrently
+    uninstallMeteorConcurrently
 }

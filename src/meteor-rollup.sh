@@ -3,23 +3,23 @@
 source "./src/constants.sh"
 source "./src/meteor.sh"
 
-function hasRollup() {
+function hasMeteorRollup() {
     hasMeteor && hasLibForCurrentMeteor rollup
 }
 
-function installRollup() {
+function installMeteorRollup() {
     installMeteorLib rollup
 }
 
-function uninstallRollup() {
+function uninstallMeteorRollup() {
     uninstallMeteorLib rollup
 }
 
-function checkRollup() {
+function checkMeteorRollup() {
     checkMeteorLib rollup
 }
 
-function setupRollup() {
+function setupMeteorRollup() {
     if ! hasMeteor; then
         setupMeteor
     fi
@@ -30,14 +30,14 @@ function setupRollup() {
     fi
 
     if ! hasMeteorLib rollup; then
-        installRollup
+        installMeteorRollup
     fi
 }
 
-function purgeRollup() {
+function purgeMeteorRollup() {
     if ! hasMeteorLib rollup; then
         return
     fi
 
-    uninstallRollup
+    uninstallMeteorRollup
 }
