@@ -1533,7 +1533,7 @@ function startMeteorApp() {
 
     oldPWD=${PWD}
     cd ${PROJECT_PATH}/${APPS_PATH}/${APP_TO}
-    meteorSettingsPath=./${APP_CONFIG_PATH}/${ENV_TO}/settings.json
+    meteorSettingsPath=${PROJECT_PATH}/${APP_CONFIG_PATH}/${ENV_TO}/settings.json
     printf "${PURPLE} - Settings Path: ${meteorSettingsPath}${NC}\n"
     printf "${PURPLE} - Port: ${PORT}${NC}\n"
 
