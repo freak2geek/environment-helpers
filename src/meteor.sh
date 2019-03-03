@@ -135,7 +135,7 @@ ENV_OVERRIDE=''
 DEVICES_TO=''
 
 function loadMeteorEnv() {
-    meteorEnvPath=./${APPS_PATH}/${APP_TO}/${APP_CONFIG_PATH}/${ENV_TO}/.env
+    meteorEnvPath=${PROJECT_PATH}/${APPS_PATH}/${APP_TO}/${APP_CONFIG_PATH}/${ENV_TO}/.env
     printf "${PURPLE} - Env Path: ${meteorEnvPath}${NC}\n"
     loadEnv ${meteorEnvPath}
 }
@@ -156,7 +156,7 @@ function startMeteorApp() {
     eval ${ENV_OVERRIDE}
 
     oldPWD=${PWD}
-    cd ./${APPS_PATH}/${APP_TO}
+    cd ${PROJECT_PATH}/${APPS_PATH}/${APP_TO}
     meteorSettingsPath=./${APP_CONFIG_PATH}/${ENV_TO}/settings.json
     printf "${PURPLE} - Settings Path: ${meteorSettingsPath}${NC}\n"
     printf "${PURPLE} - Port: ${PORT}${NC}\n"
@@ -188,7 +188,7 @@ function cleanMeteorApp() {
     APP_TO=${1-${APP_TO}}
     printf "${BLUE}[-] Cleaning \"${APP_TO}\" meteor app...${NC}\n"
     oldPWD=${PWD}
-    cd ./${APPS_PATH}/${APP_TO}
+    cd ${PROJECT_PATH}/${APPS_PATH}/${APP_TO}
     meteor reset
     rm -rf ./node_modules
     cd ${oldPWD}
