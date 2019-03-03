@@ -32,6 +32,8 @@ The helpers available are for:
 - Meteor lerna
 - Meteor m (mongo manager)
 - Meteor yarn
+- Meteor concurrently
+- Meteor rollup
 - sudo nopasswd
 - VSCode + Sync Settings
 - Zsh

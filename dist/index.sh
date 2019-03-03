@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# @freak2geek/scripts - 1.3.4
+# @freak2geek/scripts - 1.3.5
 
 
 
@@ -768,6 +768,46 @@ function setupIfconfig() {
 
 
 
+function hasConcurrently() {
+    hasMeteor && hasLibForCurrentMeteor concurrently
+}
+
+function installConcurrently() {
+    installMeteorLib concurrently
+}
+
+function uninstallConcurrently() {
+    uninstallMeteorLib concurrently
+}
+
+function checkConcurrently() {
+    checkMeteorLib concurrently
+}
+
+function setupConcurrently() {
+    if ! hasMeteor; then
+        setupMeteor
+    fi
+
+    if hasMeteorLib concurrently; then
+        printf "${GREEN}[✔] Already meteor concurrently${NC}\n"
+        return
+    fi
+
+    if ! hasMeteorLib concurrently; then
+        installConcurrently
+    fi
+}
+
+function purgeConcurrently() {
+    if ! hasMeteorLib concurrently; then
+        return
+    fi
+
+    uninstallConcurrently
+}
+
+
 function hasMeteorLerna() {
     hasMeteor && hasLibForCurrentMeteor lerna
 }
@@ -1244,6 +1284,46 @@ function restoreMongoDb() {
     printf "${PURPLE} - Options: ${MONGO_OPTIONS}${NC}\n"
 
     "$(meteor m bin ${MONGO_VERSION})/mongorestore" --host ${MONGO_HOST} --port ${MONGO_PORT} --dir ${MONGO_OUT_DIR}/${MONGO_DB_COPIED} --db ${MONGO_DB} ${MONGO_OPTIONS}
+}
+
+
+function hasRollup() {
+    hasMeteor && hasLibForCurrentMeteor rollup
+}
+
+function installRollup() {
+    installMeteorLib rollup
+}
+
+function uninstallRollup() {
+    uninstallMeteorLib rollup
+}
+
+function checkRollup() {
+    checkMeteorLib rollup
+}
+
+function setupRollup() {
+    if ! hasMeteor; then
+        setupMeteor
+    fi
+
+    if hasMeteorLib rollup; then
+        printf "${GREEN}[✔] Already meteor rollup${NC}\n"
+        return
+    fi
+
+    if ! hasMeteorLib rollup; then
+        installRollup
+    fi
+}
+
+function purgeRollup() {
+    if ! hasMeteorLib rollup; then
+        return
+    fi
+
+    uninstallRollup
 }
 
 
