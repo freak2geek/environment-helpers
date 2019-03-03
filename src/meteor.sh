@@ -135,7 +135,7 @@ ENV_OVERRIDE=''
 DEVICES_TO=''
 
 function loadMeteorEnv() {
-    meteorEnvPath=./${APPS_PATH}/${APP_TO}/${APP_CONFIG_PATH}/${ENV_TO}/.env
+    meteorEnvPath=./${APP_CONFIG_PATH}/${ENV_TO}/.env
     printf "${PURPLE} - Env Path: ${meteorEnvPath}${NC}\n"
     loadEnv ${meteorEnvPath}
 }
