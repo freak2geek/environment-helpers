@@ -135,7 +135,7 @@ ENV_OVERRIDE=''
 DEVICES_TO=''
 
 function loadMeteorEnv() {
-    meteorEnvPath=${PROJECT_PATH}/${APPS_PATH}/${APP_TO}/${APP_CONFIG_PATH}/${ENV_TO}/.env
+    meteorEnvPath=./${APPS_PATH}/${APP_TO}/${APP_CONFIG_PATH}/${ENV_TO}/.env
     printf "${PURPLE} - Env Path: ${meteorEnvPath}${NC}\n"
     loadEnv ${meteorEnvPath}
 }
@@ -150,13 +150,13 @@ function startMeteorApp() {
     fi
     printf "${PURPLE} - Env: ${ENV_TO}${NC}\n"
 
-    loadMeteorEnv
+    oldPWD=${PWD}
+    cd ${PROJECT_PATH}/${APPS_PATH}/${APP_TO}
 
+    loadMeteorEnv
     printf "${PURPLE} - Env Override: ${ENV_OVERRIDE}${NC}\n"
     eval ${ENV_OVERRIDE}
 
-    oldPWD=${PWD}
-    cd ${PROJECT_PATH}/${APPS_PATH}/${APP_TO}
     meteorSettingsPath=./${APP_CONFIG_PATH}/${ENV_TO}/settings.json
     printf "${PURPLE} - Settings Path: ${meteorSettingsPath}${NC}\n"
     printf "${PURPLE} - Port: ${PORT}${NC}\n"
