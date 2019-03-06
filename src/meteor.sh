@@ -134,6 +134,9 @@ ENV_TO='development'
 ENV_OVERRIDE=''
 DEVICES_TO=''
 
+PACKAGES_FOLDER='packages'
+SRC_FOLDER='src'
+
 function loadMeteorEnv() {
     meteorEnvPath=./${APP_CONFIG_PATH}/${ENV_TO}/.env
     printf "${PURPLE} - Env Path: ${meteorEnvPath}${NC}\n"
@@ -192,4 +195,39 @@ function cleanMeteorApp() {
     meteor reset
     rm -rf ./node_modules
     cd ${oldPWD}
+}
+
+function addPackagesSymlinksForMeteorApp() {
+    printf "${BLUE}[-] Linking packages for \"${APP_TO}\" app...${NC}\n"
+
+    APP_TO=${1-${APP_TO}}
+
+    rootPackagesPath=${PROJECT_PATH}/${PACKAGES_FOLDER}
+    rootPackageName="@$(getNpmPackageName "${PROJECT_PATH}/package.json")"
+
+    appPath=${PROJECT_PATH}/${APPS_PATH}/${APP_TO}
+    appPackagesPath=${appPath}/${PACKAGES_FOLDER}
+    appPackagesSrcPath=${appPath}/${SRC_FOLDER}/${PACKAGES_FOLDER}
+    appPackageName="@${APP_TO}"
+
+    mkdir -p ${appPackagesSrcPath}
+
+    [[ -d ${rootPackagesPath} ]] && ln -s ${rootPackagesPath} ${appPackagesSrcPath}/${rootPackageName}
+    [[ -d ${appPackagesPath} ]] && ln -s ${appPackagesPath} ${appPackagesSrcPath}/${appPackageName}
+}
+
+function removePackagesSymlinksForMeteorApp() {
+    printf "${BLUE}[-] Unlinking packages for \"${APP_TO}\" app...${NC}\n"
+
+    APP_TO=${1-${APP_TO}}
+
+    rootPackageName="@$(getNpmPackageName "${PROJECT_PATH}/package.json")"
+
+    appPath=${PROJECT_PATH}/${APPS_PATH}/${APP_TO}
+    appPackagesSrcPath=${appPath}/${SRC_FOLDER}/${PACKAGES_FOLDER}
+    appPackageName="@${APP_TO}"
+
+    rm -f ${appPackagesSrcPath}/${rootPackageName}
+    rm -f ${appPackagesSrcPath}/${appPackageName}
+    rm -rf ${appPackagesSrcPath}
 }
