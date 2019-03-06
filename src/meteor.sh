@@ -212,8 +212,14 @@ function addPackagesSymlinksForMeteorApp() {
 
     mkdir -p ${appPackagesSrcPath}
 
-    [[ -d ${rootPackagesPath} ]] && ln -s "${rootPackagesPath}" "${appPackagesSrcPath}/${rootPackageName}"
-    [[ -d ${appPackagesPath} ]] && ln -s "${appPackagesPath}" "${appPackagesSrcPath}/${appPackageName}"
+    if [[ -d ${rootPackagesPath} ]] && [[ ! -L "${appPackagesSrcPath}/${rootPackageName}" ]]; then
+        ln -s "${rootPackagesPath}" "${appPackagesSrcPath}/${rootPackageName}"
+        printf "${GREEN}[✔] ${rootPackageName}${NC}\n"
+    fi
+    if [[ -d ${rootPackagesPath} ]] && [[ ! -L "${appPackagesSrcPath}/${appPackageName}" ]]; then
+        ln -s "${rootPackagesPath}" "${appPackagesSrcPath}/${appPackageName}"
+        printf "${GREEN}[✔] ${appPackageName}${NC}\n"
+    fi
 }
 
 function removePackagesSymlinksForMeteorApp() {
