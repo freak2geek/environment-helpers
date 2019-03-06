@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# @freak2geek/scripts - 1.3.5
+# @freak2geek/scripts - 1.3.6
 
 
 
