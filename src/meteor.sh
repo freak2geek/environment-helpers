@@ -216,8 +216,8 @@ function addPackagesSymlinksForMeteorApp() {
         ln -s "${rootPackagesPath}" "${appPackagesSrcPath}/${rootPackageName}"
         printf "${GREEN}[✔] ${rootPackageName}${NC}\n"
     fi
-    if [[ -d ${rootPackagesPath} ]] && [[ ! -L "${appPackagesSrcPath}/${appPackageName}" ]]; then
-        ln -s "${rootPackagesPath}" "${appPackagesSrcPath}/${appPackageName}"
+    if [[ -d ${appPackagesPath} ]] && [[ ! -L "${appPackagesSrcPath}/${appPackageName}" ]]; then
+        ln -s "${appPackagesPath}" "${appPackagesSrcPath}/${appPackageName}"
         printf "${GREEN}[✔] ${appPackageName}${NC}\n"
     fi
 }
