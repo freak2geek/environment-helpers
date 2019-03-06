@@ -1668,8 +1668,8 @@ function addPackagesSymlinksForMeteorApp() {
 
     mkdir -p ${appPackagesSrcPath}
 
-    [[ -d ${rootPackagesPath} ]] && ln -s ${rootPackagesPath} ${appPackagesSrcPath}/${rootPackageName}
-    [[ -d ${appPackagesPath} ]] && ln -s ${appPackagesPath} ${appPackagesSrcPath}/${appPackageName}
+    [[ -d ${rootPackagesPath} ]] && ln -s "${rootPackagesPath}" "${appPackagesSrcPath}/${rootPackageName}"
+    [[ -d ${appPackagesPath} ]] && ln -s "${appPackagesPath}" "${appPackagesSrcPath}/${appPackageName}"
 }
 
 function removePackagesSymlinksForMeteorApp() {
@@ -1683,9 +1683,9 @@ function removePackagesSymlinksForMeteorApp() {
     appPackagesSrcPath=${appPath}/${SRC_FOLDER}/${PACKAGES_FOLDER}
     appPackageName="@${APP_TO}"
 
-    rm -f ${appPackagesSrcPath}/${rootPackageName}
-    rm -f ${appPackagesSrcPath}/${appPackageName}
-    rm -rf ${appPackagesSrcPath}
+    rm -f "${appPackagesSrcPath}/${rootPackageName}"
+    rm -f "${appPackagesSrcPath}/${appPackageName}"
+    rm -rf "${appPackagesSrcPath}"
 }
 
 function getNpmPackageName() {
