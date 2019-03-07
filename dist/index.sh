@@ -986,7 +986,7 @@ function isRunningMongo() {
     ps -edaf | grep -icq "\-\-port ${MONGO_PORT}"
 }
 
-function connectMongo() {
+function startMongo() {
     if ! hasMongo; then
         return
     fi
@@ -1072,7 +1072,7 @@ function isRunningMongoAndReplicas() {
         ps -edaf | grep -icq "\-\-port ${MONGO_R2_PORT}"
 }
 
-function connectMongoAndReplicas() {
+function startMongoAndReplicas() {
     if isRunningMongoAndReplicas; then
         printf "${GREEN}[✔] Already running mongo \"${MONGO_VERSION}\" and replicas${NC}\n"
         return
@@ -1136,7 +1136,7 @@ function checkMongoOplog() {
     fi
 
     if [[ ${isMongoConnected} -eq 0 ]]; then
-        connectMongo 1>/dev/null
+        startMongo 1>/dev/null
     fi
     if hasOlogConfig; then
         printf "${GREEN}[✔] meteor mongo oplog${NC}\n"
@@ -1188,7 +1188,7 @@ function setupMongoOplog() {
     fi
 
     if [[ ${isMongoConnected} -eq 0 ]]; then
-        connectMongoAndReplicas
+        startMongoAndReplicas
     fi
     if hasOplogInitialized; then
         printf "${GREEN}[✔] Already oplog initialized${NC}\n"
@@ -1209,7 +1209,7 @@ function setupMongoOplog() {
     fi
 
     if [[ ${isMongoConnected} -eq 0 ]]; then
-        connectMongo
+        startMongo
     fi
     if hasOplogUser; then
         printf "${GREEN}[✔] Already oplog user${NC}\n"
@@ -1227,7 +1227,7 @@ function purgeMongoOplog() {
 
     wasConnected=$(hasMongoConnected)
     if [[ ${wasConnected} -eq 0 ]]; then
-        connectMongo
+        startMongo
     fi
 
     if hasOplogUser; then
