@@ -290,7 +290,7 @@ function checkMongoOplog() {
         printf "${RED}[x] meteor mongo oplog${NC}\n"
     fi
     if [[ ${isMongoConnected} -eq 0 ]]; then
-        shutdownMongo 1>/dev/null
+        killMongo 1>/dev/null
     fi
 }
 
@@ -347,7 +347,7 @@ function setupMongoOplog() {
         fi
     fi
     if [[ ${isMongoConnected} -eq 0 ]]; then
-        shutdownMongoAndReplicas 1>/dev/null
+        killMongoAndReplicas1>/dev/null
     fi
 
     if isRunningMongo; then
@@ -364,7 +364,7 @@ function setupMongoOplog() {
         meteor m shell ${MONGO_VERSION} --port ${MONGO_PORT} --eval "db.getSiblingDB('admin').createUser({\"user\":\"oplogger\",\"pwd\":\"PASSWORD\",\"roles\":[{\"role\":\"read\",\"db\":\"local\"}],\"passwordDigestor\":\"server\"})"
     fi
     if [[ ${isMongoConnected} -eq 0 ]]; then
-        shutdownMongo 1>/dev/null
+        killMongo 1>/dev/null
     fi
 }
 
