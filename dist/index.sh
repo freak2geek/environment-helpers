@@ -782,6 +782,7 @@ function installXcode() {
 function configXcode() {
     printf "${BLUE}[-] Configuring xcode...${NC}\n"
     sudo xcodebuild -license accept
+    sudo xcode-select -s /Applications/Xcode.app/Contents/Developer
 }
 
 function uninstallXcode() {
