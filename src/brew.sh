@@ -60,7 +60,7 @@ function installBrewInLinux() {
 
 function installBrewInOSX() {
     printf "${BLUE}[-] Installing brew...${NC}\n"
-    /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+    yes | /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
 }
 
 function configBrewInLinux() {
@@ -102,7 +102,7 @@ function uninstallBrewInLinux() {
 
 function uninstallBrewInOSX() {
     printf "${BLUE}[-] Uninstall brew...${NC}\n"
-    /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/uninstall)"
+    yes | /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/uninstall)"
 }
 
 function checkBrew() {
