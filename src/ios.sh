@@ -28,7 +28,6 @@ function installXcode() {
     printf "${BLUE}[-] Installing xcode...${NC}\n"
     brew install mas
     mas install 497799835
-    xcode-select --install
     sudo xcodebuild -license accept
     sudo xcode-select -s /Applications/Xcode.app/Contents/Developer
 }

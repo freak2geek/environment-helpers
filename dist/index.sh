@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# @freak2geek/scripts - 1.4.2
+# @freak2geek/scripts - 1.4.3
 
 
 
@@ -768,7 +768,6 @@ function setupIfconfig() {
 
 
 
-
 function hasRuby() {
     isOSX && [[ "$(brew ls ruby 2>&1 | grep -ic "No such keg")" -eq "0" ]]
 }
@@ -794,7 +793,6 @@ function installXcode() {
     printf "${BLUE}[-] Installing xcode...${NC}\n"
     brew install mas
     mas install 497799835
-    xcode-select --install
     sudo xcodebuild -license accept
     sudo xcode-select -s /Applications/Xcode.app/Contents/Developer
 }
