@@ -3,6 +3,10 @@
 source "./src/constants.sh"
 source "./src/helpers.sh"
 
+function hasRuby() {
+    isOSX && [[ "$(brew ls ruby 2>&1 | grep -ic "No such keg")" -eq "0" ]]
+}
+
 function hasXcode() {
     [[ "$(xcode-select -p | grep -ic "not found")" -eq "0" ]] && [[ -d /Applications/Xcode.app ]]
 }
@@ -13,6 +17,11 @@ function hasCocoapods() {
 
 function hasIos() {
     isOSX && hasXcode && hasCocoapods
+}
+
+function installRuby() {
+    printf "${BLUE}[-] Installing xcode...${NC}\n"
+    brew install ruby
 }
 
 function installXcode() {
@@ -26,6 +35,10 @@ function installXcode() {
 
 function installCocoapods() {
     printf "${BLUE}[-] Installing cocoapods...${NC}\n"
+    if ! hasRuby; then
+        installRuby
+    fi
+
     sudo gem install cocoapods
     pod setup
 }
