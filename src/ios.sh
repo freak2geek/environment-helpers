@@ -4,7 +4,15 @@ source "./src/constants.sh"
 source "./src/helpers.sh"
 
 function hasXcode() {
-    isOSX && [[ "$(xcode-select -p | grep -ic "not found")" -eq "0" ]] && [[ -d /Applications/Xcode.app ]]
+    [[ "$(xcode-select -p | grep -ic "not found")" -eq "0" ]] && [[ -d /Applications/Xcode.app ]]
+}
+
+function hasCocoapods() {
+    [[ "$(gem list | grep -ic "cocoapods")" -ne "0" ]]
+}
+
+function hasIos() {
+    isOSX && hasXcode && hasCocoapods
 }
 
 function installXcode() {
@@ -12,12 +20,26 @@ function installXcode() {
     brew install mas
     mas install 497799835
     xcode-select --install
-}
-
-function configXcode() {
-    printf "${BLUE}[-] Configuring xcode...${NC}\n"
     sudo xcodebuild -license accept
     sudo xcode-select -s /Applications/Xcode.app/Contents/Developer
+}
+
+function installCocoapods() {
+    printf "${BLUE}[-] Installing cocoapods...${NC}\n"
+    sudo gem install cocoapods
+    pod setup
+}
+
+function installIos() {
+    printf "${BLUE}[-] Installing ios...${NC}\n"
+
+    if ! hasXcode; then
+        installXcode
+    fi
+
+    if ! hasCocoapods; then
+        installCocoapods
+    fi
 }
 
 function uninstallXcode() {
@@ -33,33 +55,56 @@ function uninstallXcode() {
     sudo rm -f /System/Library/Receipts/com.apple.pkg.XcodeExtensionSupport.plist
 }
 
-function checkXcode() {
-    if hasXcode; then
-        printf "${GREEN}[✔] xcode${NC}\n"
+function uninstallCocoapods() {
+    printf "${BLUE}[-] Uninstalling cocoapods...${NC}\n"
+    yes | sudo gem uninstall cocoapods
+    yes | sudo gem uninstall cocoapods-core
+    yes | sudo gem uninstall cocoapods-deintegrate
+    yes | sudo gem uninstall cocoapods-downloader
+    yes | sudo gem uninstall cocoapods-plugins
+    yes | sudo gem uninstall cocoapods-search
+    yes | sudo gem uninstall cocoapods-stats
+    yes | sudo gem uninstall cocoapods-trunk
+    yes | sudo gem uninstall cocoapods-try
+}
+
+function uninstallIos() {
+    printf "${BLUE}[-] Uninstalling ios...${NC}\n"
+    uninstallXcode
+    uninstallCocoapods
+}
+
+function checkIos() {
+    if hasIos; then
+        printf "${GREEN}[✔] ios${NC}\n"
+    elif ! isOSX; then
+        printf "${PURPLE}[-] ios. Only supported in macOS.${NC}\n"
     else
-        printf "${RED}[x] xcode${NC}\n"
+        printf "${RED}[x] ios${NC}\n"
     fi
 }
 
-function setupXcode() {
-    if hasXcode; then
-        printf "${GREEN}[✔] Already xcode${NC}\n"
-        return
-    fi
-
-    installXcode
-
-    configXcode
-}
-
-function purgeXcode() {
+function setupIos() {
     if ! isOSX; then
         return
     fi
 
-    if ! hasXcode; then
+    if hasIos; then
+        printf "${GREEN}[✔] Already ios${NC}\n"
         return
     fi
 
-    uninstallXcode
+    installIos
+}
+
+function purgeIos() {
+    if ! isOSX; then
+        return
+    fi
+
+    if ! hasIos; then
+        return
+    fi
+
+    uninstallIos
 }
