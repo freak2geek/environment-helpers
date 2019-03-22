@@ -44,7 +44,7 @@ function hasBrewByOS() {
     (isLinux && hasCurl && hasLinuxBrew && hasBrewConfig) || (isOSX && hasCurl && hasOsxBrew)
 }
 
-function installBrew() {
+function installBrewInLinux() {
     if ! hasCurl; then
         setupCurl
     fi
@@ -57,7 +57,12 @@ function installBrew() {
     brew install gcc
 }
 
-function configBrew() {
+function installBrewInOSX() {
+    printf "${BLUE}[-] Installing brew...${NC}\n"
+    /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+}
+
+function configBrewInLinux() {
     configEnvrc
 
     printf "${BLUE}[-] Configuring brew...${NC}\n"
@@ -73,7 +78,7 @@ function configBrew() {
     fi
 }
 
-function uninstallBrew() {
+function uninstallBrewInLinux() {
     if isOSX; then
         return
     fi
@@ -94,6 +99,11 @@ function uninstallBrew() {
     test -d /home/linuxbrew/.linuxbrew/share && rm -R /home/linuxbrew/.linuxbrew/share
 }
 
+function uninstallBrewInOSX() {
+    printf "${BLUE}[-] Uninstall brew...${NC}\n"
+    /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/uninstall)"
+}
+
 function checkBrew() {
     if hasBrewByOS; then
         printf "${GREEN}[✔] brew${NC}\n"
@@ -109,11 +119,17 @@ function setupBrew() {
     fi
 
     if ! hasBrewByOS; then
-        installBrew
+        if isLinux; then
+            installBrewInLinux
+        elif isOSX; then
+            installBrewInOSX
+        fi
     fi
 
     if ! hasBrewConfig; then
-        configBrew
+        if isLinux; then
+            configBrewInLinux
+        fi
     fi
 }
 
@@ -122,8 +138,12 @@ function purgeBrew() {
         return
     fi
 
-    uninstallBrew
-    purgeBrewOS
+    if isLinux; then
+        uninstallBrewInLinux
+        purgeBrewOS
+    elif isOSX; then
+        uninstallBrewInOSX
+    fi
 }
 
 # Terminal colors
