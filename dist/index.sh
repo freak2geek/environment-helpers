@@ -813,8 +813,6 @@ function installXcode() {
     printf "${BLUE}[-] Installing xcode...${NC}\n"
     brew install mas
     mas install 497799835
-    sudo xcodebuild -license accept
-    sudo xcode-select -s /Applications/Xcode.app/Contents/Developer
 }
 
 function installCocoapods() {
@@ -833,6 +831,9 @@ function installIos() {
     if ! hasXcode; then
         installXcode
     fi
+
+    sudo xcodebuild -license accept
+    sudo xcode-select -s /Applications/Xcode.app/Contents/Developer
 
     if ! hasCocoapods; then
         installCocoapods
