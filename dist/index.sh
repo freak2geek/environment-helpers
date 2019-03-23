@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# @freak2geek/scripts - 1.4.5
+# @freak2geek/scripts - 1.4.6
 
 
 
@@ -815,6 +815,11 @@ function installXcode() {
     mas install 497799835
 }
 
+function configXcode() {
+    sudo xcodebuild -license accept
+    sudo xcode-select -s /Applications/Xcode.app/Contents/Developer
+}
+
 function installCocoapods() {
     printf "${BLUE}[-] Installing cocoapods...${NC}\n"
     if ! hasRuby; then
@@ -823,21 +828,6 @@ function installCocoapods() {
 
     sudo gem install cocoapods
     pod setup
-}
-
-function installIos() {
-    printf "${BLUE}[-] Installing ios...${NC}\n"
-
-    if ! hasXcode; then
-        installXcode
-    fi
-
-    sudo xcodebuild -license accept
-    sudo xcode-select -s /Applications/Xcode.app/Contents/Developer
-
-    if ! hasCocoapods; then
-        installCocoapods
-    fi
 }
 
 function uninstallXcode() {
@@ -866,12 +856,6 @@ function uninstallCocoapods() {
     yes | sudo gem uninstall cocoapods-try
 }
 
-function uninstallIos() {
-    printf "${BLUE}[-] Uninstalling ios...${NC}\n"
-    uninstallXcode
-    uninstallCocoapods
-}
-
 function checkIos() {
     if hasIos; then
         printf "${GREEN}[✔] ios${NC}\n"
@@ -892,7 +876,17 @@ function setupIos() {
         return
     fi
 
-    installIos
+    printf "${BLUE}[-] Setting up ios...${NC}\n"
+
+    if ! hasXcode; then
+        installXcode
+    fi
+
+    configXcode
+
+    if ! hasCocoapods; then
+        installCocoapods
+    fi
 }
 
 function purgeIos() {
@@ -904,7 +898,10 @@ function purgeIos() {
         return
     fi
 
-    uninstallIos
+    printf "${BLUE}[-] Purging ios...${NC}\n"
+
+    uninstallXcode
+    uninstallCocoapods
 }
 
 
