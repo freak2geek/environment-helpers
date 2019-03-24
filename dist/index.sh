@@ -43,6 +43,8 @@ function configAndroid() {
 function checkAndroid() {
     if isOSX && hasAndroidInMac && hasAndroidConfig; then
         printf "${GREEN}[✔] android${NC}\n"
+    elif isLinux; then
+        printf "${PURPLE}[-] android. Not supported yet in linux. Please install android manually.${NC}\n"
     else
         printf "${RED}[x] android${NC}\n"
     fi
@@ -53,6 +55,11 @@ function hasAndroidConfig() {
 }
 
 function setupAndroid() {
+    if isLinux; then
+        printf "${PURPLE}[-] android. Not supported yet in linux. Please install android manually.${NC}\n"
+        return
+    fi
+
     if hasAndroidInMac && hasAndroidConfig; then
         printf "${GREEN}[✔] Already android${NC}\n"
         return
@@ -99,6 +106,10 @@ function purgeAndroidConfig() {
 }
 
 function purgeAndroid() {
+    if isLinux; then
+        return
+    fi
+
     printf "${BLUE}[-] Purging android...${NC}\n"
 
     if isOSX; then
