@@ -173,7 +173,7 @@ function startMeteorAppInDevice() {
         setupIfconfig
     fi
 
-    MOBILE_SERVER_TO=$(ifconfig | grep '\<inet\>' | cut -d ' ' -f2 | grep -v '127.0.0.1')
+    MOBILE_SERVER_TO=$(getLocalIp)
     startMeteorApp ${1} "--mobile-server ${MOBILE_SERVER_TO}:${PORT}" ${@:2}
 }
 
