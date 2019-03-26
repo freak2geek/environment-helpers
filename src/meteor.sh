@@ -136,9 +136,10 @@ DEVICES_TO=''
 
 PACKAGES_FOLDER='packages'
 SRC_FOLDER='src'
+ENV_FILENAME='.env'
 
 function loadMeteorEnv() {
-    meteorEnvPath=./${APP_CONFIG_PATH}/${ENV_TO}/.env
+    meteorEnvPath=./${APP_CONFIG_PATH}/${ENV_TO}/${ENV_FILENAME}
     printf "${PURPLE} - Env Path: ${meteorEnvPath}${NC}\n"
     loadEnv ${meteorEnvPath}
 }
