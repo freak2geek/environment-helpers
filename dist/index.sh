@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# @freak2geek/scripts - 1.5.3
+# @freak2geek/scripts - 1.5.4
 
 
 
@@ -1457,7 +1457,7 @@ function setupMongoOplog() {
     if hasOplogInitialized; then
         printf "${GREEN}[✔] Already oplog initialized${NC}\n"
     else
-        OPLOG_CONFIG="{\"_id\":\"${MONGO_REPLICA}\",\"members\":[{\"_id\":0,\"host\":\"127.0.0.1:${MONGO_PORT}\"},{\"_id\":1,\"host\":\"127.0.0.1:${MONGO_R1_PORT}\"},{\"_id\":2,\"host\":\"127.0.0.1:${MONGO_R2_PORT}\"}]}"
+        OPLOG_CONFIG="{\"_id\":\"${MONGO_REPLICA}\",\"members\":[{\"_id\":0,\"host\":\"127.0.0.1:${MONGO_PORT}\",\"priority\":1},{\"_id\":1,\"host\":\"127.0.0.1:${MONGO_R1_PORT}\",\"priority\":0},{\"_id\":2,\"host\":\"127.0.0.1:${MONGO_R2_PORT}\",\"priority\":0}]}"
         if hasOplogConf; then
             meteor m shell ${MONGO_VERSION} --port ${MONGO_PORT} --eval "rs.reconfig(${OPLOG_CONFIG})"
         else
