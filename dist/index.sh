@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# @freak2geek/scripts - 1.5.2
+# @freak2geek/scripts - 1.5.3
 
 
 
@@ -730,12 +730,11 @@ function configEnvrc() {
         printf "${GREEN}[✔] Set: global .envrc in zsh${NC}\n"
     fi
 
-    if ! hasDynamicEnvrcLoader; then
-        tryPrintNewLine ~/.envrc
-        echo "[[ -s ~/.envrc-dl ]] && source ~/.envrc-dl" >>~/.envrc
-        source ~/.envrc-dl
-        printf "${GREEN}[✔] Set: dynamic .envrc loader${NC}\n"
-    fi
+    sedi "/.envrc-dl/d" ~/.envrc
+    tryPrintNewLine ~/.envrc
+    echo "[[ -s ~/.envrc-dl ]] && source ~/.envrc-dl" >>~/.envrc
+    source ~/.envrc-dl
+    printf "${GREEN}[✔] Set: dynamic .envrc loader${NC}\n"
 }
 
 function setupEnvrc() {
