@@ -30,12 +30,17 @@ function installAndroidStudioInMac() {
 function configAndroid() {
     printf "${BLUE}[-] Configuring Android...${NC}\n"
     tryPrintNewLine ~/.envrc
+
+    echo "export JAVA_HOME=$(/usr/libexec/java_home -v1.8)" >>~/.envrc
+    export JAVA_HOME=$(/usr/libexec/java_home -v1.8)
+
     echo "export ANDROID_HOME=/usr/local/share/android-sdk" >>~/.envrc
     echo "export PATH=\$PATH:\$ANDROID_HOME/tools:\$ANDROID_HOME/platform-tools" >>~/.envrc
     echo "export ANDROID_SDK_ROOT=\"/usr/local/share/android-sdk\"" >>~/.envrc
     export ANDROID_HOME=/usr/local/share/android-sdk
     export PATH=$PATH:$ANDROID_HOME/tools:$ANDROID_HOME/platform-tools
     export ANDROID_SDK_ROOT="/usr/local/share/android-sdk"
+
     yes | sdkmanager "platform-tools" "platforms;android-26"
     yes | sdkmanager "build-tools;26.0.0"
 }
@@ -51,7 +56,8 @@ function checkAndroid() {
 }
 
 function hasAndroidConfig() {
-    [[ "$(cat ~/.envrc | grep -ic "export ANDROID_HOME=/usr/local/share/android-sdk")" -ne "0" ]]
+    [[ "$(cat ~/.envrc | grep -ic "export ANDROID_HOME=/usr/local/share/android-sdk")" -ne "0" ]] &&
+        [[ "$(cat ~/.envrc | grep -ic "export JAVA_HOME")" -ne "0" ]]
 }
 
 function setupAndroid() {
@@ -101,6 +107,7 @@ function uninstallAndroidStudioInMac() {
 
 function purgeAndroidConfig() {
     printf "${BLUE}[-] Purging Android Config...${NC}\n"
+    sedi '/JAVA_HOME/d' ~/.envrc
     sedi '/ANDROID_HOME/d' ~/.envrc
     sedi '/ANDROID_SDK_ROOT/d' ~/.envrc
 }
