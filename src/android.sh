@@ -9,10 +9,25 @@ function hasAndroidInMac() {
         [[ "$(brew ls gradle 2>&1 | grep -ic "No such keg")" -eq "0" ]]
 }
 
+function hasAndroidInLinux() {
+    [[ "$(apt list oracle-java8-installer 2>&1 | grep -ic "installed")" -ne "0" ]] &&
+        [[ "$(apt list android-sdk 2>&1 | grep -ic "installed")" -ne "0" ]] &&
+        [[ "$(snap list android-studio 2>&1 | grep -ic "no matching snaps")" -eq "0" ]]
+}
+
 function installJavaInMac() {
     printf "${BLUE}[-] Installing Java 8...${NC}\n"
     brew tap homebrew/cask-versions
     brew cask install homebrew/cask-versions/java8
+}
+
+function installJavaInLinux() {
+    printf "${BLUE}[-] Installing Java 8...${NC}\n"
+    sudo dpkg --configure -a
+    yes | sudo add-apt-repository ppa:webupd8team/java
+    yes | sudo apt update
+    sudo apt install oracle-java8-installer
+    yes | sudo apt install oracle-java8-set-default
 }
 
 function installAndroidSDKInMac() {
@@ -22,12 +37,38 @@ function installAndroidSDKInMac() {
     brew cask install android-platform-tools
 }
 
+function installAndroidSDKInLinux() {
+    printf "${BLUE}[-] Installing Android SDK...${NC}\n"
+    yes | sudo apt update
+    yes | sudo apt install android-sdk
+}
+
 function installAndroidStudioInMac() {
     printf "${BLUE}[-] Installing Android Studio...${NC}\n"
     brew cask install android-studio
 }
 
-function configAndroid() {
+function installAndroidStudioInLinux() {
+    printf "${BLUE}[-] Installing Android Studio...${NC}\n"
+    yes | sudo snap install android-studio --classic
+}
+
+function checkAndroid() {
+    if isOSX && hasAndroidInMac && hasAndroidConfigInMac; then
+        printf "${GREEN}[✔] android${NC}\n"
+    elif isLinux && hasAndroidInLinux && hasAndroidConfigInLinux; then
+        printf "${GREEN}[✔] android${NC}\n"
+    else
+        printf "${RED}[x] android${NC}\n"
+    fi
+}
+
+function hasAndroidConfigInMac() {
+    [[ "$(cat ~/.envrc | grep -ic "export ANDROID_HOME")" -ne "0" ]] &&
+        [[ "$(cat ~/.envrc | grep -ic "export JAVA_HOME")" -ne "0" ]]
+}
+
+function configAndroidInMac() {
     printf "${BLUE}[-] Configuring Android...${NC}\n"
     tryPrintNewLine ~/.envrc
 
@@ -36,37 +77,39 @@ function configAndroid() {
 
     echo "export ANDROID_HOME=/usr/local/share/android-sdk" >>~/.envrc
     echo "export PATH=\$PATH:\$ANDROID_HOME/tools:\$ANDROID_HOME/platform-tools" >>~/.envrc
-    echo "export ANDROID_SDK_ROOT=\"/usr/local/share/android-sdk\"" >>~/.envrc
+    echo "export ANDROID_SDK_ROOT=\"\$ANDROID_HOME\"" >>~/.envrc
     export ANDROID_HOME=/usr/local/share/android-sdk
     export PATH=$PATH:$ANDROID_HOME/tools:$ANDROID_HOME/platform-tools
-    export ANDROID_SDK_ROOT="/usr/local/share/android-sdk"
+    export ANDROID_SDK_ROOT="${ANDROID_HOME}"
 
     yes | sdkmanager "platform-tools" "platforms;android-26"
     yes | sdkmanager "build-tools;26.0.0"
 }
 
-function checkAndroid() {
-    if isOSX && hasAndroidInMac && hasAndroidConfig; then
-        printf "${GREEN}[✔] android${NC}\n"
-    elif isLinux; then
-        printf "${PURPLE}[-] android. Not supported yet in linux. Please install android manually.${NC}\n"
-    else
-        printf "${RED}[x] android${NC}\n"
-    fi
+function hasAndroidConfigInLinux() {
+    [[ "$(cat ~/.envrc | grep -ic "export ANDROID_HOME")" -ne "0" ]]
 }
 
-function hasAndroidConfig() {
-    [[ "$(cat ~/.envrc | grep -ic "export ANDROID_HOME=/usr/local/share/android-sdk")" -ne "0" ]] &&
-        [[ "$(cat ~/.envrc | grep -ic "export JAVA_HOME")" -ne "0" ]]
+function configAndroidInLinux() {
+    printf "${BLUE}[-] Configuring Android...${NC}\n"
+    tryPrintNewLine ~/.envrc
+
+    echo "export ANDROID_HOME=/usr/lib/android-sdk" >>~/.envrc
+    echo "export PATH=\$PATH:\$ANDROID_HOME/tools:\$ANDROID_HOME/platform-tools" >>~/.envrc
+    echo "export ANDROID_SDK_ROOT=\"\$ANDROID_HOME\"" >>~/.envrc
+    export ANDROID_HOME=/usr/lib/android-sdk
+    export PATH=$PATH:$ANDROID_HOME/tools:$ANDROID_HOME/platform-tools
+    export ANDROID_SDK_ROOT="${ANDROID_HOME}"
+
+    yes | sdkmanager "platform-tools" "platforms;android-26"
+    yes | sdkmanager "build-tools;26.0.0"
 }
 
 function setupAndroid() {
-    if isLinux; then
-        printf "${PURPLE}[-] android. Not supported yet in linux. Please install android manually.${NC}\n"
+    if hasAndroidInMac && hasAndroidConfigInMac; then
+        printf "${GREEN}[✔] Already android${NC}\n"
         return
-    fi
-
-    if hasAndroidInMac && hasAndroidConfig; then
+    elif hasAndroidInLinux && hasAndroidConfigInLinux; then
         printf "${GREEN}[✔] Already android${NC}\n"
         return
     fi
@@ -77,10 +120,16 @@ function setupAndroid() {
         installJavaInMac
         installAndroidSDKInMac
         installAndroidStudioInMac
+    elif isLinux && ! hasAndroidInLinux; then
+        installJavaInLinux
+        installAndroidSDKInLinux
+        installAndroidStudioInLinux
     fi
 
-    if ! hasAndroidConfig; then
-        configAndroid
+    if isOSX && ! hasAndroidConfigInMac; then
+        configAndroidInMac
+    elif isLinux && ! hasAndroidConfigInLinux; then
+        configAndroidInLinux
     fi
 }
 
@@ -93,6 +142,12 @@ function uninstallJavaInMac() {
     rm -fr ~/Library/Application\ Support/Oracle/Java
 }
 
+function uninstallJavaInLinux() {
+    printf "${BLUE}[-] Uninstalling Java 8...${NC}\n"
+    yes | sudo apt install oracle-java8-set-default --purge
+    yes | sudo apt remove oracle-java8-installer --purge
+}
+
 function uninstallAndroidSDKInMac() {
     printf "${BLUE}[-] Uninstalling Android SDK...${NC}\n"
     brew uninstall gradle
@@ -100,9 +155,19 @@ function uninstallAndroidSDKInMac() {
     brew cask uninstall android-platform-tools
 }
 
+function uninstallAndroidSDKInLinux() {
+    printf "${BLUE}[-] Uninstalling Android SDK...${NC}\n"
+    yes | sudo apt remove android-sdk --purge
+}
+
 function uninstallAndroidStudioInMac() {
     printf "${BLUE}[-] Uninstalling Android Studio...${NC}\n"
     brew cask uninstall android-studio
+}
+
+function uninstallAndroidStudioInLinux() {
+    printf "${BLUE}[-] Uninstalling Android Studio...${NC}\n"
+    yes | sudo snap remove android-studio
 }
 
 function purgeAndroidConfig() {
@@ -113,16 +178,16 @@ function purgeAndroidConfig() {
 }
 
 function purgeAndroid() {
-    if isLinux; then
-        return
-    fi
-
     printf "${BLUE}[-] Purging android...${NC}\n"
 
     if isOSX; then
         uninstallJavaInMac
         uninstallAndroidSDKInMac
         uninstallAndroidStudioInMac
-        purgeAndroidConfig
+    elif isLinux; then
+        uninstallJavaInLinux
+        uninstallAndroidSDKInLinux
+        uninstallAndroidStudioInLinux
     fi
+    purgeAndroidConfig
 }
