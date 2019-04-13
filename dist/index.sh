@@ -1,12 +1,23 @@
 #!/usr/bin/env bash
-# @freak2geek/scripts - 1.5.8
+# @freak2geek/scripts - 1.5.9
 
 
+
+function hasJavaInMac() {
+    [[ "$(brew cask list 2>&1 | grep -ic "java8")" -ne "0" ]]
+}
+
+function hasAndroidSDKInMac() {
+    [[ "$(brew cask list 2>&1 | grep -ic "android-sdk")" -ne "0" ]] &&
+        [[ "$(brew ls gradle 2>&1 | grep -ic "No such keg")" -eq "0" ]]
+}
+
+function hasAndroidStudioInMac() {
+    [[ "$(brew cask list 2>&1 | grep -ic "android-studio")" -ne "0" ]]
+}
 
 function hasAndroidInMac() {
-    [[ "$(brew cask list 2>&1 | grep -ic "java8")" -ne "0" ]] &&
-        [[ "$(brew cask list 2>&1 | grep -ic "android-sdk")" -ne "0" ]] &&
-        [[ "$(brew ls gradle 2>&1 | grep -ic "No such keg")" -eq "0" ]]
+    hasJavaInMac && hasAndroidStudioInMac && hasAndroidSDKInMac
 }
 
 function hasJavaInLinux() {
@@ -45,6 +56,9 @@ function installAndroidSDKInMac() {
     brew install gradle
     brew cask install android-sdk
     brew cask install android-platform-tools
+    mkdir -p ~/Library/Android
+    ln -s /usr/local/share/android-sdk ~/Library/Android
+    mv ~/Library/Android/android-sdk ~/Library/Android/sdk
 }
 
 function installAndroidSDKInLinux() {
@@ -72,9 +86,14 @@ function checkAndroid() {
     fi
 }
 
+EXPORT_ANDROID_HOME_MAC="export ANDROID_HOME=~/Library/Android/sdk"
+EXPORT_ANDROID_PATH_MAC="export PATH=\$PATH:\$ANDROID_HOME/tools/bin:\$ANDROID_HOME/platform-tools"
+EXPORT_ANDROID_SDK_MAC="export ANDROID_SDK_ROOT=\"\$ANDROID_HOME\""
+
 function hasAndroidConfigInMac() {
-    [[ "$(cat ~/.envrc | grep -ic "export ANDROID_HOME")" -ne "0" ]] &&
-        [[ "$(cat ~/.envrc | grep -ic "export JAVA_HOME")" -ne "0" ]]
+    [[ "$(cat ~/.envrc | grep -ic ${EXPORT_ANDROID_HOME_MAC})" -ne "0" ]] &&
+        [[ "$(cat ~/.envrc | grep -ic ${EXPORT_ANDROID_PATH_MAC})" -ne "0" ]] &&
+        [[ "$(cat ~/.envrc | grep -ic ${EXPORT_ANDROID_SDK_MAC})" -ne "0" ]]
 }
 
 function configAndroidInMac() {
@@ -84,15 +103,15 @@ function configAndroidInMac() {
     echo "export JAVA_HOME=$(/usr/libexec/java_home -v1.8)" >>~/.envrc
     export JAVA_HOME=$(/usr/libexec/java_home -v1.8)
 
-    echo "export ANDROID_HOME=/usr/local/share/android-sdk" >>~/.envrc
-    echo "export PATH=\$PATH:\$ANDROID_HOME/tools:\$ANDROID_HOME/platform-tools" >>~/.envrc
-    echo "export ANDROID_SDK_ROOT=\"\$ANDROID_HOME\"" >>~/.envrc
-    export ANDROID_HOME=/usr/local/share/android-sdk
-    export PATH=$PATH:$ANDROID_HOME/tools:$ANDROID_HOME/platform-tools
-    export ANDROID_SDK_ROOT="${ANDROID_HOME}"
+    echo ${EXPORT_ANDROID_HOME_MAC} >>~/.envrc
+    echo ${EXPORT_ANDROID_PATH_MAC} >>~/.envrc
+    echo ${EXPORT_ANDROID_SDK_MAC} >>~/.envrc
 
-    yes | sdkmanager "platform-tools" "platforms;android-26"
-    yes | sdkmanager "build-tools;26.0.0"
+    eval ${EXPORT_ANDROID_HOME_MAC}
+    eval ${EXPORT_ANDROID_PATH_MAC}
+    eval ${EXPORT_ANDROID_SDK_MAC}
+
+    yes | sdkmanager "platform-tools" "platforms;android-28" "build-tools;28.0.0"
 }
 
 EXPORT_ANDROID_HOME_LINUX="export ANDROID_HOME=~/Android/Sdk"
@@ -130,9 +149,19 @@ function setupAndroid() {
     printf "${BLUE}[-] Setting up android...${NC}\n"
 
     if isOSX && ! hasAndroidInMac; then
-        installJavaInMac
-        installAndroidSDKInMac
-        installAndroidStudioInMac
+        if ! hasJavaInMac; then
+            installJavaInMac
+        fi
+        if ! hasAndroidSDKInMac; then
+            installAndroidSDKInMac
+        fi
+        if ! hasAndroidStudioInMac; then
+            installAndroidStudioInMac
+        fi
+
+        if ! hasAndroidConfigInMac; then
+            configAndroidInMac
+        fi
     elif isLinux && ! hasAndroidInLinux; then
         if ! hasJavaInLinux; then
             installJavaInLinux
@@ -146,10 +175,6 @@ function setupAndroid() {
         if ! hasAndroidSDKInLinux; then
             installAndroidSDKInLinux
         fi
-    fi
-
-    if isOSX && ! hasAndroidConfigInMac; then
-        configAndroidInMac
     fi
 }
 
@@ -1683,6 +1708,138 @@ function purgeMeteorRollup() {
 }
 
 
+function hasMeteorYarn() {
+    hasMeteor && hasLibForCurrentMeteor yarn
+}
+
+function installMeteorYarn() {
+    installMeteorLib yarn
+}
+
+function uninstallMeteorYarn() {
+    uninstallMeteorLib yarn
+}
+
+function hasMeteorYarnConfig() {
+    [[ -d ~/.cache ]] && ls -la ~ | grep -icq "drwxrwxrwx .* \.cache"
+}
+
+function configMeteorYarn() {
+    printf "${BLUE}[-] Configuring meteor yarn...${NC}\n"
+    [[ ! -d ~/.cache ]] && mkdir ~/.cache
+    sudo chmod 777 ~/.cache
+}
+
+function checkMeteorYarn() {
+    if hasMeteorYarn && hasMeteorYarnConfig; then
+        printf "${GREEN}[✔] meteor yarn${NC}\n"
+    else
+        printf "${RED}[x] meteor yarn${NC}\n"
+    fi
+}
+
+function setupMeteorYarn() {
+    if ! hasMeteor; then
+        setupMeteor
+    fi
+
+    if hasMeteorLib yarn && hasMeteorYarnConfig; then
+        printf "${GREEN}[✔] Already meteor yarn${NC}\n"
+        return
+    fi
+
+    if ! hasMeteorLib yarn; then
+        [[ -d ~/.npm ]] && sudo chmod -R 777 ~/.npm
+        installMeteorYarn
+    fi
+
+    if ! hasMeteorYarnConfig; then
+        configMeteorYarn
+    fi
+}
+
+function purgeMeteorYarn() {
+    if ! hasMeteorLib yarn; then
+        return
+    fi
+
+    uninstallMeteorYarn
+    rm -rf ~/.cache
+}
+
+function getPackageName() {
+    packagePath=${1-"."}
+    cd ${PROJECT_PATH}/${packagePath}
+    cat package.json | sed -n 's@.*"name": "\(.*\)".*@\1@p'
+}
+
+function hasYarnDeps() {
+    packagePath=${1-"."}
+    [[ "$(meteor yarn check --verify-tree 2>&1 >/dev/null | grep -ic "error")" -eq "0" ]]
+}
+
+function checkYarnDeps() {
+    oldPath=${PWD}
+    packagePath=${1-"."}
+    package=${2-$(getPackageName $@)}
+
+    cd ${PROJECT_PATH}/${packagePath}
+    if hasMeteorYarn && hasYarnDeps $@; then
+        printf "${GREEN}[✔] \"${package}\" dependencies${NC}\n"
+    else
+        printf "${RED}[x] \"${package}\" dependencies${NC}\n"
+    fi
+    cd ${oldPath}
+}
+
+function installYarnDeps() {
+    oldPath=${PWD}
+    packagePath=${1-"."}
+    package=${2-$(getPackageName $@)}
+
+    printf "${BLUE}[-] Installing \"${package}\" dependencies...${NC}\n"
+    cd ${PROJECT_PATH}/${packagePath}
+    if ! hasMeteorYarn; then
+        installMeteorYarn
+    fi
+    meteor yarn install
+    cd ${oldPath}
+}
+
+function setupYarnDeps() {
+    oldPath=${PWD}
+    packagePath=${1-"."}
+    package=${2-$(getPackageName $@)}
+
+    if hasYarnDeps $@; then
+        printf "${GREEN}[✔] Already \"${package}\" dependencies${NC}\n"
+        return
+    fi
+
+    installYarnDeps $@
+}
+
+function checkApp() {
+    APP_TO=${1-${APP_TO}}
+    printf "${BLUE}[-] Checking \"${APP_TO}\" app...${NC}\n"
+
+    checkYarnDeps ./${APPS_PATH}/${APP_TO}
+}
+
+function setupApp() {
+    APP_TO=${1-${APP_TO}}
+    printf "${BLUE}[-] Installing \"${APP_TO}\" app...${NC}\n"
+
+    meteor yarn --cwd ${PROJECT_PATH}/${APPS_PATH}/${APP_TO} install ${@:2}
+}
+
+function cleanApp() {
+    APP_TO=${1-${APP_TO}}
+    printf "${BLUE}[-] Cleaning \"${APP_TO}\" app...${NC}\n"
+    rm -rf ${PROJECT_PATH}/${APPS_PATH}/${APP_TO}/node_modules
+}
+
+
 METEOR_TOOL_DIR=~/.meteor/packages/meteor-tool
 
 function hasMeteor() {
@@ -1917,138 +2074,6 @@ function removePackagesSymlinksForMeteorApp() {
     rm -f "${appPackagesSrcPath}/${rootPackageName}"
     rm -f "${appPackagesSrcPath}/${appPackageName}"
     rm -rf "${appPackagesSrcPath}"
-}
-
-
-function hasMeteorYarn() {
-    hasMeteor && hasLibForCurrentMeteor yarn
-}
-
-function installMeteorYarn() {
-    installMeteorLib yarn
-}
-
-function uninstallMeteorYarn() {
-    uninstallMeteorLib yarn
-}
-
-function hasMeteorYarnConfig() {
-    [[ -d ~/.cache ]] && ls -la ~ | grep -icq "drwxrwxrwx .* \.cache"
-}
-
-function configMeteorYarn() {
-    printf "${BLUE}[-] Configuring meteor yarn...${NC}\n"
-    [[ ! -d ~/.cache ]] && mkdir ~/.cache
-    sudo chmod 777 ~/.cache
-}
-
-function checkMeteorYarn() {
-    if hasMeteorYarn && hasMeteorYarnConfig; then
-        printf "${GREEN}[✔] meteor yarn${NC}\n"
-    else
-        printf "${RED}[x] meteor yarn${NC}\n"
-    fi
-}
-
-function setupMeteorYarn() {
-    if ! hasMeteor; then
-        setupMeteor
-    fi
-
-    if hasMeteorLib yarn && hasMeteorYarnConfig; then
-        printf "${GREEN}[✔] Already meteor yarn${NC}\n"
-        return
-    fi
-
-    if ! hasMeteorLib yarn; then
-        [[ -d ~/.npm ]] && sudo chmod -R 777 ~/.npm
-        installMeteorYarn
-    fi
-
-    if ! hasMeteorYarnConfig; then
-        configMeteorYarn
-    fi
-}
-
-function purgeMeteorYarn() {
-    if ! hasMeteorLib yarn; then
-        return
-    fi
-
-    uninstallMeteorYarn
-    rm -rf ~/.cache
-}
-
-function getPackageName() {
-    packagePath=${1-"."}
-    cd ${PROJECT_PATH}/${packagePath}
-    cat package.json | sed -n 's@.*"name": "\(.*\)".*@\1@p'
-}
-
-function hasYarnDeps() {
-    packagePath=${1-"."}
-    [[ "$(meteor yarn check --verify-tree 2>&1 >/dev/null | grep -ic "error")" -eq "0" ]]
-}
-
-function checkYarnDeps() {
-    oldPath=${PWD}
-    packagePath=${1-"."}
-    package=${2-$(getPackageName $@)}
-
-    cd ${PROJECT_PATH}/${packagePath}
-    if hasMeteorYarn && hasYarnDeps $@; then
-        printf "${GREEN}[✔] \"${package}\" dependencies${NC}\n"
-    else
-        printf "${RED}[x] \"${package}\" dependencies${NC}\n"
-    fi
-    cd ${oldPath}
-}
-
-function installYarnDeps() {
-    oldPath=${PWD}
-    packagePath=${1-"."}
-    package=${2-$(getPackageName $@)}
-
-    printf "${BLUE}[-] Installing \"${package}\" dependencies...${NC}\n"
-    cd ${PROJECT_PATH}/${packagePath}
-    if ! hasMeteorYarn; then
-        installMeteorYarn
-    fi
-    meteor yarn install
-    cd ${oldPath}
-}
-
-function setupYarnDeps() {
-    oldPath=${PWD}
-    packagePath=${1-"."}
-    package=${2-$(getPackageName $@)}
-
-    if hasYarnDeps $@; then
-        printf "${GREEN}[✔] Already \"${package}\" dependencies${NC}\n"
-        return
-    fi
-
-    installYarnDeps $@
-}
-
-function checkApp() {
-    APP_TO=${1-${APP_TO}}
-    printf "${BLUE}[-] Checking \"${APP_TO}\" app...${NC}\n"
-
-    checkYarnDeps ./${APPS_PATH}/${APP_TO}
-}
-
-function setupApp() {
-    APP_TO=${1-${APP_TO}}
-    printf "${BLUE}[-] Installing \"${APP_TO}\" app...${NC}\n"
-
-    meteor yarn --cwd ${PROJECT_PATH}/${APPS_PATH}/${APP_TO} install ${@:2}
-}
-
-function cleanApp() {
-    APP_TO=${1-${APP_TO}}
-    printf "${BLUE}[-] Cleaning \"${APP_TO}\" app...${NC}\n"
-    rm -rf ${PROJECT_PATH}/${APPS_PATH}/${APP_TO}/node_modules
 }
 
 function getNpmPackageName() {

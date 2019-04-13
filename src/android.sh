@@ -3,10 +3,21 @@
 source "./src/constants.sh"
 source "./src/helpers.sh"
 
-function hasAndroidInMac() {
-    [[ "$(brew cask list 2>&1 | grep -ic "java8")" -ne "0" ]] &&
-        [[ "$(brew cask list 2>&1 | grep -ic "android-sdk")" -ne "0" ]] &&
+function hasJavaInMac() {
+    [[ "$(brew cask list 2>&1 | grep -ic "java8")" -ne "0" ]]
+}
+
+function hasAndroidSDKInMac() {
+    [[ "$(brew cask list 2>&1 | grep -ic "android-sdk")" -ne "0" ]] &&
         [[ "$(brew ls gradle 2>&1 | grep -ic "No such keg")" -eq "0" ]]
+}
+
+function hasAndroidStudioInMac() {
+    [[ "$(brew cask list 2>&1 | grep -ic "android-studio")" -ne "0" ]]
+}
+
+function hasAndroidInMac() {
+    hasJavaInMac && hasAndroidStudioInMac && hasAndroidSDKInMac
 }
 
 function hasJavaInLinux() {
@@ -45,6 +56,9 @@ function installAndroidSDKInMac() {
     brew install gradle
     brew cask install android-sdk
     brew cask install android-platform-tools
+    mkdir -p ~/Library/Android
+    ln -s /usr/local/share/android-sdk ~/Library/Android
+    mv ~/Library/Android/android-sdk ~/Library/Android/sdk
 }
 
 function installAndroidSDKInLinux() {
@@ -72,9 +86,14 @@ function checkAndroid() {
     fi
 }
 
+EXPORT_ANDROID_HOME_MAC="export ANDROID_HOME=~/Library/Android/sdk"
+EXPORT_ANDROID_PATH_MAC="export PATH=\$PATH:\$ANDROID_HOME/tools/bin:\$ANDROID_HOME/platform-tools"
+EXPORT_ANDROID_SDK_MAC="export ANDROID_SDK_ROOT=\"\$ANDROID_HOME\""
+
 function hasAndroidConfigInMac() {
-    [[ "$(cat ~/.envrc | grep -ic "export ANDROID_HOME")" -ne "0" ]] &&
-        [[ "$(cat ~/.envrc | grep -ic "export JAVA_HOME")" -ne "0" ]]
+    [[ "$(cat ~/.envrc | grep -ic ${EXPORT_ANDROID_HOME_MAC})" -ne "0" ]] &&
+        [[ "$(cat ~/.envrc | grep -ic ${EXPORT_ANDROID_PATH_MAC})" -ne "0" ]] &&
+        [[ "$(cat ~/.envrc | grep -ic ${EXPORT_ANDROID_SDK_MAC})" -ne "0" ]]
 }
 
 function configAndroidInMac() {
@@ -84,15 +103,15 @@ function configAndroidInMac() {
     echo "export JAVA_HOME=$(/usr/libexec/java_home -v1.8)" >>~/.envrc
     export JAVA_HOME=$(/usr/libexec/java_home -v1.8)
 
-    echo "export ANDROID_HOME=/usr/local/share/android-sdk" >>~/.envrc
-    echo "export PATH=\$PATH:\$ANDROID_HOME/tools:\$ANDROID_HOME/platform-tools" >>~/.envrc
-    echo "export ANDROID_SDK_ROOT=\"\$ANDROID_HOME\"" >>~/.envrc
-    export ANDROID_HOME=/usr/local/share/android-sdk
-    export PATH=$PATH:$ANDROID_HOME/tools:$ANDROID_HOME/platform-tools
-    export ANDROID_SDK_ROOT="${ANDROID_HOME}"
+    echo ${EXPORT_ANDROID_HOME_MAC} >>~/.envrc
+    echo ${EXPORT_ANDROID_PATH_MAC} >>~/.envrc
+    echo ${EXPORT_ANDROID_SDK_MAC} >>~/.envrc
 
-    yes | sdkmanager "platform-tools" "platforms;android-26"
-    yes | sdkmanager "build-tools;26.0.0"
+    eval ${EXPORT_ANDROID_HOME_MAC}
+    eval ${EXPORT_ANDROID_PATH_MAC}
+    eval ${EXPORT_ANDROID_SDK_MAC}
+
+    yes | sdkmanager "platform-tools" "platforms;android-28" "build-tools;28.0.0"
 }
 
 EXPORT_ANDROID_HOME_LINUX="export ANDROID_HOME=~/Android/Sdk"
@@ -130,9 +149,19 @@ function setupAndroid() {
     printf "${BLUE}[-] Setting up android...${NC}\n"
 
     if isOSX && ! hasAndroidInMac; then
-        installJavaInMac
-        installAndroidSDKInMac
-        installAndroidStudioInMac
+        if ! hasJavaInMac; then
+            installJavaInMac
+        fi
+        if ! hasAndroidSDKInMac; then
+            installAndroidSDKInMac
+        fi
+        if ! hasAndroidStudioInMac; then
+            installAndroidStudioInMac
+        fi
+
+        if ! hasAndroidConfigInMac; then
+            configAndroidInMac
+        fi
     elif isLinux && ! hasAndroidInLinux; then
         if ! hasJavaInLinux; then
             installJavaInLinux
@@ -146,10 +175,6 @@ function setupAndroid() {
         if ! hasAndroidSDKInLinux; then
             installAndroidSDKInLinux
         fi
-    fi
-
-    if isOSX && ! hasAndroidConfigInMac; then
-        configAndroidInMac
     fi
 }
 
