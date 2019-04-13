@@ -9,10 +9,20 @@ function hasAndroidInMac() {
         [[ "$(brew ls gradle 2>&1 | grep -ic "No such keg")" -eq "0" ]]
 }
 
+function hasJavaInLinux() {
+    [[ "$(apt list oracle-java8-installer 2>&1 | grep -ic "installed")" -ne "0" ]]
+}
+
+function hasAndroidStudioInLinux() {
+    [[ "$(snap list android-studio 2>&1 | grep -ic "no matching snaps")" -eq "0" ]]
+}
+
+function hasAndroidSDKInLinux() {
+    [[ -d ~/Android/Sdk ]]
+}
+
 function hasAndroidInLinux() {
-    [[ "$(apt list oracle-java8-installer 2>&1 | grep -ic "installed")" -ne "0" ]] &&
-        [[ "$(apt list android-sdk 2>&1 | grep -ic "installed")" -ne "0" ]] &&
-        [[ "$(snap list android-studio 2>&1 | grep -ic "no matching snaps")" -eq "0" ]]
+    hasJavaInLinux && hasAndroidStudioInLinux && hasAndroidSDKInLinux
 }
 
 function installJavaInMac() {
@@ -39,8 +49,7 @@ function installAndroidSDKInMac() {
 
 function installAndroidSDKInLinux() {
     printf "${BLUE}[-] Installing Android SDK...${NC}\n"
-    yes | sudo apt update
-    yes | sudo apt install android-sdk
+    snap run android-studio
 }
 
 function installAndroidStudioInMac() {
@@ -86,23 +95,27 @@ function configAndroidInMac() {
     yes | sdkmanager "build-tools;26.0.0"
 }
 
+EXPORT_ANDROID_HOME_LINUX="export ANDROID_HOME=~/Android/Sdk"
+EXPORT_ANDROID_PATH_LINUX="export PATH=\$PATH:\$ANDROID_HOME/tools/bin:\$ANDROID_HOME/platform-tools"
+EXPORT_ANDROID_SDK_LINUX="export ANDROID_SDK_ROOT=\"\$ANDROID_HOME\""
+
 function hasAndroidConfigInLinux() {
-    [[ "$(cat ~/.envrc | grep -ic "export ANDROID_HOME")" -ne "0" ]]
+    [[ "$(cat ~/.envrc | grep -ic ${EXPORT_ANDROID_HOME_LINUX})" -ne "0" ]] &&
+        [[ "$(cat ~/.envrc | grep -ic ${EXPORT_ANDROID_PATH_LINUX})" -ne "0" ]] &&
+        [[ "$(cat ~/.envrc | grep -ic ${EXPORT_ANDROID_SDK_LINUX})" -ne "0" ]]
 }
 
 function configAndroidInLinux() {
     printf "${BLUE}[-] Configuring Android...${NC}\n"
     tryPrintNewLine ~/.envrc
 
-    echo "export ANDROID_HOME=/usr/lib/android-sdk" >>~/.envrc
-    echo "export PATH=\$PATH:\$ANDROID_HOME/tools:\$ANDROID_HOME/platform-tools" >>~/.envrc
-    echo "export ANDROID_SDK_ROOT=\"\$ANDROID_HOME\"" >>~/.envrc
-    export ANDROID_HOME=/usr/lib/android-sdk
-    export PATH=$PATH:$ANDROID_HOME/tools:$ANDROID_HOME/platform-tools
-    export ANDROID_SDK_ROOT="${ANDROID_HOME}"
+    echo ${EXPORT_ANDROID_HOME_LINUX} >>~/.envrc
+    echo ${EXPORT_ANDROID_PATH_LINUX} >>~/.envrc
+    echo ${EXPORT_ANDROID_SDK_LINUX} >>~/.envrc
 
-    yes | sdkmanager "platform-tools" "platforms;android-26"
-    yes | sdkmanager "build-tools;26.0.0"
+    eval ${EXPORT_ANDROID_HOME_LINUX}
+    eval ${EXPORT_ANDROID_PATH_LINUX}
+    eval ${EXPORT_ANDROID_SDK_LINUX}
 }
 
 function setupAndroid() {
@@ -121,15 +134,22 @@ function setupAndroid() {
         installAndroidSDKInMac
         installAndroidStudioInMac
     elif isLinux && ! hasAndroidInLinux; then
-        installJavaInLinux
-        installAndroidSDKInLinux
-        installAndroidStudioInLinux
+        if ! hasJavaInLinux; then
+            installJavaInLinux
+        fi
+        if ! hasAndroidStudioInLinux; then
+            installAndroidStudioInLinux
+        fi
+        if ! hasAndroidConfigInLinux; then
+            configAndroidInLinux
+        fi
+        if ! hasAndroidSDKInLinux; then
+            installAndroidSDKInLinux
+        fi
     fi
 
     if isOSX && ! hasAndroidConfigInMac; then
         configAndroidInMac
-    elif isLinux && ! hasAndroidConfigInLinux; then
-        configAndroidInLinux
     fi
 }
 
@@ -144,7 +164,7 @@ function uninstallJavaInMac() {
 
 function uninstallJavaInLinux() {
     printf "${BLUE}[-] Uninstalling Java 8...${NC}\n"
-    yes | sudo apt install oracle-java8-set-default --purge
+    yes | sudo apt remove oracle-java8-set-default --purge
     yes | sudo apt remove oracle-java8-installer --purge
 }
 
@@ -157,7 +177,7 @@ function uninstallAndroidSDKInMac() {
 
 function uninstallAndroidSDKInLinux() {
     printf "${BLUE}[-] Uninstalling Android SDK...${NC}\n"
-    yes | sudo apt remove android-sdk --purge
+    rm -rf ~/Android/Sdk
 }
 
 function uninstallAndroidStudioInMac() {
