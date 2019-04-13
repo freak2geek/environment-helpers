@@ -165,7 +165,7 @@ function startMeteorApp() {
     printf "${PURPLE} - Settings Path: ${meteorSettingsPath}${NC}\n"
     printf "${PURPLE} - Port: ${PORT}${NC}\n"
 
-    trap "killMeteorApp ${@} && cd ${oldPWD}" SIGINT SIGTERM
+    trap "killMeteorApp ${APP_TO} && cd ${oldPWD}" SIGINT SIGTERM
     meteor run ${DEVICES_TO} --settings ${meteorSettingsPath} --port ${PORT} ${@:2}
 }
 
