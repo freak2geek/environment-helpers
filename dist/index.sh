@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# @freak2geek/scripts - 1.5.10
+# @freak2geek/scripts - 1.5.11
 
 
 
@@ -91,9 +91,9 @@ EXPORT_ANDROID_PATH_MAC="export PATH=\$PATH:\$ANDROID_HOME/tools/bin:\$ANDROID_H
 EXPORT_ANDROID_SDK_MAC="export ANDROID_SDK_ROOT=\"\$ANDROID_HOME\""
 
 function hasAndroidConfigInMac() {
-    [[ "$(cat ~/.envrc | grep -ic ${EXPORT_ANDROID_HOME_MAC})" -ne "0" ]] &&
-        [[ "$(cat ~/.envrc | grep -ic ${EXPORT_ANDROID_PATH_MAC})" -ne "0" ]] &&
-        [[ "$(cat ~/.envrc | grep -ic ${EXPORT_ANDROID_SDK_MAC})" -ne "0" ]]
+    [[ "$(cat ~/.envrc | grep -ic "${EXPORT_ANDROID_HOME_MAC}")" -ne "0" ]] &&
+        [[ "$(cat ~/.envrc | grep -ic "${EXPORT_ANDROID_PATH_MAC}")" -ne "0" ]] &&
+        [[ "$(cat ~/.envrc | grep -ic "${EXPORT_ANDROID_SDK_MAC}")" -ne "0" ]]
 }
 
 function configAndroidInMac() {
@@ -103,13 +103,13 @@ function configAndroidInMac() {
     echo "export JAVA_HOME=$(/usr/libexec/java_home -v1.8)" >>~/.envrc
     export JAVA_HOME=$(/usr/libexec/java_home -v1.8)
 
-    echo ${EXPORT_ANDROID_HOME_MAC} >>~/.envrc
-    echo ${EXPORT_ANDROID_PATH_MAC} >>~/.envrc
-    echo ${EXPORT_ANDROID_SDK_MAC} >>~/.envrc
+    echo "${EXPORT_ANDROID_HOME_MAC}" >>~/.envrc
+    echo "${EXPORT_ANDROID_PATH_MAC}" >>~/.envrc
+    echo "${EXPORT_ANDROID_SDK_MAC}" >>~/.envrc
 
-    eval ${EXPORT_ANDROID_HOME_MAC}
-    eval ${EXPORT_ANDROID_PATH_MAC}
-    eval ${EXPORT_ANDROID_SDK_MAC}
+    eval "${EXPORT_ANDROID_HOME_MAC}"
+    eval "${EXPORT_ANDROID_PATH_MAC}"
+    eval "${EXPORT_ANDROID_SDK_MAC}"
 
     setupAndroidSDK 28
     setupAndroidSDK 27
@@ -120,22 +120,22 @@ EXPORT_ANDROID_PATH_LINUX="export PATH=\$PATH:\$ANDROID_HOME/tools/bin:\$ANDROID
 EXPORT_ANDROID_SDK_LINUX="export ANDROID_SDK_ROOT=\"\$ANDROID_HOME\""
 
 function hasAndroidConfigInLinux() {
-    [[ "$(cat ~/.envrc | grep -ic ${EXPORT_ANDROID_HOME_LINUX})" -ne "0" ]] &&
-        [[ "$(cat ~/.envrc | grep -ic ${EXPORT_ANDROID_PATH_LINUX})" -ne "0" ]] &&
-        [[ "$(cat ~/.envrc | grep -ic ${EXPORT_ANDROID_SDK_LINUX})" -ne "0" ]]
+    [[ "$(cat ~/.envrc | grep -ic "${EXPORT_ANDROID_HOME_LINUX}")" -ne "0" ]] &&
+        [[ "$(cat ~/.envrc | grep -ic "${EXPORT_ANDROID_PATH_LINUX}")" -ne "0" ]] &&
+        [[ "$(cat ~/.envrc | grep -ic "${EXPORT_ANDROID_SDK_LINUX}")" -ne "0" ]]
 }
 
 function configAndroidInLinux() {
     printf "${BLUE}[-] Configuring Android...${NC}\n"
     tryPrintNewLine ~/.envrc
 
-    echo ${EXPORT_ANDROID_HOME_LINUX} >>~/.envrc
-    echo ${EXPORT_ANDROID_PATH_LINUX} >>~/.envrc
-    echo ${EXPORT_ANDROID_SDK_LINUX} >>~/.envrc
+    echo "${EXPORT_ANDROID_HOME_LINUX}" >>~/.envrc
+    echo "${EXPORT_ANDROID_PATH_LINUX}" >>~/.envrc
+    echo "${EXPORT_ANDROID_SDK_LINUX}" >>~/.envrc
 
-    eval ${EXPORT_ANDROID_HOME_LINUX}
-    eval ${EXPORT_ANDROID_PATH_LINUX}
-    eval ${EXPORT_ANDROID_SDK_LINUX}
+    eval "${EXPORT_ANDROID_HOME_LINUX}"
+    eval "${EXPORT_ANDROID_PATH_LINUX}"
+    eval "${EXPORT_ANDROID_SDK_LINUX}"
 }
 
 function setupAndroid() {
