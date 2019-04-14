@@ -111,7 +111,8 @@ function configAndroidInMac() {
     eval ${EXPORT_ANDROID_PATH_MAC}
     eval ${EXPORT_ANDROID_SDK_MAC}
 
-    yes | sdkmanager "platform-tools" "platforms;android-28" "build-tools;28.0.0"
+    setupAndroidSDK 28
+    setupAndroidSDK 27
 }
 
 EXPORT_ANDROID_HOME_LINUX="export ANDROID_HOME=~/Android/Sdk"
@@ -176,6 +177,14 @@ function setupAndroid() {
             installAndroidSDKInLinux
         fi
     fi
+}
+
+function setupAndroidSDK() {
+    version=${1-'26'}
+
+    printf "${BLUE}[-] Setting up android sdk ${version}...${NC}\n"
+
+    yes | sdkmanager "platforms;android-${version}" "build-tools;${version}.0.0"
 }
 
 function uninstallJavaInMac() {
