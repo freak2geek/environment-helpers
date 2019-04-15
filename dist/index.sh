@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# @freak2geek/scripts - 1.6.3
+# @freak2geek/scripts - 1.6.4
 
 
 
@@ -1313,16 +1313,18 @@ function hasMeteorM() {
 }
 
 function installMeteorM() {
+    prepareMeteorM
     installMeteorLib m
 }
 
 function uninstallMeteorM() {
+    sudo rm -rf /usr/local/m/versions
     uninstallMeteorLib m
 }
 
-function configMeteorM() {
-    printf "${BLUE}[-] Configuring meteor m...${NC}\n"
-    sudo chmod -R 777 /usr/local
+function prepareMeteorM() {
+    sudo mkdir -p /usr/local/m/versions
+    sudo chmod -R 777 /usr/local/m
 }
 
 function checkMeteorM() {

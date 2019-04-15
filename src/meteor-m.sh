@@ -23,16 +23,18 @@ function hasMeteorM() {
 }
 
 function installMeteorM() {
+    prepareMeteorM
     installMeteorLib m
 }
 
 function uninstallMeteorM() {
+    sudo rm -rf /usr/local/m/versions
     uninstallMeteorLib m
 }
 
-function configMeteorM() {
-    printf "${BLUE}[-] Configuring meteor m...${NC}\n"
-    sudo chmod -R 777 /usr/local
+function prepareMeteorM() {
+    sudo mkdir -p /usr/local/m/versions
+    sudo chmod -R 777 /usr/local/m
 }
 
 function checkMeteorM() {
