@@ -264,6 +264,9 @@ function setOverride() {
 }
 
 function unsetOverride() {
+    if [[ ! -f "${PROJECT_PATH}/${ENV_OVERRIDE_FILENAME}" ]]; then
+        return
+    fi
     override=${1-}
     sedi "/${override}/d" "${PROJECT_PATH}/${ENV_OVERRIDE_FILENAME}"
 }
