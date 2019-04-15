@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# @freak2geek/scripts - 1.6.2
+# @freak2geek/scripts - 1.6.3
 
 
 
@@ -1001,6 +1001,19 @@ function loadEnv {
   fi
 }
 
+function printEnv() {
+    file=${1-}
+    prefix=${2-}
+    if [[ -f ${file} ]] ; then
+        while read -r line
+        do
+            [[ -z "$line" ]] && continue
+            parsedLine="$(eval "echo "$(echo ${line})"")"
+            printf "${PURPLE}${prefix}${parsedLine}${NC}\n"
+        done < "${file}"
+    fi
+}
+
 ENV_OVERRIDE_FILENAME=".env.override"
 
 function setOverride() {
@@ -1030,13 +1043,7 @@ function cleanOverrides() {
 function printOverrides() {
     prefix=${1-}
     envOverridePath="${PROJECT_PATH}/${ENV_OVERRIDE_FILENAME}"
-    if [[ -f ${envOverridePath} ]] ; then
-        while read -r line
-        do
-            [[ -z "$line" ]] && continue
-            printf "${PURPLE}${prefix}${line}${NC}\n"
-        done < "${envOverridePath}"
-    fi
+    printEnv ${envOverridePath} ${prefix}
 }
 
 
@@ -2043,12 +2050,13 @@ function startMeteorApp() {
     cd ${PROJECT_PATH}/${APPS_PATH}/${APP_TO}
 
     loadMeteorEnv
+    printEnv ${meteorEnvPath} "    - "
 
     envOverridePath="${PROJECT_PATH}/${ENV_OVERRIDE_FILENAME}"
     if [[ -f ${envOverridePath} ]]; then
         printf "${PURPLE} - Env Override: ./${ENV_OVERRIDE_FILENAME}${NC}\n"
         loadOverrides
-        printOverrides "    - "
+        printEnv ${envOverridePath} "    - "
     fi
 
     meteorSettingsPath=./${APP_CONFIG_PATH}/${ENV_TO}/settings.json
