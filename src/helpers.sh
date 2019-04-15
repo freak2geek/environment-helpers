@@ -279,3 +279,15 @@ function cleanOverrides() {
     rm -f "${PROJECT_PATH}/${ENV_OVERRIDE_FILENAME}"
     touch "${PROJECT_PATH}/${ENV_OVERRIDE_FILENAME}"
 }
+
+function printOverrides() {
+    prefix=${1-}
+    envOverridePath="${PROJECT_PATH}/${ENV_OVERRIDE_FILENAME}"
+    if [[ -f ${envOverridePath} ]] ; then
+        while read -r line
+        do
+            [[ -z "$line" ]] && continue
+            printf "${PURPLE}${prefix}${line}${NC}\n"
+        done < "${envOverridePath}"
+    fi
+}

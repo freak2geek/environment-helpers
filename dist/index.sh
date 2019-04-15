@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# @freak2geek/scripts - 1.6.1
+# @freak2geek/scripts - 1.6.2
 
 
 
@@ -1027,6 +1027,18 @@ function cleanOverrides() {
     touch "${PROJECT_PATH}/${ENV_OVERRIDE_FILENAME}"
 }
 
+function printOverrides() {
+    prefix=${1-}
+    envOverridePath="${PROJECT_PATH}/${ENV_OVERRIDE_FILENAME}"
+    if [[ -f ${envOverridePath} ]] ; then
+        while read -r line
+        do
+            [[ -z "$line" ]] && continue
+            printf "${PURPLE}${prefix}${line}${NC}\n"
+        done < "${envOverridePath}"
+    fi
+}
+
 
 function hasIfconfig() {
     which ifconfig >/dev/null && [[ "$(which ifconfig | grep -ic "not found")" -eq "0" ]]
@@ -2036,6 +2048,7 @@ function startMeteorApp() {
     if [[ -f ${envOverridePath} ]]; then
         printf "${PURPLE} - Env Override: ./${ENV_OVERRIDE_FILENAME}${NC}\n"
         loadOverrides
+        printOverrides "    - "
     fi
 
     meteorSettingsPath=./${APP_CONFIG_PATH}/${ENV_TO}/settings.json

@@ -163,6 +163,7 @@ function startMeteorApp() {
     if [[ -f ${envOverridePath} ]]; then
         printf "${PURPLE} - Env Override: ./${ENV_OVERRIDE_FILENAME}${NC}\n"
         loadOverrides
+        printOverrides "    - "
     fi
 
     meteorSettingsPath=./${APP_CONFIG_PATH}/${ENV_TO}/settings.json
