@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# @freak2geek/scripts - 1.6.7
+# @freak2geek/scripts - 1.6.8
 
 
 
@@ -2096,7 +2096,9 @@ function startMeteorAppInDevice() {
     fi
 
     MOBILE_SERVER_TO=$(getLocalIp)
-    startMeteorApp ${1} "--mobile-server ${MOBILE_SERVER_TO}:${PORT}" ${@:2}
+    meteorMobileServer="${MOBILE_SERVER_TO}:${PORT}"
+    export METEOR_MOBILE_SERVER=${meteorMobileServer}
+    startMeteorApp ${1} "--mobile-server ${meteorMobileServer}" ${@:2}
 }
 
 function killMeteorApp() {

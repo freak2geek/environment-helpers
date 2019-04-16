@@ -186,7 +186,9 @@ function startMeteorAppInDevice() {
     fi
 
     MOBILE_SERVER_TO=$(getLocalIp)
-    startMeteorApp ${1} "--mobile-server ${MOBILE_SERVER_TO}:${PORT}" ${@:2}
+    meteorMobileServer="${MOBILE_SERVER_TO}:${PORT}"
+    export METEOR_MOBILE_SERVER=${meteorMobileServer}
+    startMeteorApp ${1} "--mobile-server ${meteorMobileServer}" ${@:2}
 }
 
 function killMeteorApp() {
