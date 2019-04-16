@@ -171,8 +171,13 @@ function startMeteorApp() {
     printf "${PURPLE} - Settings Path: ${meteorSettingsPath}${NC}\n"
     printf "${PURPLE} - Port: ${PORT}${NC}\n"
 
+    meteorOptions=${@:2}
+    if [[ ! -z ${meteorOptions} ]]; then
+        printf "${PURPLE} - Options: ${meteorOptions}${NC}\n"
+    fi
+
     trap "killMeteorApp ${APP_TO} && cd ${oldPWD}" SIGINT SIGTERM
-    meteor run ${DEVICES_TO} --settings ${meteorSettingsPath} --port ${PORT} ${@:2}
+    meteor run ${DEVICES_TO} --settings ${meteorSettingsPath} --port ${PORT} ${meteorOptions}
 }
 
 function startMeteorAppInDevice() {
