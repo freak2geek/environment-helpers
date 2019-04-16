@@ -209,6 +209,15 @@ function cleanMeteorApp() {
     cd ${oldPWD}
 }
 
+function cleanMeteorMobileApp() {
+    APP_TO=${1-${APP_TO}}
+    printf "${BLUE}[-] Cleaning \"${APP_TO}\" meteor mobile app...${NC}\n"
+    oldPWD=${PWD}
+    cd ${PROJECT_PATH}/${APPS_PATH}/${APP_TO}
+    rm -rf ./.meteor/local/cordova-build
+    cd ${oldPWD}
+}
+
 function addPackagesSymlinksForMeteorApp() {
     printf "${BLUE}[-] Linking packages for \"${APP_TO}\" app...${NC}\n"
 

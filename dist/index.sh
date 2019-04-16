@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# @freak2geek/scripts - 1.6.5
+# @freak2geek/scripts - 1.6.6
 
 
 
@@ -2100,6 +2100,15 @@ function cleanMeteorApp() {
     cd ${PROJECT_PATH}/${APPS_PATH}/${APP_TO}
     meteor reset
     rm -rf ./node_modules
+    cd ${oldPWD}
+}
+
+function cleanMeteorMobileApp() {
+    APP_TO=${1-${APP_TO}}
+    printf "${BLUE}[-] Cleaning \"${APP_TO}\" meteor mobile app...${NC}\n"
+    oldPWD=${PWD}
+    cd ${PROJECT_PATH}/${APPS_PATH}/${APP_TO}
+    rm -rf ./.meteor/local/cordova-build
     cd ${oldPWD}
 }
 
