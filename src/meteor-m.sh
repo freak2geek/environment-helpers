@@ -433,3 +433,19 @@ function restoreMongoDb() {
 
     "$(meteor m bin ${MONGO_VERSION})/mongorestore" --host ${MONGO_HOST} --port ${MONGO_PORT} --dir ${MONGO_OUT_DIR}/${MONGO_DB_COPIED} --db ${MONGO_DB} ${MONGO_OPTIONS}
 }
+
+function restoreMongoDbSchema() {
+    schemaDb="${MONGO_OUT_DIR}/${MONGO_DB}-schema"
+    printf "${BLUE}[-] Restoring db schema..${NC}\n"
+    printf "${PURPLE} - Host: ${MONGO_HOST}${NC}\n"
+    printf "${PURPLE} - Port: ${MONGO_PORT}${NC}\n"
+    printf "${PURPLE} - DB copied: ${MONGO_OUT_DIR}/${MONGO_DB_COPIED}${NC}\n"
+    printf "${PURPLE} - DB schema: ${schemaDb}${NC}\n"
+    printf "${PURPLE} - DB to restore schema: ${MONGO_DB}${NC}\n"
+    printf "${PURPLE} - Options: ${MONGO_OPTIONS}${NC}\n"
+
+    mkdir -p "${schemaDb}"
+    find "${MONGO_OUT_DIR}/${MONGO_DB_COPIED}" -name '*metadata*' -type f -exec cp {} ${schemaDb} \;
+
+    "$(meteor m bin ${MONGO_VERSION})/mongorestore" --host ${MONGO_HOST} --port ${MONGO_PORT} --dir ${schemaDb} --db ${MONGO_DB} ${MONGO_OPTIONS}
+}
