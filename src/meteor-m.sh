@@ -290,6 +290,16 @@ function checkMongoOplog() {
         printf "${GREEN}[✔] meteor mongo oplog${NC}\n"
     else
         printf "${RED}[x] meteor mongo oplog${NC}\n"
+        if hasOplogUser; then
+            printf "${GREEN}    [✔] oplog user${NC}\n"
+        else
+            printf "${RED}    [x] oplog user${NC}\n"
+        fi
+        if hasOplogInitialized; then
+            printf "${GREEN}    [✔] oplog config${NC}\n"
+        else
+            printf "${RED}    [x] oplog config${NC}\n"
+        fi
     fi
     if [[ ${isMongoConnected} -eq 0 ]]; then
         shutdownMongo 1>/dev/null
@@ -331,6 +341,26 @@ function setupMongoOplog() {
     fi
 
     isMongoConnected=0
+    if isRunningMongo; then
+        isMongoConnected=1
+    fi
+
+    if [[ ${isMongoConnected} -eq 0 ]]; then
+        startMongo
+    fi
+    if hasOplogUser; then
+        printf "${GREEN}[✔] Already oplog user${NC}\n"
+    else
+
+        meteor m shell ${MONGO_VERSION} --port ${MONGO_PORT} --eval "db.getSiblingDB('admin').createUser({\"user\":\"oplogger\",\"pwd\":\"PASSWORD\",\"roles\":[{\"role\":\"read\",\"db\":\"local\"}],\"passwordDigestor\":\"server\"})"
+    fi
+    if [[ ${isMongoConnected} -eq 0 ]]; then
+        shutdownMongo 1>/dev/null
+        if isRunningMongo; then
+            killMongo
+        fi
+    fi
+
     if isRunningMongoAndReplicas; then
         isMongoConnected=1
     fi
@@ -350,23 +380,9 @@ function setupMongoOplog() {
     fi
     if [[ ${isMongoConnected} -eq 0 ]]; then
         shutdownMongoAndReplicas 1>/dev/null
-    fi
-
-    if isRunningMongo; then
-        isMongoConnected=1
-    fi
-
-    if [[ ${isMongoConnected} -eq 0 ]]; then
-        startMongo
-    fi
-    if hasOplogUser; then
-        printf "${GREEN}[✔] Already oplog user${NC}\n"
-    else
-
-        meteor m shell ${MONGO_VERSION} --port ${MONGO_PORT} --eval "db.getSiblingDB('admin').createUser({\"user\":\"oplogger\",\"pwd\":\"PASSWORD\",\"roles\":[{\"role\":\"read\",\"db\":\"local\"}],\"passwordDigestor\":\"server\"})"
-    fi
-    if [[ ${isMongoConnected} -eq 0 ]]; then
-        shutdownMongo 1>/dev/null
+        if isRunningMongo; then
+            killMongoAndReplicas
+        fi
     fi
 }
 
