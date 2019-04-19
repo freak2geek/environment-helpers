@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# @freak2geek/scripts - 1.6.9
+# @freak2geek/scripts - 1.6.10
 
 
 
@@ -2125,6 +2125,17 @@ function killMeteorApp() {
     printf "${PURPLE} - Port: ${PORT}${NC}\n"
 
     killProcessByPort ${PORT}
+}
+
+
+
+function startMeteorShell() {
+    APP_TO=${1-${APP_TO}}
+    printf "${BLUE}[-] Starting \"${APP_TO}\" shell...${NC}\n"
+    oldPWD=${PWD}
+    cd ${PROJECT_PATH}/${APPS_PATH}/${APP_TO}
+    trap "cd ${oldPWD}" SIGINT SIGTERM
+    meteor shell
 }
 
 function cleanMeteorApp() {
