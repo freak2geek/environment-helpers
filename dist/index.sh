@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# @freak2geek/scripts - 1.6.10
+# @freak2geek/scripts - 1.6.11
 
 
 
@@ -1044,6 +1044,33 @@ function printOverrides() {
     prefix=${1-}
     envOverridePath="${PROJECT_PATH}/${ENV_OVERRIDE_FILENAME}"
     printEnv ${envOverridePath} ${prefix}
+}
+
+APPS=()
+
+function runOnApps() {
+    commandToRun=${@:1:$#-1}
+    shouldLog=${@: -1}
+
+    if [[ ${shouldLog} != true ]] && [[ ${shouldLog} != false ]]; then
+        shouldLog=true
+    fi
+
+    oldPwd=${PWD}
+    trap "cd ${oldPWD}" SIGINT SIGTERM
+
+    for appTo in "${APPS[@]}"
+    do
+        appFolder="${PROJECT_PATH}/${APPS_PATH}/${appTo}"
+        if [[ -d ${appFolder} ]]; then
+            cd ${appFolder}
+            if [[ ${shouldLog} == true ]]; then
+                printf "${BLUE}[-] Running on \"${appTo}\" app...${NC}\n"
+                printf "${PURPLE} - Command: ${commandToRun}${NC}\n"
+            fi
+            eval ${commandToRun}
+        fi
+    done
 }
 
 
