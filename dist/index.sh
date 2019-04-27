@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# @freak2geek/scripts - 1.6.12
+# @freak2geek/scripts - 1.6.13
 
 
 
@@ -2092,9 +2092,29 @@ SRC_FOLDER='src'
 ENV_FILENAME='.env'
 
 function loadMeteorEnv() {
-    meteorEnvPath=./${APP_CONFIG_PATH}/${ENV_TO}/${ENV_FILENAME}
-    printf "${PURPLE} - Env Path: ${meteorEnvPath}${NC}\n"
+    meteorEnvPath=${PROJECT_PATH}/${APPS_PATH}/${APP_TO}/${APP_CONFIG_PATH}/${ENV_TO}/${ENV_FILENAME}
     loadEnv ${meteorEnvPath}
+    if [[ ${ENABLE_LOGGING} == true ]]; then
+        printf "${PURPLE} - Env Path: ${meteorEnvPath}${NC}\n"
+    fi
+}
+
+function loadAndLogMeteorEnv() {
+    ENABLE_LOGGING=true
+    loadMeteorEnv
+    ENABLE_LOGGING=false
+}
+
+function isRunningMeteorApp() {
+    APP_TO=${1-${APP_TO}}
+    loadMeteorEnv
+    ps -edaf | grep -icq "\-\-port ${PORT}"
+}
+
+function waitMeteorApp() {
+    APP_TO=${1-${APP_TO}}
+    loadMeteorEnv
+    while ! isRunningMeteorApp ${APP_TO}; do sleep 1; done
 }
 
 function startMeteorApp() {
@@ -2110,7 +2130,7 @@ function startMeteorApp() {
     oldPWD=${PWD}
     cd ${PROJECT_PATH}/${APPS_PATH}/${APP_TO}
 
-    loadMeteorEnv
+    loadAndLogMeteorEnv
     printEnv ${meteorEnvPath} "    - "
 
     envOverridePath="${PROJECT_PATH}/${ENV_OVERRIDE_FILENAME}"
@@ -2148,16 +2168,15 @@ function killMeteorApp() {
     APP_TO=${1-${APP_TO}}
     printf "${BLUE}[-] Killing \"${APP_TO}\" app...${NC}\n"
 
-    loadMeteorEnv
+    loadAndLogMeteorEnv
     printf "${PURPLE} - Port: ${PORT}${NC}\n"
 
     killProcessByPort ${PORT}
 }
 
-
-
 function startMeteorShell() {
     APP_TO=${1-${APP_TO}}
+
     printf "${BLUE}[-] Starting \"${APP_TO}\" shell...${NC}\n"
     oldPWD=${PWD}
     cd ${PROJECT_PATH}/${APPS_PATH}/${APP_TO}
