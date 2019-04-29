@@ -35,6 +35,7 @@ The helpers available are for:
 - Meteor concurrently
 - Meteor rollup
 - sudo nopasswd
+- Redis
 - VSCode + Sync Settings
 - Zsh
 
