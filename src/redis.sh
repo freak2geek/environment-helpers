@@ -50,5 +50,11 @@ function startRedis() {
     fi
 
     printf "${BLUE}[-] Starting redis...${NC}\n"
-    redis-server /usr/local/etc/redis.conf &
+    redis-server /usr/local/etc/redis.conf --daemonize yes 1>/dev/null
+    while ! isRunningRedis; do sleep 1; done
+    printf "${GREEN}[✔] Already running redis${NC}\n"
+}
+
+function killRedis() {
+    pkill redis-server
 }
