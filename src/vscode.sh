@@ -50,8 +50,8 @@ function tryCreateUserSettingsFile() {
         userConfigFile=~/.config/Code\ -\ Insiders/User/settings.json
     fi
 
-    if [[ ! -f ${userConfigFile} ]]; then
-        touch ${userConfigFile}
+    if [[ ! -f "${userConfigFile}" ]]; then
+        touch "${userConfigFile}"
     fi
 }
 

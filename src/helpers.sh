@@ -324,4 +324,6 @@ function runOnApps() {
             eval ${commandToRun}
         fi
     done
+
+    cd ${oldPWD}
 }

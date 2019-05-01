@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# @freak2geek/scripts - 1.7.2
+# @freak2geek/scripts - 1.7.3
 
 
 
@@ -1071,6 +1071,8 @@ function runOnApps() {
             eval ${commandToRun}
         fi
     done
+
+    cd ${oldPWD}
 }
 
 
@@ -2435,8 +2437,8 @@ function tryCreateUserSettingsFile() {
         userConfigFile=~/.config/Code\ -\ Insiders/User/settings.json
     fi
 
-    if [[ ! -f ${userConfigFile} ]]; then
-        touch ${userConfigFile}
+    if [[ ! -f "${userConfigFile}" ]]; then
+        touch "${userConfigFile}"
     fi
 }
 
