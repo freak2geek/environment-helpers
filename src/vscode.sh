@@ -43,6 +43,18 @@ function getSyncPluginConfigPath() {
     echo "${configFile}"
 }
 
+function tryCreateUserSettingsFile() {
+    if isOSX; then
+        userConfigFile=~/Library/Application\ Support/Code\ -\ Insiders/User/settings.json
+    elif isLinux; then
+        userConfigFile=~/.config/Code\ -\ Insiders/User/settings.json
+    fi
+
+    if [[ ! -f ${userConfigFile} ]]; then
+        touch ${userConfigFile}
+    fi
+}
+
 function hasCodeInsidersConfig() {
     hasCodeInsiders && [[ "$($(which code-insiders) --list-extensions | grep -ic "shan.code-settings-sync")" -eq "1" ]] &&
         [[ -f "$(getSyncPluginConfigPath)" ]] && [[ "$(cat "$(getSyncPluginConfigPath)" | grep -ic "\"downloadPublicGist\":true")" -eq "1" ]]
@@ -69,6 +81,7 @@ function configCodeInsiders() {
         echo "$(jq -c '. + { "downloadPublicGist":true }' <<<"{}")" > "${configFile}"
     fi
 
+    tryCreateUserSettingsFile
     runCodeInsiders
 }
 
