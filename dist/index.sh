@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# @freak2geek/scripts - 1.7.4
+# @freak2geek/scripts - 1.7.5
 
 
 
@@ -804,7 +804,14 @@ function getLocalHomeVarName() {
 
 function hasLocalHome() {
     localHomeName="$(getLocalHomeVarName)"
-    [[ -f ~/.envrc ]] && [[ "$(cat ~/.envrc | grep -ic "export ${localHomeName}=${PWD}")" -ne "0" ]]
+
+    localHomeValue="${PWD}"
+    if [[ "${PROJECT_PATH}" != "." ]]; then
+        localHomeValue="${PROJECT_PATH}"
+    fi
+
+    [[ -f ~/.envrc ]] && echo "${PWD}" | grep -q "${localHomeValue}" &&
+        [[ "$(cat ~/.envrc | grep -ic "export ${localHomeName}=${localHomeValue}")" -ne "0" ]]
 }
 
 function hasDynamicEnvrcLoader() {
