@@ -37,8 +37,12 @@ function hasBrewUmaskConfig() {
     hasEnvrc && cat ~/.envrc | grep -icq "${BREW_UMASK}"
 }
 
+function hasBrewOwnership() {
+    [[ "$(ls -l /home/linuxbrew/.linuxbrew | grep -i "Homebrew" | awk '{print $3}' | grep -ic "$(whoami)" )" -ne "0" ]]
+}
+
 function hasBrewConfig() {
-   hasBrewPathConfig && hasBrewUmaskConfig
+    hasBrewPathConfig && hasBrewUmaskConfig && hasBrewOwnership
 }
 
 function hasBrewByOS() {
@@ -76,6 +80,10 @@ function configBrewInLinux() {
     if ! hasBrewUmaskConfig; then
         tryPrintNewLine ~/.envrc
         echo "${BREW_UMASK}" >>~/.envrc
+    fi
+
+    if ! hasBrewOwnership; then
+        sudo chown -R $(whoami) /home/linuxbrew/.linuxbrew/Homebrew
     fi
 }
 
@@ -120,9 +128,9 @@ function setupBrew() {
     fi
 
     if ! hasBrewByOS; then
-        if isLinux; then
+        if isLinux && ! hasLinuxBrew; then
             installBrewInLinux
-        elif isOSX; then
+        elif isOSX && ! hasOsxBrew; then
             installBrewInOSX
         fi
     fi
