@@ -309,7 +309,7 @@ function runOnApps() {
         shouldLog=true
     fi
 
-    oldPwd=${PWD}
+    oldPWD=${PWD}
     trap "cd ${oldPWD}" SIGINT SIGTERM
 
     for APP_TO in "${APPS[@]}"
