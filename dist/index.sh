@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# @freak2geek/scripts - 1.7.7
+# @freak2geek/scripts - 1.8.0
 
 
 
@@ -690,7 +690,6 @@ function killDocker() {
     printf "${BLUE}[-] Killing docker...${NC}\n"
     sudo pkill docker
 }
-
 
 
 # GIT FLOW default config
