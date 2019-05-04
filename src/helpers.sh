@@ -180,28 +180,29 @@ function tryPrintNewLine() {
     fi
 }
 
-VISUDO_NOPASSWD="${USER} ALL=(ALL) NOPASSWD: ALL"
+USER_TO="${USER}"
+VISUDO_NOPASSWD="ALL=(ALL) NOPASSWD: ALL"
 
 function hasSudoNoPasswd() {
-    [[ $(sudo cat /etc/sudoers | grep -ic "${VISUDO_NOPASSWD}") -ne "0" ]]
+    [[ $(sudo cat /etc/sudoers | grep -ic "${USER_TO} ${VISUDO_NOPASSWD}") -ne "0" ]]
 }
 
 function configSudoNoPasswd() {
     printf "${BLUE}[-] Configuring sudo nopasswd...${NC}\n"
-    echo "${VISUDO_NOPASSWD}" | sudo EDITOR='tee -a' visudo
+    echo "${USER_TO} ${VISUDO_NOPASSWD}" | sudo EDITOR='tee -a' visudo
 }
 
 function checkSudoNoPasswd() {
     if hasSudoNoPasswd; then
-        printf "${GREEN}[✔] sudo nopasswd${NC}\n"
+        printf "${GREEN}[✔] sudo nopasswd: ${USER_TO}${NC}\n"
     else
-        printf "${RED}[x] sudo nopasswd${NC}\n"
+        printf "${RED}[x] sudo nopasswd: ${USER_TO}${NC}\n"
     fi
 }
 
 function setupSudoNoPasswd() {
     if hasSudoNoPasswd; then
-        printf "${GREEN}[✔] Already sudo nopasswd${NC}\n"
+        printf "${GREEN}[✔] Already sudo nopasswd: ${USER_TO}${NC}\n"
         return
     fi
 
