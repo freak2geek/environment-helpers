@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# @freak2geek/scripts - 1.8.0
+# @freak2geek/scripts - 1.8.1
 
 
 
@@ -2337,6 +2337,11 @@ function removePackagesSymlinksForMeteorApp() {
     rm -rf "${appPackagesSrcPath}"
 }
 
+function preinstallLinuxForMeteor() {
+    printf "${BLUE}[-] Pre-installing Linux for Meteor...${NC}\n"
+    sudo apt-get install -y ca-certificates
+}
+
 function getNpmPackageName() {
     packagePath=${1-'package.json'}
     [[ -f ${packagePath} ]] && cat ${packagePath} | grep name | head -1 | awk -F: '{ print $2 }' | sed 's/[\",]//g' | tr -d '[[:space:]]'
@@ -2345,6 +2350,12 @@ function getNpmPackageName() {
 function getNpmPackageVersion() {
     packagePath=${1-'package.json'}
     [[ -f ${packagePath} ]] && cat ${packagePath} | grep version | head -1 | awk -F: '{ print $2 }' | sed 's/[\",]//g' | tr -d '[[:space:]]'
+}
+
+function preinstallLinux() {
+    printf "${BLUE}[-] Pre-installing Linux...${NC}\n"
+    apt-get install sudo
+    sudo apt-get install -y build-essential netcat
 }
 
 

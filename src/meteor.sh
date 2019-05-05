@@ -290,3 +290,8 @@ function removePackagesSymlinksForMeteorApp() {
     rm -f "${appPackagesSrcPath}/${appPackageName}"
     rm -rf "${appPackagesSrcPath}"
 }
+
+function preinstallLinuxForMeteor() {
+    printf "${BLUE}[-] Pre-installing Linux for Meteor...${NC}\n"
+    sudo apt-get install -y ca-certificates
+}
