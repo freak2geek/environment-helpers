@@ -587,8 +587,6 @@ function hasDockerInLinux() {
 
 function installDockerInMac() {
     printf "${BLUE}[-] Installing docker...${NC}\n"
-    brew install docker
-    brew install docker-compose
     brew cask install docker
 }
 
@@ -599,7 +597,6 @@ function installDockerInLinux() {
 
 function uninstallDockerInMac() {
     printf "${BLUE}[-] Uninstalling docker...${NC}\n"
-    brew uninstall docker docker-compose
     brew cask uninstall docker
 }
 
