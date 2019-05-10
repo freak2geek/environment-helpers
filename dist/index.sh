@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# @freak2geek/scripts - 1.8.1
+# @freak2geek/scripts - 1.9.0
 
 
 
@@ -686,6 +686,21 @@ function killDocker() {
 
     printf "${BLUE}[-] Killing docker...${NC}\n"
     sudo pkill docker
+}
+
+
+function downloadFromGoogleDrive() {
+    gDriveId="${1}"
+    gDriveExtension="${2-"tmp"}"
+    gDriveFilename=${3-"${gDriveId}.${gDriveExtension}"}
+
+    if [[ -z ${gDriveId} ]]; then
+        printf "${RED} Please, provide the id of the Google Drive file.${NC}\n"
+        return
+    fi
+
+    curl -c /tmp/cookie -s -L "https://drive.google.com/uc?export=download&id=${gDriveId}" > /dev/null
+    curl -Lb /tmp/cookie "https://drive.google.com/uc?export=download&confirm=`awk '/download/ {print $NF}' /tmp/cookie`&id=${gDriveId}" -o /tmp/${gDriveFilename}
 }
 
 
