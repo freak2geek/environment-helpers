@@ -33,7 +33,7 @@ function setupIfconfig() {
 
 function getLocalIp() {
     if isOSX; then
-        echo "$(ifconfig | grep '\<inet\>' | cut -d ' ' -f2 | grep -v '127.0.0.1')"
+        echo "$(ifconfig | grep '\<inet\>' | cut -d ' ' -f2 | grep -v '127.0.0.1' | head -n 1)"
         return
     elif isLinux; then
         echo "$(ifconfig | grep "inet" | awk '{print $2}' | cut -d/ -f1 | head -n 1)"
