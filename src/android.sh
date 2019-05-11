@@ -4,7 +4,11 @@ source "./src/constants.sh"
 source "./src/helpers.sh"
 
 function hasJavaInMac() {
-    hasCurl && [[ "$(java -version 2>&1 | grep -ic "1.8")" -ne "0" ]]
+    hasCurl && [[ "$(java -version 2>&1 | grep -ic "java version \"1.8")" -ne "0" ]]
+}
+
+function hasJavaInLinux() {
+    hasCurl && [[ "$(java -version 2>&1 | grep -ic "java version \"1.8")" -ne "0" ]]
 }
 
 function hasAndroidSDKInMac() {
@@ -18,10 +22,6 @@ function hasAndroidStudioInMac() {
 
 function hasAndroidInMac() {
     hasJavaInMac && hasAndroidStudioInMac && hasAndroidSDKInMac
-}
-
-function hasJavaInLinux() {
-    [[ "$(apt list oracle-java8-installer 2>&1 | grep -ic "installed")" -ne "0" ]]
 }
 
 function hasAndroidStudioInLinux() {
@@ -45,23 +45,34 @@ function installJavaInMac() {
     javaGDriveId="1HEqM3yZp4BtaeO-DiIG3YRtVRrpOu1tL"
     javaGDriveExtension="dmg"
     javaGDriveFilename="${javaGDriveId}.${javaGDriveExtension}"
+    javaGDriveOutput="/tmp/${javaGDriveFilename}"
 
-    if [[ ! -f "/tmp/${javaGDriveFilename}" ]]; then
-        downloadFromGoogleDrive ${javaGDriveId} ${javaGDriveExtension}
+    if [[ ! -f ${javaGDriveOutput} ]]; then
+        downloadFromGoogleDrive ${javaGDriveId} ${javaGDriveExtension} ${javaGDriveOutput}
     fi
 
-    sudo hdiutil attach /tmp/${javaGDriveFilename}
+    sudo hdiutil attach ${javaGDriveOutput}
     sudo installer -package /Volumes/JDK\ 8\ Update\ 211/JDK\ 8\ Update\ 211.pkg -target /
     sudo hdiutil detach /Volumes/JDK\ 8\ Update\ 211
 }
 
 function installJavaInLinux() {
     printf "${BLUE}[-] Installing Java 8...${NC}\n"
-    sudo dpkg --configure -a
-    yes | sudo add-apt-repository ppa:webupd8team/java
-    yes | sudo apt update
-    sudo apt install oracle-java8-installer
-    yes | sudo apt install oracle-java8-set-default
+    if ! hasCurl; then
+        setupCurl
+    fi
+
+    javaGDriveId="1BXCxKFOwtGQit3cbefRmEj5VG_R62o2g"
+    javaGDriveExtension="tar.gz"
+    javaGDriveFilename="${javaGDriveId}.${javaGDriveExtension}"
+    javaGDriveOutput="/tmp/${javaGDriveFilename}"
+
+    if [[ ! -f ${javaGDriveOutput} ]]; then
+        downloadFromGoogleDrive ${javaGDriveId} ${javaGDriveExtension} ${javaGDriveOutput}
+    fi
+
+    sudo mkdir /usr/lib/jvm
+    sudo tar xvzf ${javaGDriveOutput} -C /usr/lib/jvm
 }
 
 function installAndroidSDKInMac() {
@@ -107,7 +118,8 @@ function hasAndroidConfigInMac() {
     [[ "$(cat ~/.envrc | grep -ic "${EXPORT_ANDROID_HOME_MAC}")" -ne "0" ]] &&
         [[ "$(cat ~/.envrc | grep -ic "${EXPORT_ANDROID_PATH_MAC}")" -ne "0" ]] &&
         [[ "$(cat ~/.envrc | grep -ic "${EXPORT_ANDROID_SDK_MAC}")" -ne "0" ]] &&
-        [[ "$(cat ~/.envrc | grep -ic "export JAVA_HOME=$(/usr/libexec/java_home -v1.8)")" -ne "0" ]]
+        [[ "$(cat ~/.envrc | grep -ic "export JAVA_HOME=$(/usr/libexec/java_home -v1.8)")" -ne "0" ]] &&
+        [[ "$(cat ~/.envrc | grep -ic "export PATH=\$PATH:\$JAVA_HOME/bin")" -ne "0" ]]
 }
 
 function configAndroidInMac() {
@@ -120,6 +132,9 @@ function configAndroidInMac() {
     tryPrintNewLine ~/.envrc
     echo "export JAVA_HOME=$(/usr/libexec/java_home -v1.8)" >>~/.envrc
     export JAVA_HOME=$(/usr/libexec/java_home -v1.8)
+
+    echo "export PATH=\$PATH:\$JAVA_HOME/bin" >>~/.envrc
+    export PATH=$PATH:$JAVA_HOME/bin
 
     echo "${EXPORT_ANDROID_HOME_MAC}" >>~/.envrc
     echo "${EXPORT_ANDROID_PATH_MAC}" >>~/.envrc
@@ -141,12 +156,23 @@ function hasAndroidConfigInLinux() {
     [[ "$(cat ~/.envrc | grep -ic "${EXPORT_ANDROID_HOME_LINUX}")" -ne "0" ]] &&
         [[ "$(cat ~/.envrc | grep -ic "${EXPORT_ANDROID_PATH_LINUX}")" -ne "0" ]] &&
         [[ "$(cat ~/.envrc | grep -ic "${EXPORT_ANDROID_SDK_LINUX}")" -ne "0" ]] &&
-        [[ "$(cat ~/.envrc | grep -ic "export JAVA_HOME=$(/usr/libexec/java_home -v1.8)")" -ne "0" ]]
+        [[ "$(cat ~/.envrc | grep -ic "export JAVA_HOME=/usr/lib/jvm/jdk1.8.0_211")" -ne "0" ]] &&
+        [[ "$(cat ~/.envrc | grep -ic "export PATH=\$PATH:\$JAVA_HOME/bin")" -ne "0" ]]
 }
 
 function configAndroidInLinux() {
     printf "${BLUE}[-] Configuring Android...${NC}\n"
+
+    sedi '/JAVA_HOME/d' ~/.envrc
+    sedi '/ANDROID_HOME/d' ~/.envrc
+    sedi '/ANDROID_SDK_ROOT/d' ~/.envrc
+
     tryPrintNewLine ~/.envrc
+    echo "export JAVA_HOME=/usr/lib/jvm/jdk1.8.0_211" >>~/.envrc
+    export JAVA_HOME=/usr/lib/jvm/jdk1.8.0_211
+
+    echo "export PATH=\$PATH:\$JAVA_HOME/bin" >>~/.envrc
+    export PATH=$PATH:$JAVA_HOME/bin
 
     echo "${EXPORT_ANDROID_HOME_LINUX}" >>~/.envrc
     echo "${EXPORT_ANDROID_PATH_LINUX}" >>~/.envrc
@@ -208,16 +234,14 @@ function setupAndroidSDK() {
 
 function uninstallJavaInMac() {
     printf "${BLUE}[-] Uninstalling Java 8...${NC}\n"
-    rm -rf ~/Library/Java
-    rm -fr /Library/Internet\ Plug-Ins/JavaAppletPlugin.plugin
-    rm -fr /Library/PreferencePanes/JavaControlPanel.prefPane
-    rm -fr ~/Library/Application\ Support/Oracle/Java
+    sudo rm -rf "$(/usr/libexec/java_home -v1.8)"
+    sedi '/JAVA_HOME/d' ~/.envrc
 }
 
 function uninstallJavaInLinux() {
     printf "${BLUE}[-] Uninstalling Java 8...${NC}\n"
-    yes | sudo apt remove oracle-java8-set-default --purge
-    yes | sudo apt remove oracle-java8-installer --purge
+    sudo rm -rf /usr/lib/jvm/jdk1.8.0_211
+    sedi '/JAVA_HOME/d' ~/.envrc
 }
 
 function uninstallAndroidSDKInMac() {
