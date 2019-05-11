@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
-# @freak2geek/scripts - 1.9.0
+# @freak2geek/scripts - 1.9.1
 
 
 
 function hasJavaInMac() {
-    [[ "$(brew cask list 2>&1 | grep -ic "java8")" -ne "0" ]]
+    hasCurl && [[ "$(java -version 2>&1 | grep -ic "1.8")" -ne "0" ]]
 }
 
 function hasAndroidSDKInMac() {
@@ -38,8 +38,21 @@ function hasAndroidInLinux() {
 
 function installJavaInMac() {
     printf "${BLUE}[-] Installing Java 8...${NC}\n"
-    brew tap homebrew/cask-versions
-    brew cask install homebrew/cask-versions/java8
+    if ! hasCurl; then
+        setupCurl
+    fi
+
+    javaGDriveId="1HEqM3yZp4BtaeO-DiIG3YRtVRrpOu1tL"
+    javaGDriveExtension="dmg"
+    javaGDriveFilename="${javaGDriveId}.${javaGDriveExtension}"
+
+    if [[ ! -f "/tmp/${javaGDriveFilename}" ]]; then
+        downloadFromGoogleDrive ${javaGDriveId} ${javaGDriveExtension}
+    fi
+
+    sudo hdiutil attach /tmp/${javaGDriveFilename}
+    sudo installer -package /Volumes/JDK\ 8\ Update\ 211/JDK\ 8\ Update\ 211.pkg -target /
+    sudo hdiutil detach /Volumes/JDK\ 8\ Update\ 211
 }
 
 function installJavaInLinux() {
@@ -93,13 +106,18 @@ EXPORT_ANDROID_SDK_MAC="export ANDROID_SDK_ROOT=\"\$ANDROID_HOME\""
 function hasAndroidConfigInMac() {
     [[ "$(cat ~/.envrc | grep -ic "${EXPORT_ANDROID_HOME_MAC}")" -ne "0" ]] &&
         [[ "$(cat ~/.envrc | grep -ic "${EXPORT_ANDROID_PATH_MAC}")" -ne "0" ]] &&
-        [[ "$(cat ~/.envrc | grep -ic "${EXPORT_ANDROID_SDK_MAC}")" -ne "0" ]]
+        [[ "$(cat ~/.envrc | grep -ic "${EXPORT_ANDROID_SDK_MAC}")" -ne "0" ]] &&
+        [[ "$(cat ~/.envrc | grep -ic "export JAVA_HOME=$(/usr/libexec/java_home -v1.8)")" -ne "0" ]]
 }
 
 function configAndroidInMac() {
     printf "${BLUE}[-] Configuring Android...${NC}\n"
-    tryPrintNewLine ~/.envrc
 
+    sedi '/JAVA_HOME/d' ~/.envrc
+    sedi '/ANDROID_HOME/d' ~/.envrc
+    sedi '/ANDROID_SDK_ROOT/d' ~/.envrc
+
+    tryPrintNewLine ~/.envrc
     echo "export JAVA_HOME=$(/usr/libexec/java_home -v1.8)" >>~/.envrc
     export JAVA_HOME=$(/usr/libexec/java_home -v1.8)
 
@@ -122,7 +140,8 @@ EXPORT_ANDROID_SDK_LINUX="export ANDROID_SDK_ROOT=\"\$ANDROID_HOME\""
 function hasAndroidConfigInLinux() {
     [[ "$(cat ~/.envrc | grep -ic "${EXPORT_ANDROID_HOME_LINUX}")" -ne "0" ]] &&
         [[ "$(cat ~/.envrc | grep -ic "${EXPORT_ANDROID_PATH_LINUX}")" -ne "0" ]] &&
-        [[ "$(cat ~/.envrc | grep -ic "${EXPORT_ANDROID_SDK_LINUX}")" -ne "0" ]]
+        [[ "$(cat ~/.envrc | grep -ic "${EXPORT_ANDROID_SDK_LINUX}")" -ne "0" ]] &&
+        [[ "$(cat ~/.envrc | grep -ic "export JAVA_HOME=$(/usr/libexec/java_home -v1.8)")" -ne "0" ]]
 }
 
 function configAndroidInLinux() {
@@ -149,7 +168,7 @@ function setupAndroid() {
 
     printf "${BLUE}[-] Setting up android...${NC}\n"
 
-    if isOSX && ! hasAndroidInMac; then
+    if isOSX; then
         if ! hasJavaInMac; then
             installJavaInMac
         fi
@@ -163,7 +182,7 @@ function setupAndroid() {
         if ! hasAndroidConfigInMac; then
             configAndroidInMac
         fi
-    elif isLinux && ! hasAndroidInLinux; then
+    elif isLinux; then
         if ! hasJavaInLinux; then
             installJavaInLinux
         fi
@@ -189,7 +208,6 @@ function setupAndroidSDK() {
 
 function uninstallJavaInMac() {
     printf "${BLUE}[-] Uninstalling Java 8...${NC}\n"
-    brew cask uninstall homebrew/cask-versions/java8
     rm -rf ~/Library/Java
     rm -fr /Library/Internet\ Plug-Ins/JavaAppletPlugin.plugin
     rm -fr /Library/PreferencePanes/JavaControlPanel.prefPane
