@@ -1,6 +1,6 @@
 {
   "name": "@freak2geek/scripts",
-  "version": "1.9.3",
+  "version": "1.9.4",
   "license": "MIT",
   "devDependencies": {
     "@commitlint/cli": "^7.0.0",

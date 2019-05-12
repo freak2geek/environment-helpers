@@ -45,7 +45,10 @@ function setupMeteorYarn() {
     fi
 
     if ! hasMeteorLib yarn; then
-        [[ -d ~/.npm ]] && sudo chmod -R 777 ~/.npm
+        if [[ -d ~/.npm ]]; then
+            sudo chown -R $(whoami) ~/.npm
+            sudo chmod -R 777 ~/.npm
+        fi
         installMeteorYarn
     fi
 
