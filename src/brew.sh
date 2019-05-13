@@ -21,6 +21,13 @@ function purgeBrewOS() {
         sudo apt autoremove -y
 }
 
+function hasBrewOwnership() {
+    [[ "$(ls -l /usr/local | grep -i "sbin" | awk '{print $3}' | grep -ic "$(whoami)" )" -ne "0" ]] &&
+        [[ "$(ls -l /usr/local | grep -i "bin" | awk '{print $3}' | grep -ic "$(whoami)" )" -ne "0" ]] &&
+        [[ "$(ls -l /usr/local | grep -i "share" | awk '{print $3}' | grep -ic "$(whoami)" )" -ne "0" ]] &&
+        [[ "$(ls -l /usr/local | grep -i "opt" | awk '{print $3}' | grep -ic "$(whoami)" )" -ne "0" ]]
+}
+
 function hasLinuxBrew() {
     [[ "$(brew --version 2>&1 | grep -ic "not")" -eq "0" ]]
 }
@@ -37,12 +44,12 @@ function hasBrewUmaskConfig() {
     hasEnvrc && cat ~/.envrc | grep -icq "${BREW_UMASK}"
 }
 
-function hasBrewOwnership() {
+function hasBrewOwnershipInLinux() {
     [[ "$(ls -l /home/linuxbrew/.linuxbrew | grep -i "Homebrew" | awk '{print $3}' | grep -ic "$(whoami)" )" -ne "0" ]]
 }
 
 function hasBrewConfig() {
-    hasBrewPathConfig && hasBrewUmaskConfig && hasBrewOwnership
+    hasBrewPathConfig && hasBrewUmaskConfig && hasBrewOwnershipInLinux
 }
 
 function hasBrewByOS() {
@@ -82,7 +89,7 @@ function configBrewInLinux() {
         echo "${BREW_UMASK}" >>~/.envrc
     fi
 
-    if ! hasBrewOwnership; then
+    if ! hasBrewOwnershipInLinux; then
         sudo chown -R $(whoami) /home/linuxbrew/.linuxbrew/Homebrew
     fi
 }
@@ -114,7 +121,7 @@ function uninstallBrewInOSX() {
 }
 
 function checkBrew() {
-    if hasBrewByOS; then
+    if hasBrewByOS && hasBrewOwnership; then
         printf "${GREEN}[✔] brew${NC}\n"
     else
         printf "${RED}[x] brew${NC}\n"
@@ -122,7 +129,7 @@ function checkBrew() {
 }
 
 function setupBrew() {
-    if hasBrewByOS; then
+    if hasBrewByOS && hasBrewOwnership; then
         printf "${GREEN}[✔] Already brew${NC}\n"
         return
     fi
@@ -133,6 +140,18 @@ function setupBrew() {
         elif isOSX && ! hasOsxBrew; then
             installBrewInOSX
         fi
+    fi
+
+    if ! hasBrewOwnership; then
+        printf "${BLUE}[-] Configuring brew ownership...${NC}\n"
+        sudo mkdir -p /usr/local/sbin
+        sudo mkdir -p /usr/local/bin
+        sudo mkdir -p /usr/local/share
+        sudo mkdir -p /usr/local/opt
+        sudo chown -R $(whoami) /usr/local/sbin
+        sudo chown -R $(whoami) /usr/local/bin
+        sudo chown -R $(whoami) /usr/local/share
+        sudo chown -R $(whoami) /usr/local/opt
     fi
 
     if ! hasBrewConfig; then
