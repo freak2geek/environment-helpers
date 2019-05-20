@@ -2327,6 +2327,7 @@ function startMeteorAppInDevice() {
         setupIfconfig
     fi
 
+    loadMeteorEnv
     MOBILE_SERVER_TO=$(getLocalIp)
     meteorMobileServer="${MOBILE_SERVER_TO}:${PORT}"
     export METEOR_MOBILE_SERVER=${meteorMobileServer}
