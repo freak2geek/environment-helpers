@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# @freak2geek/scripts - 1.9.5
+# @freak2geek/scripts - 1.9.7
 
 
 
@@ -2378,22 +2378,26 @@ function addPackagesSymlinksForMeteorApp() {
 
     APP_TO=${1-${APP_TO}}
 
-    rootPackagesPath=${PROJECT_PATH}/${PACKAGES_FOLDER}
+    rootPackagesPath="${PROJECT_PATH}/${PACKAGES_FOLDER}"
     rootPackageName="@$(getNpmPackageName "${PROJECT_PATH}/package.json")"
 
-    appPath=${PROJECT_PATH}/${APPS_PATH}/${APP_TO}
-    appPackagesPath=${appPath}/${PACKAGES_FOLDER}
-    appPackagesSrcPath=${appPath}/${SRC_FOLDER}/${PACKAGES_FOLDER}
+    appPath="${PROJECT_PATH}/${APPS_PATH}/${APP_TO}"
+    appPackagesPath="${appPath}/${PACKAGES_FOLDER}"
+    appPackagesSrcPath="${appPath}/${SRC_FOLDER}/${PACKAGES_FOLDER}"
     appPackageName="@${APP_TO}"
 
     mkdir -p ${appPackagesSrcPath}
 
-    if [[ -d ${rootPackagesPath} ]] && [[ ! -L "${appPackagesSrcPath}/${rootPackageName}" ]]; then
-        ln -s "${rootPackagesPath}" "${appPackagesSrcPath}/${rootPackageName}"
+    rootPackageLink="${appPackagesSrcPath}/${rootPackageName}"
+    rm -f ${rootPackageLink}
+    if [[ -d ${rootPackagesPath} ]] && [[ ! -L ${rootPackageLink} ]]; then
+        ln -s ${rootPackagesPath} ${rootPackageLink}
         printf "${GREEN}[✔] ${rootPackageName}${NC}\n"
     fi
-    if [[ -d ${appPackagesPath} ]] && [[ ! -L "${appPackagesSrcPath}/${appPackageName}" ]]; then
-        ln -s "${appPackagesPath}" "${appPackagesSrcPath}/${appPackageName}"
+    appPackageLink="${appPackagesSrcPath}/${appPackageName}"
+    rm -f ${appPackageLink}
+    if [[ -d ${appPackagesPath} ]] && [[ ! -L ${appPackageLink} ]]; then
+        ln -s ${appPackagesPath} ${appPackageLink}
         printf "${GREEN}[✔] ${appPackageName}${NC}\n"
     fi
 }
